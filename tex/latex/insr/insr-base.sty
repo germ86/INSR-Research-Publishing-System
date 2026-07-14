@@ -10,14 +10,10 @@
 \newif\ifinsr@blindreview
 \newif\ifinsr@rtl
 \newif\ifinsr@python
-\newif\ifinsr@minted
-\newif\ifinsr@review
 \newif\ifinsr@externalize
 \DeclareOption{blindreview}{\insr@blindreviewtrue}
 \DeclareOption{rtl}{\insr@rtltrue}
 \DeclareOption{python}{\insr@pythontrue}
-\DeclareOption{minted}{\insr@mintedtrue}
-\DeclareOption{review}{\insr@reviewtrue}
 \DeclareOption{externalize}{\insr@externalizetrue}
 \ProcessOptions\relax
 
@@ -75,12 +71,6 @@
 \ifinsr@python
   \IfFileExists{pyluatex.sty}{\RequirePackage{pyluatex}}{\PackageWarning{insr-base}{pyluatex.sty not found; Python execution macros will be unavailable}}
 \fi
-\ifinsr@minted
-  \IfFileExists{minted.sty}{\RequirePackage{minted}}{\PackageWarning{insr-base}{minted.sty not found; code highlighting will be unavailable}}
-\fi
-\ifinsr@review
-  \IfFileExists{todonotes.sty}{\RequirePackage[textsize=scriptsize,colorinlistoftodos]{todonotes}}{\PackageWarning{insr-base}{todonotes.sty not found; review notes will fall back to inline markers}}
-\fi
 
 \newcommand{\INSRName}{Integrative Neuro-Somatic Recalibration}
 \newcommand{\INSRShort}{INSR}
@@ -107,9 +97,6 @@
 \newtcolorbox{insrmethod}[2][]{enhanced,breakable,colback=INSRTeal!6,colframe=INSRTeal,title=#2,fonttitle=\bfseries,coltitle=white,#1}
 
 \newcommand{\INSRReviewNote}[2][INSRTeal]{\textcolor{#1}{\textbf{[#2]}}}
-\newcommand{\INSRTodoClinical}[1]{\ifinsr@review\@ifpackageloaded{todonotes}{\todo[color=INSRTeal!20]{Clinical: #1}}{\INSRReviewNote[INSRTeal]{Clinical: #1}}\else\INSRReviewNote[INSRTeal]{Clinical: #1}\fi}
-\newcommand{\INSRTodoBiostats}[1]{\ifinsr@review\@ifpackageloaded{todonotes}{\todo[color=INSRAmber!30]{Biostats: #1}}{\INSRReviewNote[INSRAmber]{Biostats: #1}}\else\INSRReviewNote[INSRAmber]{Biostats: #1}\fi}
-\newcommand{\INSRTodoTech}[1]{\ifinsr@review\@ifpackageloaded{todonotes}{\todo[color=INSRSoftGreen!20]{Tech: #1}}{\INSRReviewNote[INSRSoftGreen]{Tech: #1}}\else\INSRReviewNote[INSRSoftGreen]{Tech: #1}\fi}
 \newcommand{\INSRFidelityCheck}[1]{\par\noindent$\square$\,#1\par}
 
 \newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
