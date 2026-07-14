@@ -29,7 +29,6 @@
 \bool_new:N \g_insr_python_bool
 \bool_new:N \g_insr_high_contrast_bool
 \seq_new:N \g_insr_author_seq
-\seq_new:N \g_insr_author_display_seq
 \seq_new:N \g_insr_institution_seq
 \seq_new:N \g_insr_logo_seq
 \tl_gset:Nn \g_insr_document_type_tl { paper }
@@ -66,8 +65,7 @@
     unknown .code:n = { \msg_warning:nnn { insr } { unknown-option } { \l_keys_key_str } }
   }
 \NewDocumentCommand \INSRSetup { m } { \keys_set:nn { insr/setup } { #1 } }
-\NewDocumentCommand \INSRAuthor { O{} m m O{} O{} } { \seq_gput_right:Nn \g_insr_author_seq { {#1}{#2}{#3}{#4}{#5} } \seq_gput_right:Nn \g_insr_author_display_seq { #2 } }
-\NewDocumentCommand \INSRAddAuthor { O{} m m O{} O{} } { \INSRAuthor[#1]{#2}{#3}[#4][#5] }
+\NewDocumentCommand \INSRAuthor { O{} m m O{} O{} } { \seq_gput_right:Nn \g_insr_author_seq { {#1}{#2}{#3}{#4}{#5} } }
 \NewDocumentCommand \INSRInstitution { O{} m O{} } { \seq_gput_right:Nn \g_insr_institution_seq { {#1}{#2}{#3} } }
 \NewDocumentCommand \INSRLogo { O{} m m } { \seq_gput_right:Nn \g_insr_logo_seq { {#1}{#2}{#3} } }
 \DeclareOption*{\msg_warning:nnn { insr } { unknown-option } { \CurrentOption }}
@@ -85,7 +83,7 @@
     { poster } { \input{adapters/insr-adapter-poster.tex} }
     { letter } { \input{adapters/insr-adapter-letter.tex} }
   }
-  { \msg_warning:nnn { insr } { unknown-document-type } { safe-paper-fallback } \tl_gset:Nn \g_insr_document_type_tl { paper } \input{adapters/insr-adapter-paper.tex} }
+  { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \input{adapters/insr-adapter-paper.tex} }
 \ExplSyntaxOff
 \RequirePackage{ifluatex}
 \ifluatex\else\ClassError{insr}{INSR requires LuaLaTeX}{Select LuaLaTeX. The ordinary build also needs Biber for references.}\fi
@@ -99,8 +97,8 @@
 \IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{TeX Gyre Pagella}}
 \IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\setsansfont{TeX Gyre Heros}}
 \IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\setmonofont{Latin Modern Mono}}
-\IfFontExistsTF{Amiri}{\babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri}}{\babelfont[arabic]{rm}{Latin Modern Roman}}
-\IfFontExistsTF{FreeSerif}{\babelfont[hebrew]{rm}[Renderer=HarfBuzz]{FreeSerif}}{\babelfont[hebrew]{rm}{Latin Modern Roman}}
+\babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri}
+\babelfont[hebrew]{rm}[Renderer=HarfBuzz]{FreeSerif}
 \RequirePackage{xcolor}
 \definecolor{INSRNavy}{HTML}{0A2342}
 \definecolor{INSRTeal}{HTML}{17A2B8}
@@ -124,7 +122,7 @@
 \RequirePackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \ExplSyntaxOn
-\tl_if_blank:NF \g_insr_bibresource_tl { \addbibresource{\g_insr_bibresource_tl} }
+\tl_if_blank:VF \g_insr_bibresource_tl { \addbibresource{\g_insr_bibresource_tl} }
 \bool_if:NT \g_insr_python_bool { \IfFileExists{pyluatex.sty}{\RequirePackage{pyluatex}}{\msg_warning:nnn { insr } { unknown-option } { pyluatex-not-installed } } }
 \hypersetup{unicode=true,colorlinks=true,linkcolor=INSRNavy,citecolor=INSRTeal,urlcolor=INSRTeal,pdftitle={\g_insr_title_tl},pdfsubject={\g_insr_pdfsubject_tl},pdfauthor={INSR Consortium}}
 \ExplSyntaxOff
@@ -137,7 +135,7 @@
 \cs_new_protected:Npn \insr_apply_title: {
   \tl_if_blank:NF \g_insr_title_tl { \title{\g_insr_title_tl} }
   \tl_if_blank:NF \g_insr_date_tl { \date{\g_insr_date_tl} }
-  \seq_if_empty:NF \g_insr_author_display_seq { \author{\seq_use:Nn \g_insr_author_display_seq { \and }} }
+  \seq_if_empty:NF \g_insr_author_seq { \author{\seq_use:Nn \g_insr_author_seq { \and }} }
 }
 \NewDocumentCommand \INSRMakeTitle {} { \insr_apply_title: \maketitle \INSRPrintLogos }
 \NewDocumentCommand \INSRPrintLogos {} { \seq_map_inline:Nn \g_insr_logo_seq { \insr_logo_render:nnn ##1 } }
