@@ -1,0 +1,20 @@
+# Generated package archives and LaTeX build output
+/dist/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.ist
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdy
+_minted-*/
+build/tikz/

@@ -1,0 +1,26 @@
+name: Build LaTeX
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: |
+            main.tex
+            examples/paper-demo.tex
+            examples/beamer-demo.tex
+            examples/manual-demo.tex
+          latexmk_use_lualatex: true
+          extra_system_packages: py3-pygments zip
+      - name: Build package archive
+        run: ./scripts/build-ctan.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: insr-latex-package
+          path: dist/insr-latex-0.1.0.zip

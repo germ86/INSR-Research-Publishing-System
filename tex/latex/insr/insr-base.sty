@@ -1,0 +1,125 @@
+% INSR base package -- shared research typography, colors and utilities.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-base}[2026/07/14 v0.1 INSR shared LaTeX framework]
+
+\RequirePackage{ifluatex}
+\ifluatex\else
+  \PackageError{insr-base}{INSR requires LuaLaTeX}{Select LuaLaTeX in Overleaf or run latexmk -lualatex locally.}
+\fi
+
+\newif\ifinsr@blindreview
+\newif\ifinsr@rtl
+\newif\ifinsr@python
+\newif\ifinsr@minted
+\newif\ifinsr@review
+\newif\ifinsr@externalize
+\DeclareOption{blindreview}{\insr@blindreviewtrue}
+\DeclareOption{rtl}{\insr@rtltrue}
+\DeclareOption{python}{\insr@pythontrue}
+\DeclareOption{minted}{\insr@mintedtrue}
+\DeclareOption{review}{\insr@reviewtrue}
+\DeclareOption{externalize}{\insr@externalizetrue}
+\ProcessOptions\relax
+
+\RequirePackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
+\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{TeX Gyre Pagella}}
+\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\setmonofont{Latin Modern Mono}}
+
+\RequirePackage{polyglossia}
+\setdefaultlanguage{english}
+\setotherlanguages{german,arabic,hebrew,french,spanish}
+\newfontfamily\arabicfont[Script=Arabic,Scale=1.05]{Amiri}
+\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}
+\ifinsr@rtl\setdefaultlanguage{arabic}\fi
+
+\RequirePackage{xcolor}
+\definecolor{INSRNavy}{HTML}{0A2342}
+\definecolor{INSRTeal}{HTML}{17A2B8}
+\definecolor{INSRAmber}{HTML}{FFC107}
+\definecolor{INSRSlate}{HTML}{F8F9FA}
+\definecolor{INSRGraphite}{HTML}{343A40}
+\definecolor{INSRSoftRed}{HTML}{D9534F}
+\definecolor{INSRSoftGreen}{HTML}{2E7D32}
+\definecolor{INSRViolet}{HTML}{6F42C1}
+
+\RequirePackage{microtype}
+\RequirePackage{graphicx}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{longtable}
+\RequirePackage{array}
+\@ifclassloaded{beamer}{}{\RequirePackage{enumitem}}
+\RequirePackage{amsmath,amssymb,mathtools}
+\RequirePackage{siunitx}
+\sisetup{detect-all, per-mode=symbol}
+\RequirePackage{csquotes}
+\@ifclassloaded{beamer}{}{\RequirePackage{authblk}}
+\RequirePackage[acronym,shortcuts,record=hybrid]{glossaries-extra}
+\setabbreviationstyle[acronym]{long-short}
+\RequirePackage{tikz}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\ifinsr@externalize
+  \usetikzlibrary{external}
+  \tikzexternalize[prefix=build/tikz/]
+\fi
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\RequirePackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=INSRNavy,citecolor=INSRTeal,urlcolor=INSRTeal,pdfauthor={INSR Research Consortium}}
+\RequirePackage[nameinlink,noabbrev]{cleveref}
+\RequirePackage[style=apa,backend=biber,sortcites=true,uniquename=false]{biblatex}
+
+\ifinsr@python
+  \IfFileExists{pyluatex.sty}{\RequirePackage{pyluatex}}{\PackageWarning{insr-base}{pyluatex.sty not found; Python execution macros will be unavailable}}
+\fi
+\ifinsr@minted
+  \IfFileExists{minted.sty}{\RequirePackage{minted}}{\PackageWarning{insr-base}{minted.sty not found; code highlighting will be unavailable}}
+\fi
+\ifinsr@review
+  \IfFileExists{todonotes.sty}{\RequirePackage[textsize=scriptsize,colorinlistoftodos]{todonotes}}{\PackageWarning{insr-base}{todonotes.sty not found; review notes will fall back to inline markers}}
+\fi
+
+\newcommand{\INSRName}{Integrative Neuro-Somatic Recalibration}
+\newcommand{\INSRShort}{INSR}
+\newcommand{\INSRTagline}{Precision trauma research with human-governed neuro-somatic state calibration}
+\newcommand{\INSRCorrespondence}[1]{\def\insr@correspondence{#1}}
+\newcommand{\insr@correspondence}{}
+
+\newcommand{\INSRAddAuthor}[3][]{%
+  \ifinsr@blindreview
+    \author[ ]{Anonymous Author}
+    \affil[ ]{Institution withheld for blind review}
+  \else
+    \author[#1]{#2}
+    \affil[#1]{#3}
+  \fi}
+
+\newcommand{\INSRClinicalStop}[1]{\textcolor{INSRSoftRed}{\textbf{Clinical hard-stop:} #1}}
+\newcommand{\INSRSomaticHold}[1]{\textcolor{INSRAmber}{\textbf{Somatic hold:} #1}}
+\newcommand{\INSRHumanLoop}{\textbf{Human-in-the-loop CDSS}}
+
+\newtcolorbox{insrbox}[2][]{enhanced,breakable,colback=INSRSlate,colframe=INSRNavy,title=#2,fonttitle=\bfseries,coltitle=white,#1}
+\newtcolorbox{insralert}[2][]{enhanced,breakable,colback=INSRAmber!12,colframe=INSRAmber!80!black,title=#2,fonttitle=\bfseries,coltitle=black,#1}
+\newtcolorbox{insrclinical}[2][]{enhanced,breakable,colback=INSRSoftRed!6,colframe=INSRSoftRed,title=#2,fonttitle=\bfseries,coltitle=white,#1}
+\newtcolorbox{insrmethod}[2][]{enhanced,breakable,colback=INSRTeal!6,colframe=INSRTeal,title=#2,fonttitle=\bfseries,coltitle=white,#1}
+
+\newcommand{\INSRReviewNote}[2][INSRTeal]{\textcolor{#1}{\textbf{[#2]}}}
+\newcommand{\INSRTodoClinical}[1]{\ifinsr@review\@ifpackageloaded{todonotes}{\todo[color=INSRTeal!20]{Clinical: #1}}{\INSRReviewNote[INSRTeal]{Clinical: #1}}\else\INSRReviewNote[INSRTeal]{Clinical: #1}\fi}
+\newcommand{\INSRTodoBiostats}[1]{\ifinsr@review\@ifpackageloaded{todonotes}{\todo[color=INSRAmber!30]{Biostats: #1}}{\INSRReviewNote[INSRAmber]{Biostats: #1}}\else\INSRReviewNote[INSRAmber]{Biostats: #1}\fi}
+\newcommand{\INSRTodoTech}[1]{\ifinsr@review\@ifpackageloaded{todonotes}{\todo[color=INSRSoftGreen!20]{Tech: #1}}{\INSRReviewNote[INSRSoftGreen]{Tech: #1}}\else\INSRReviewNote[INSRSoftGreen]{Tech: #1}\fi}
+\newcommand{\INSRFidelityCheck}[1]{\par\noindent$\square$\,#1\par}
+
+\newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
+\newacronym{cptsd}{C-PTSD}{Complex Posttraumatic Stress Disorder}
+\newacronym{dso}{DSO}{Disturbances in Self-Organization}
+\newacronym{hrv}{HRV}{heart-rate variability}
+\newacronym{rmssd}{RMSSD}{root mean square of successive differences}
+\newacronym{eda}{EDA}{electrodermal activity}
+\newacronym{tdcs}{tDCS}{transcranial direct-current stimulation}
+\newacronym{cdss}{CDSS}{Clinical Decision Support System}
+\newacronym{mdr}{MDR}{Medical Device Regulation}
+\newacronym{itq}{ITQ}{International Trauma Questionnaire}
+\newacronym{caps}{CAPS-5}{Clinician-Administered PTSD Scale for DSM-5}
