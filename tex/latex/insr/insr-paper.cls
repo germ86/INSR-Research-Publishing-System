@@ -22,4 +22,4 @@
 \newenvironment{INSRStructuredAbstract}{\begin{insrbox}{Structured abstract}\begin{description}[leftmargin=2.8cm,style=nextline]}{\end{description}\end{insrbox}}
 \renewcommand{\INSRKeywords}[1]{\par\noindent\textbf{Keywords:} #1\par}
 \newcommand{\INSRFunding}[1]{\ifinsr@blindreview\else\section*{Funding}#1\fi}
-\newcommand{\INSRAcknowledgements}[1]{\ifinsr@blindreview\else\section*{Acknowledgements}#1\fi}
+\renewcommand{\INSRAcknowledgements}[1]{\ifinsr@blindreview\else\section*{Acknowledgements}#1\fi}
