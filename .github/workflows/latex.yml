@@ -4,17 +4,68 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+env:
+  TEXINPUTS: .//:./tex/latex/insr//:./examples//:
+  BIBINPUTS: .//:
+
 jobs:
-  build:
+  static-validation:
+    name: Static repository validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run static validators
+        run: ./tests/run-tests.sh --static-only
+
+  root-smoke:
+    name: Root smoke document
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_use_lualatex: true
+          extra_system_packages: py3-pygments
+
+  paper:
+    name: Paper class examples
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
         with:
           root_file: |
-            main.tex
             examples/paper-demo.tex
+            examples/minimal-english-paper.tex
+          latexmk_use_lualatex: true
+          extra_system_packages: py3-pygments
+
+  beamer:
+    name: Beamer class examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: |
             examples/beamer-demo.tex
+            examples/german-scientific-presentation.tex
+          latexmk_use_lualatex: true
+          extra_system_packages: py3-pygments
+
+  manual:
+    name: Manual class examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: |
             examples/manual-demo.tex
+            doc/latex/insr/insr-latex-manual.tex
           latexmk_use_lualatex: true
           extra_system_packages: py3-pygments
