@@ -11,10 +11,14 @@
 \newif\ifinsr@rtl
 \newif\ifinsr@python
 \newif\ifinsr@externalize
+\newif\ifinsr@minted
+\newif\ifinsr@review
 \DeclareOption{blindreview}{\insr@blindreviewtrue}
 \DeclareOption{rtl}{\insr@rtltrue}
 \DeclareOption{python}{\insr@pythontrue}
 \DeclareOption{externalize}{\insr@externalizetrue}
+\DeclareOption{minted}{\insr@mintedtrue}
+\DeclareOption{review}{\insr@reviewtrue}
 \ProcessOptions\relax
 
 \RequirePackage{fontspec}
@@ -71,6 +75,12 @@
 \ifinsr@python
   \IfFileExists{pyluatex.sty}{\RequirePackage{pyluatex}}{\PackageWarning{insr-base}{pyluatex.sty not found; Python execution macros will be unavailable}}
 \fi
+\ifinsr@minted
+  \IfFileExists{minted.sty}{\RequirePackage{minted}}{\PackageWarning{insr-base}{minted.sty not found; code highlighting will be unavailable}}
+\fi
+\ifinsr@review
+  \IfFileExists{todonotes.sty}{\RequirePackage{xargs}\RequirePackage{todonotes}}{\PackageWarning{insr-base}{todonotes.sty not found; review todo commands will fall back to inline notes}}
+\fi
 
 \newcommand{\INSRName}{Integrative Neuro-Somatic Recalibration}
 \newcommand{\INSRShort}{INSR}
@@ -97,6 +107,17 @@
 \newtcolorbox{insrmethod}[2][]{enhanced,breakable,colback=INSRTeal!6,colframe=INSRTeal,title=#2,fonttitle=\bfseries,coltitle=white,#1}
 
 \newcommand{\INSRReviewNote}[2][INSRTeal]{\textcolor{#1}{\textbf{[#2]}}}
+\makeatletter
+\@ifpackageloaded{todonotes}{%
+  \newcommandx{\INSRTodoClinical}[2][1=]{\todo[linecolor=INSRSoftRed,backgroundcolor=INSRSoftRed!12,bordercolor=INSRSoftRed,#1]{Clinical: #2}}%
+  \newcommandx{\INSRTodoBiostats}[2][1=]{\todo[linecolor=INSRTeal,backgroundcolor=INSRTeal!12,bordercolor=INSRTeal,#1]{Biostats: #2}}%
+  \newcommandx{\INSRTodoTech}[2][1=]{\todo[linecolor=INSRViolet,backgroundcolor=INSRViolet!12,bordercolor=INSRViolet,#1]{Tech: #2}}%
+}{%
+  \newcommand{\INSRTodoClinical}[2][]{\INSRReviewNote[INSRSoftRed]{Clinical: #2}}%
+  \newcommand{\INSRTodoBiostats}[2][]{\INSRReviewNote[INSRTeal]{Biostats: #2}}%
+  \newcommand{\INSRTodoTech}[2][]{\INSRReviewNote[INSRViolet]{Tech: #2}}%
+}
+\makeatother
 \newcommand{\INSRFidelityCheck}[1]{\par\noindent$\square$\,#1\par}
 
 \newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
