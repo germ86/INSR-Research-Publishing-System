@@ -1,0 +1,7 @@
+% INSR typography preset: noto
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\setmainfont{TeX Gyre Pagella}}
+\IfFontExistsTF{Noto Sans}{\setsansfont{Noto Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Noto Sans Mono}{\setmonofont{Noto Sans Mono}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}}
+\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}

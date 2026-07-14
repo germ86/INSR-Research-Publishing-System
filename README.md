@@ -2,6 +2,17 @@
 
 A modular LuaLaTeX framework for the Integrative Neuro-Somatic Recalibration (INSR) research program. It supports scientific papers, Beamer presentations and clinical manuals with a shared corporate design, multilingual LTR/RTL typesetting, multi-author affiliation handling and Overleaf/GitHub workflows.
 
+
+## INSR v4.0 public entry model
+
+The production entry architecture is:
+
+- one public class: `insr.cls`;
+- one public entry document: `main.tex`;
+- one authoritative configuration file: `config/project-config.tex`.
+
+Switch paper, slides, poster, book, manual or protocol output by changing `document/type` in `config/project-config.tex`, not by editing `main.tex`. Legacy classes under `tex/latex/insr/` are deprecated compatibility surfaces while the v4.0 `insr.cls` architecture becomes authoritative.
+
 ## Overleaf compatibility findings
 
 These implementation notes were checked against the current Overleaf documentation on 14 July 2026. See the Overleaf pages on [selecting a TeX Live version and compiler](https://docs.overleaf.com/getting-started/recompiling-your-project/selecting-a-tex-live-version-and-latex-compiler), [typesetting non-Latin languages](https://docs.overleaf.com/troubleshooting-and-support/typesetting-non-latin-languages), [TeX Live support](https://docs.overleaf.com/troubleshooting-and-support/tex-live) and [compile timeouts](https://docs.overleaf.com/troubleshooting-and-support/fixing-and-preventing-compile-timeouts).

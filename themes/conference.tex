@@ -1,0 +1,13 @@
+% INSR theme: conference
+\@ifclassloaded{beamer}{%
+  \usetheme{default}\usefonttheme{professionalfonts}\setbeamertemplate{navigation symbols}{}
+  \setbeamercolor{frametitle}{fg=white,bg=INSRPrimary}
+  \setbeamercolor{title}{fg=INSRPrimary}
+  \setbeamercolor{structure}{fg=INSRSecondary}
+  \setbeamercolor{block title}{fg=white,bg=INSRSecondary}
+  \setbeamercolor{block body}{fg=INSRText,bg=INSRSurfaceAlt}
+  \setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1ex,leftskip=1em]{author in head/foot}\insertshorttitle\end{beamercolorbox}\begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1ex,center]{date in head/foot}\insertframenumber/\inserttotalframenumber\end{beamercolorbox}}}
+}{%
+  \RequirePackage{fancyhdr}\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\textcolor{INSRPrimary}{\nouppercase{\leftmark}}}\fancyhead[R]{\textcolor{INSRSecondary}{INSR}}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0.4pt}
+}
+\setlength{\parskip}{0.45em}
