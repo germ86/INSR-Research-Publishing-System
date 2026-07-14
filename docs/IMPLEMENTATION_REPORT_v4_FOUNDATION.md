@@ -104,3 +104,18 @@ The reported root cause was LaTeX3 internals being parsed with normal LaTeX catc
 The Babel setup was narrowed to LuaLaTeX-safe core package options (`english`, `ngerman`) with Arabic and Hebrew registered through `\babelprovide`, avoiding legacy `inputenc`, IvriTeX and raw TeX--XeT direction primitives in the core runtime. PDF metadata is assigned through a single bridge that expands configured title, author and keywords before passing them to `hyperref`. KOMA outputs now use `scrlayer-scrpage` through themes instead of `fancyhdr`.
 
 Commands executed in this environment: `./tests/run-tests.sh --static-only`, `python3 -Werror tools/validate_project.py`, `git diff --check`, `./scripts/test.sh --compile` and `./scripts/test.sh --all`. Exit code was 0 for all commands. Full PDF page count remains unavailable because this container has no TeX Live/latexmk installation; in a TeX-enabled environment the next required command is `latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex`.
+
+## PR #20 rebase onto current main
+
+The PR branch was rebased onto the latest `origin/main` for PR #20. Conflicts were resolved semantically rather than by accepting one side wholesale:
+
+- `main.tex`: kept the v4 canonical public root and removed the invalid main-branch `insr-manual` root metadata, preserving the single-entry architecture.
+- `insr.cls`: preserved the PR runtime because it contains the latest LuaLaTeX syntax-boundary, dynamic loader, language expansion, PDF metadata and public API export fixes.
+- `config/project-config.tex`: preserved the v4 central configuration plus author/institution registry seed data.
+- `framework/adapters/*`: preserved adapter implementations with registry-backed author/institution rendering and class-safe structure.
+- `themes/*`: preserved KOMA-native `scrlayer-scrpage` theme code and Beamer-native rendering.
+- `tex/latex/insr/*.cls`: preserved thin deprecated wrappers delegating to `insr.cls`.
+- `tools/validate_project.py`: preserved the merged validator that includes legacy file checks, v4 architecture checks, runtime hardening checks and conflict-marker detection.
+- `scripts/test.*` and `tests/run-tests.sh`: preserved the local test entry points and static/compile modes.
+
+No conflict markers remain after resolution. Full local LuaLaTeX compilation still depends on TeX Live/latexmk availability.
