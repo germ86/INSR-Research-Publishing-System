@@ -9,6 +9,7 @@
 \msg_new:nnn { insr } { unknown-palette } { Unknown~palette~'#1'.~Falling~back~to~neuroclinical.~See~palettes/*.tex. }
 \msg_new:nnn { insr } { unknown-theme } { Unknown~theme~'#1'.~Falling~back~to~insr-default.~See~themes/*.tex. }
 \msg_new:nnn { insr } { unknown-font } { Unknown~font~preset~'#1'.~Falling~back~to~libertinus.~See~typography/*.tex. }
+\msg_new:nnn { insr } { unknown-key } { Unknown~configuration~key~'#1'.~Ignoring~it. }
 \msg_new:nnn { insr } { missing-slot } { Template~slot~'#1'~is~empty;~rendering~demonstrator~content. }
 \tl_new:N \g_insr_document_type_tl
 \tl_new:N \g_insr_base_class_tl
@@ -31,6 +32,21 @@
 \tl_new:N \g_insr_institution_tl
 \tl_new:N \g_insr_bibresource_tl
 \tl_new:N \g_insr_keywords_tl
+\tl_new:N \l_insr_author_id_tl
+\tl_new:N \l_insr_author_name_tl
+\tl_new:N \l_insr_author_orcid_tl
+\tl_new:N \l_insr_author_roles_tl
+\tl_new:N \l_insr_institution_id_tl
+\tl_new:N \l_insr_institution_name_tl
+\tl_new:N \l_insr_unit_id_tl
+\tl_new:N \l_insr_unit_title_tl
+\tl_new:N \l_insr_unit_outputs_tl
+\tl_new:N \l_insr_unit_full_tl
+\tl_new:N \l_insr_unit_summary_tl
+\tl_new:N \l_insr_unit_key_tl
+\tl_new:N \l_insr_unit_notes_tl
+\seq_new:N \g_insr_author_seq
+\seq_new:N \g_insr_institution_seq
 \bool_new:N \g_insr_high_contrast_bool
 \tl_gset:Nn \g_insr_document_type_tl { paper }
 \tl_gset:Nn \g_insr_density_tl { standard }
@@ -70,13 +86,75 @@
     bibliography/resource .tl_gset:N = \g_insr_bibresource_tl,
     metadata/keywords .tl_gset:N = \g_insr_keywords_tl,
     content/template .tl_gset:N = \g_insr_template_tl,
-    unknown .code:n = { \msg_warning:nnn { insr } { unknown-theme } { \l_keys_key_str } }
+    unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { \l_keys_key_str } }
   }
+
+\keys_define:nn { insr/author }
+  {
+    id .tl_set:N = \l_insr_author_id_tl,
+    name .tl_set:N = \l_insr_author_name_tl,
+    short-name .code:n = {},
+    orcid .tl_set:N = \l_insr_author_orcid_tl,
+    email .code:n = {},
+    affiliations .code:n = {},
+    corresponding .code:n = {},
+    equal-first .code:n = {},
+    equal-senior .code:n = {},
+    roles .tl_set:N = \l_insr_author_roles_tl,
+    unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { author/#1 } }
+  }
+\keys_define:nn { insr/institution }
+  {
+    id .tl_set:N = \l_insr_institution_id_tl,
+    name .tl_set:N = \l_insr_institution_name_tl,
+    short-name .code:n = {},
+    department .code:n = {},
+    city .code:n = {},
+    country .code:n = {},
+    type .code:n = {},
+    logo .code:n = {},
+    logo-dark .code:n = {},
+    url .code:n = {},
+    unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { institution/#1 } }
+  }
+\keys_define:nn { insr/content-unit }
+  {
+    id .tl_set:N = \l_insr_unit_id_tl,
+    title .tl_set:N = \l_insr_unit_title_tl,
+    outputs .tl_set:N = \l_insr_unit_outputs_tl,
+    unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { content-unit/#1 } }
+  }
+
 \NewDocumentCommand \INSRConfigure { m } { \keys_set:nn { insr } { #1 } }
 \NewDocumentCommand \INSRSetup { m } { \keys_set:nn { insr } { #1 } }
-\NewDocumentCommand \INSRAuthor { O{} m m O{} O{} } { \tl_gset:Nn \g_insr_author_tl { #2 } \tl_gset:Nn \g_insr_institution_tl { #3 } }
-\NewDocumentCommand \INSRInstitution { O{} m O{} } { \tl_gset:Nn \g_insr_institution_tl { #2 } }
+\NewDocumentCommand \INSRAddAuthor { m } { \tl_clear:N \l_insr_author_name_tl \tl_clear:N \l_insr_author_orcid_tl \tl_clear:N \l_insr_author_roles_tl \keys_set:nn { insr/author } { #1 } \seq_gput_right:Nx \g_insr_author_seq { \tl_use:N \l_insr_author_name_tl } }
+\NewDocumentCommand \INSRAddInstitution { m } { \tl_clear:N \l_insr_institution_name_tl \keys_set:nn { insr/institution } { #1 } \seq_gput_right:Nx \g_insr_institution_seq { \tl_use:N \l_insr_institution_name_tl } }
+\NewDocumentCommand \INSRAuthor { O{} m m O{} O{} } { \tl_gset:Nn \g_insr_author_tl { #2 } \tl_gset:Nn \g_insr_institution_tl { #3 } \seq_gput_right:Nn \g_insr_author_seq { #2 } }
+\NewDocumentCommand \INSRInstitution { O{} m O{} } { \tl_gset:Nn \g_insr_institution_tl { #2 } \seq_gput_right:Nn \g_insr_institution_seq { #2 } }
 \NewDocumentCommand \INSRLogo { O{} m m } { }
+\cs_new:Npn \insr_author_block: { \seq_if_empty:NTF \g_insr_author_seq { \tl_use:N \g_insr_author_tl } { \seq_use:Nn \g_insr_author_seq {,~} } }
+\cs_new:Npn \insr_institution_block: { \seq_if_empty:NTF \g_insr_institution_seq { \tl_use:N \g_insr_institution_tl } { \seq_use:Nn \g_insr_institution_seq {;~} } }
+
+% Public API commands are exported before base-class loading so that a stale
+% adapter failure cannot leave the public entry document with undefined macros.
+\DeclareRobustCommand{\INSRMakeTitle}{%
+  \ifcsname insr_adapter_make_title:\endcsname
+    \csname insr_adapter_make_title:\endcsname
+  \else
+    \ClassWarning{insr}{INSRMakeTitle called before adapter finalisation; using emergency title renderer}%
+    \begin{center}\Large\bfseries INSR Scientific Publishing Platform\end{center}%
+  \fi}
+\DeclareRobustCommand{\INSRRenderDocument}{%
+  \ifcsname insr_template_render:\endcsname
+    \csname insr_template_render:\endcsname
+  \else
+    \ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}%
+    \par\noindent INSR template renderer unavailable. Check the class banner for the loaded insr.cls version.\par
+  \fi}
+\DeclareRobustCommand{\INSRPublicAPIBanner}{%
+  \typeout{INSR v4 public API exports: \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}%
+}
+
 \InputIfFileExists{config/project-config.tex}{}{\msg_warning:nn { insr } { missing-config }}
 \DeclareOption*{\keys_set:nn { insr } { \CurrentOption }}
 \ProcessOptions\relax
@@ -108,6 +186,8 @@
     { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
 }
 \insr_resolve_document_type:
+\INSRPublicAPIBanner
+\typeout{INSR~v4~class: root insr.cls version 2026/07/14 v4.0; git commit unavailable without shell escape}
 \typeout{INSR~v4~bootstrap:~type=\tl_use:N\g_insr_document_type_tl,~base=\tl_use:N\g_insr_base_class_tl,~adapter=\tl_use:N\g_insr_adapter_tl,~theme=\tl_use:N\g_insr_theme_tl,~palette=\tl_use:N\g_insr_palette_tl,~font=\tl_use:N\g_insr_font_tl,~language=\tl_use:N\g_insr_language_tl,~direction=\tl_use:N\g_insr_direction_tl,~profile=\tl_use:N\g_insr_build_profile_tl}
 \exp_args:NV \LoadClass \g_insr_base_class_tl
 \ExplSyntaxOff
@@ -115,7 +195,7 @@
 \RequirePackage{ifluatex}
 \ifluatex\else\ClassError{insr}{INSR requires LuaLaTeX}{Select LuaLaTeX in Overleaf or run latexmk -lualatex locally.}\fi
 \RequirePackage{fontspec}
-\RequirePackage[bidi=basic,english,ngerman,arabic,hebrew]{babel}
+\RequirePackage[english,ngerman]{babel}
 \babelprovide[import,main]{english}
 \babelprovide[import]{ngerman}
 \babelprovide[import]{arabic}
@@ -133,16 +213,52 @@
 \RequirePackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \@ifclassloaded{beamer}{}{\RequirePackage[a4paper,margin=2.7cm]{geometry}}
+
 \ExplSyntaxOn
-\tl_if_blank:VF \g_insr_bibresource_tl { \addbibresource{\g_insr_bibresource_tl} }
-\file_if_exist_input:nF { typography/\tl_use:N\g_insr_font_tl.tex } { \msg_warning:nnx { insr } { unknown-font } { \tl_use:N\g_insr_font_tl } \file_input:n { typography/libertinus.tex } }
-\file_if_exist_input:nF { palettes/\tl_use:N\g_insr_palette_tl.tex } { \msg_warning:nnx { insr } { unknown-palette } { \tl_use:N\g_insr_palette_tl } \file_input:n { palettes/neuroclinical.tex } }
+\cs_generate_variant:Nn \file_if_exist:nTF { V }
+\cs_generate_variant:Nn \file_input:n { V }
+\tl_new:N \l__insr_runtime_file_tl
+\tl_new:N \l__insr_pdf_title_tl
+\tl_new:N \l__insr_pdf_author_tl
+\tl_new:N \l__insr_pdf_keywords_tl
+\cs_new_protected:Npn \__insr_load_file_with_fallback:nnn #1#2#3
+  {
+    \tl_set:Nx \l__insr_runtime_file_tl { #1 }
+    \typeout{INSR~#2:~\tl_use:N \l__insr_runtime_file_tl}
+    \file_if_exist:VTF \l__insr_runtime_file_tl
+      { \file_input:V \l__insr_runtime_file_tl }
+      { #3 }
+  }
+\cs_new_protected:Npn \__insr_load_typography:
+  { \__insr_load_file_with_fallback:nnn { typography/\tl_use:N\g_insr_font_tl.tex } { typography } { \msg_warning:nnx { insr } { unknown-font } { \tl_use:N\g_insr_font_tl } \file_input:n { typography/libertinus.tex } } }
+\cs_new_protected:Npn \__insr_load_palette:
+  { \__insr_load_file_with_fallback:nnn { palettes/\tl_use:N\g_insr_palette_tl.tex } { palette } { \msg_warning:nnx { insr } { unknown-palette } { \tl_use:N\g_insr_palette_tl } \file_input:n { palettes/neuroclinical.tex } } }
+\cs_new_protected:Npn \__insr_load_theme:
+  { \__insr_load_file_with_fallback:nnn { themes/\tl_use:N\g_insr_theme_tl.tex } { theme } { \msg_warning:nnx { insr } { unknown-theme } { \tl_use:N\g_insr_theme_tl } \file_input:n { themes/insr-default.tex } } }
+\cs_new_protected:Npn \__insr_load_profile:
+  { \__insr_load_file_with_fallback:nnn { profiles/documents/\tl_use:N\g_insr_document_type_tl.profile.tex } { profile } { \msg_warning:nnn { insr } { missing-slot } { profile } } }
+\cs_new_protected:Npn \__insr_load_adapter:
+  { \__insr_load_file_with_fallback:nnn { framework/adapters/\tl_use:N\g_insr_adapter_tl.tex } { adapter } { \msg_warning:nnn { insr } { missing-slot } { adapter } } }
+\cs_new_protected:Npn \__insr_select_language:
+  { \exp_args:NV \selectlanguage \g_insr_language_tl }
+\cs_new_protected:Npn \__insr_setup_bibliography:
+  { \tl_if_blank:VF \g_insr_bibresource_tl { \exp_args:NV \addbibresource \g_insr_bibresource_tl } }
+\cs_new_protected:Npn \__insr_setup_pdf_metadata:
+  {
+    \tl_set_eq:NN \l__insr_pdf_title_tl \g_insr_title_tl
+    \tl_set_eq:NN \l__insr_pdf_author_tl \g_insr_author_tl
+    \tl_set_eq:NN \l__insr_pdf_keywords_tl \g_insr_keywords_tl
+    \exp_args:Nx \hypersetup { unicode=true,colorlinks=true,linkcolor=INSRLink,citecolor=INSRLink,urlcolor=INSRLink,pdftitle={\tl_use:N \l__insr_pdf_title_tl},pdfauthor={\tl_use:N \l__insr_pdf_author_tl},pdfkeywords={\tl_use:N \l__insr_pdf_keywords_tl} }
+  }
+\__insr_setup_bibliography:
+\__insr_load_typography:
+\__insr_load_palette:
 \bool_if:NT \g_insr_high_contrast_bool { \file_input:n { palettes/high-contrast.tex } }
-\file_if_exist_input:nF { themes/\tl_use:N\g_insr_theme_tl.tex } { \msg_warning:nnx { insr } { unknown-theme } { \tl_use:N\g_insr_theme_tl } \file_input:n { themes/insr-default.tex } }
-\file_if_exist_input:n { profiles/documents/\tl_use:N\g_insr_document_type_tl.profile.tex }
-\file_if_exist_input:n { framework/adapters/\tl_use:N\g_insr_adapter_tl.tex }
-\selectlanguage{\g_insr_language_tl}
-\hypersetup{unicode=true,colorlinks=true,linkcolor=INSRLink,citecolor=INSRLink,urlcolor=INSRLink,pdftitle={\g_insr_title_tl},pdfauthor={\g_insr_author_tl}}
+\__insr_load_theme:
+\__insr_load_profile:
+\__insr_load_adapter:
+\__insr_select_language:
+\__insr_setup_pdf_metadata:
 \ExplSyntaxOff
 
 \newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
@@ -152,8 +268,7 @@
 
 \ExplSyntaxOn
 \NewDocumentCommand \INSRShowResolvedConfiguration {} {\par\small\noindent\textbf{INSR configuration:}~type=\tl_use:N\g_insr_document_type_tl;~base=\tl_use:N\g_insr_base_class_tl;~adapter=\tl_use:N\g_insr_adapter_tl;~template=\tl_use:N\g_insr_template_tl;~theme=\tl_use:N\g_insr_theme_tl;~palette=\tl_use:N\g_insr_palette_tl;~typography=\tl_use:N\g_insr_font_tl;~language=\tl_use:N\g_insr_language_tl;~direction=\tl_use:N\g_insr_direction_tl;~build=\tl_use:N\g_insr_build_profile_tl.\par}
-\NewDocumentCommand \INSRMakeTitle {} { \insr_adapter_make_title: }
-\NewDocumentCommand \INSRRenderDocument {} { \insr_template_render: }
+% \INSRMakeTitle and \INSRRenderDocument are declared before \LoadClass and dispatch dynamically.
 \NewDocumentCommand \INSRPart { m } { \insr_adapter_part:n {#1} }
 \NewDocumentCommand \INSRChapter { m } { \insr_adapter_chapter:n {#1} }
 \NewDocumentCommand \INSRSection { m } { \insr_adapter_section:n {#1} }
@@ -184,24 +299,39 @@
 \newenvironment{SafetyBox}{\begin{tcolorbox}[colback=INSRSurfaceAlt,colframe=INSRSafety,title=Safety]}{\end{tcolorbox}}
 \newenvironment{KeyPoint}{\begin{tcolorbox}[colback=INSRSurfaceAlt,colframe=INSRAccent,title=Key point]}{\end{tcolorbox}}
 \ExplSyntaxOn
+\cs_generate_variant:Nn \clist_if_in:NnTF { NV }
+\cs_generate_variant:Nn \clist_if_in:nnT { nV }
+\cs_generate_variant:Nn \clist_if_in:nnF { nV }
 \cs_new_protected:Npn \insr_template_render: {
-  \@ifclassloaded{beamer}{\insr_template_render_beamer:}{\insr_template_render_text:}
-}
-\cs_new_protected:Npn \insr_template_render_text: {
-  \INSRChapter{Overview}
-  \begin{ResearchNote}\ResearchQuestion{How can INSR maintain one source while producing class-safe scientific outputs?}\end{ResearchNote}
-  \Objective{Demonstrate the configured document profile, theme, palette and typography preset.}
-  \Method{The v4.0 runtime resolves document type before loading a base class, then applies adapters and design tokens.}
-  \KeyFinding{Changing \texttt{config/project-config.tex} changes the output without editing \texttt{main.tex}.}
-  \begin{EvidenceBlock}Semantic components use design tokens rather than raw theme colours.\end{EvidenceBlock}
-  \SafetyStatement{Clinical and protocol documents preserve explicit safety labels in addition to colour.}
+  \InputIfFileExists{content/manifest.tex}{}{\ClassWarning{insr}{content/manifest.tex missing; no content rendered}}
   \INSRPrintBibliography
 }
-\cs_new_protected:Npn \insr_template_render_beamer: {
-  \begin{frame}{Overview}\ResearchQuestion{How can INSR maintain one source while producing class-safe scientific outputs?}\Objective{Demonstrate the configured document profile, theme, palette and typography preset.}\end{frame}
-  \begin{frame}{Adapter-safe structure}\KeyFinding{\texttt{main.tex} never changes; the selected adapter comes from configuration.}\begin{EvidenceBlock}Beamer receives frames, while paper/report/book receive sectioning commands.\end{EvidenceBlock}\end{frame}
-  \begin{frame}{Safety}\SafetyStatement{Status information is labelled and bordered, not represented by colour alone.}\end{frame}
-  \INSRPrintBibliography
+\NewDocumentCommand \INSROnlyFor { m +m } { \clist_if_in:nVT {#1} \g_insr_document_type_tl {#2} }
+\NewDocumentCommand \INSRExceptFor { m +m } { \clist_if_in:nVF {#1} \g_insr_document_type_tl {#2} }
+\NewDocumentCommand \INSRFullText { +m } { \tl_set:Nn \l_insr_unit_full_tl {#1} }
+\NewDocumentCommand \INSRSummary { +m } { \tl_set:Nn \l_insr_unit_summary_tl {#1} }
+\NewDocumentCommand \INSRKeyMessage { +m } { \tl_set:Nn \l_insr_unit_key_tl {#1} }
+\NewDocumentCommand \INSRSpeakerNotes { +m } { \tl_set:Nn \l_insr_unit_notes_tl {#1} }
+\NewDocumentEnvironment { INSRContentUnit } { O{} +b }
+  {
+    \tl_clear:N \l_insr_unit_id_tl \tl_clear:N \l_insr_unit_title_tl \tl_clear:N \l_insr_unit_outputs_tl
+    \tl_clear:N \l_insr_unit_full_tl \tl_clear:N \l_insr_unit_summary_tl \tl_clear:N \l_insr_unit_key_tl \tl_clear:N \l_insr_unit_notes_tl
+    \keys_set:nn { insr/content-unit } { #1 } #2 \insr_content_unit_render:
+  }
+  { }
+\cs_new_protected:Npn \insr_content_unit_render: {
+  \tl_if_blank:NTF \l_insr_unit_outputs_tl { \insr_content_unit_render_selected: } { \clist_if_in:NVTF \l_insr_unit_outputs_tl \g_insr_document_type_tl { \insr_content_unit_render_selected: } { } }
+}
+\cs_new_protected:Npn \insr_content_unit_render_selected: {
+  \@ifclassloaded{beamer}{
+    \begin{frame}{\tl_use:N \l_insr_unit_title_tl}
+      \tl_if_blank:NTF \l_insr_unit_summary_tl { \tl_if_blank:NF \l_insr_unit_key_tl { \textbf{Key~message:}~\tl_use:N \l_insr_unit_key_tl } } { \tl_use:N \l_insr_unit_summary_tl }
+      \tl_if_blank:NF \l_insr_unit_key_tl { \par\medskip\alert{\tl_use:N \l_insr_unit_key_tl} }
+    \end{frame}
+  }{
+    \INSRSection{\tl_use:N \l_insr_unit_title_tl}
+    \tl_if_blank:NTF \l_insr_unit_full_tl { \tl_use:N \l_insr_unit_summary_tl } { \tl_use:N \l_insr_unit_full_tl }
+  }
 }
 \ExplSyntaxOff
 
@@ -209,9 +339,7 @@
 \NewDocumentCommand \INSRAbstract { m } { \@ifclassloaded{beamer}{\begin{frame}{Abstract}#1\end{frame}}{\begin{abstract}#1\end{abstract}} }
 \NewDocumentCommand \INSRKeywords { o } { \par\noindent\textbf{Keywords:~}\tl_use:N\g_insr_keywords_tl\par }
 \NewDocumentCommand \INSRDeclarations {} { \par\noindent\textbf{Declarations:}~No conflicts declared for the demonstrator.\par }
-\NewDocumentCommand \INSRBeginDocument {} { \selectlanguage{\g_insr_language_tl} }
-\NewDocumentCommand \INSRContentUnit { m m m m m m } { \@ifclassloaded{beamer}{\begin{frame}{#1}#4\par\medskip\alert{#5}\end{frame}}{#3\par} }
-\NewDocumentCommand \INSRKeyMessage { m } { \KeyFinding{#1} }
+\NewDocumentCommand \INSRBeginDocument {} { \csname __insr_select_language:\endcsname }
 \NewDocumentCommand \INSRNote { m } { \@ifclassloaded{beamer}{\note{#1}}{\marginpar{\scriptsize #1}} }
 \NewDocumentCommand \INSRAltFigure { O{} m m } { \begin{figure}[htbp]\centering #3\caption[#1]{#2}\end{figure} }
 \NewDocumentCommand \INSRRTL { m } { \foreignlanguage{arabic}{#1} }

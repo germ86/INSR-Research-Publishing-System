@@ -1,5 +1,5 @@
 \ExplSyntaxOn
-\cs_set_protected:Npn \insr_adapter_make_title: { \title{\tl_use:N\g_insr_title_tl} \author{\tl_use:N\g_insr_author_tl\\\tl_use:N\g_insr_institution_tl} \date{\tl_use:N\g_insr_date_tl} \maketitle \INSRShowResolvedConfiguration }
+\cs_set_protected:Npn \insr_adapter_make_title: { \title{\tl_use:N\g_insr_title_tl} \author{\insr_author_block:\\\insr_institution_block:} \date{\tl_use:N\g_insr_date_tl} \maketitle \INSRShowResolvedConfiguration }
 \cs_set_protected:Npn \insr_adapter_part:n #1 { \part{#1} }
 \cs_set_protected:Npn \insr_adapter_chapter:n #1 { \chapter{#1} }
 \cs_set_protected:Npn \insr_adapter_section:n #1 { \section{#1} }
