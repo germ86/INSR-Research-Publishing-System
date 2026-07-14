@@ -1,14 +1,19 @@
-\documentclass{insr}
+\documentclass{insr-beamer}
+\addbibresource{references.bib}
+\title{INSR Research Framework Demonstrator}
+\INSRAddAuthor[1]{INSR Research Consortium}{Independent translational research program}
+\date{14 July 2026}
 \begin{document}
-\INSRBeginDocument
-\INSRMakeTitle
-\INSRAbstract{This root document demonstrates the public \texttt{insr.cls} class, central configuration, semantic content units, bibliography integration, and accessibility-oriented figure API.}
-\INSRKeywords
-\INSRSection{Semantic single-source content}
-\INSRContentUnit{State-aware publishing}{paper,slides,protocol,manual}{The INSR Scientific Publishing Platform separates semantic content from output format. A central configuration selects paper, slides, protocol, manual, poster, or letter output without changing the public class.}{Semantic content is selected from one source.}{One class, one config, many outputs.}{Speaker or reviewer notes may be attached without changing core text.}
-\INSRKeyMessage{Ordinary Overleaf builds require LuaLaTeX and Biber only; Python tooling remains optional.}
-\INSRSection{Accessible figure example}
-\INSRAltFigure[Semantic INSR pipeline]{Semantic INSR publishing pipeline with accessible alternative text.}{\fbox{\parbox{0.72\linewidth}{INSR content $\rightarrow$ configuration $\rightarrow$ adapter $\rightarrow$ accessible PDF}}}
-\INSRDeclarations
-\INSRPrintBibliography
+\maketitle
+\begin{abstract}
+This root document validates the Overleaf-compatible INSR paper class with multilingual, acronym, bibliography and corporate-design defaults.
+\end{abstract}
+\INSRKeywords{C-PTSD; clinical decision support; HRV; state detection; trauma research}
+\section{Purpose}
+\gls{insr} is designed as a modular \gls{cdss} research framework with human-governed decision support, multilingual typesetting and reproducible bibliography handling. The neurobiological rationale can cite the neurovisceral integration model \parencite{thayer2000neurovisceral}.
+\begin{insrmethod}{Operational principle}
+State recommendations must remain assistive: \INSRHumanLoop{} semantics preserve clinical accountability.
+\end{insrmethod}
+\printglossary[type=\acronymtype]
+\printbibliography
 \end{document}

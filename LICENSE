@@ -2,7 +2,16 @@ LaTeX Project Public License, Version 1.3c
 
 Copyright (c) 2026 INSR Research Consortium
 
-This work may be distributed and/or modified under the conditions of the LaTeX Project Public License, either version 1.3c of this license or any later version.
+This work may be distributed and/or modified under the conditions of the
+LaTeX Project Public License, either version 1.3c of this license or, at your
+option, any later version. The latest version of this license is available at
+
+  https://www.latex-project.org/lppl.txt
 
 This work has the LPPL maintenance status `maintained'.
-The Current Maintainer is the INSR Research Consortium.
+
+The Current Maintainer of this work is the INSR Research Consortium.
+
+This work consists of the files in tex/latex/insr, the documentation in
+README.md and doc/latex/insr, the examples in examples, build.lua, latexmkrc,
+and supporting repository metadata.

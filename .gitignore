@@ -1,3 +1,4 @@
+# Generated package archives and LaTeX build output
 /dist/
 *.aux
 *.bbl
@@ -11,9 +12,9 @@
 *.ist
 *.log
 *.out
-*.pdf
 *.run.xml
 *.synctex.gz
 *.toc
 *.xdy
-__pycache__/
+_minted-*/
+build/tikz/
