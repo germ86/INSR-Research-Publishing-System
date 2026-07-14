@@ -87,15 +87,26 @@
 \newcommand{\INSRTagline}{Precision trauma research with human-governed neuro-somatic state calibration}
 \newcommand{\INSRCorrespondence}[1]{\def\insr@correspondence{#1}}
 \newcommand{\insr@correspondence}{}
+\newcommand{\INSRKeywords}[1]{\par\noindent\textbf{Keywords:} #1\par}
 
 \newcommand{\INSRAddAuthor}[3][]{%
-  \ifinsr@blindreview
-    \author[ ]{Anonymous Author}
-    \affil[ ]{Institution withheld for blind review}
-  \else
-    \author[#1]{#2}
-    \affil[#1]{#3}
-  \fi}
+  \@ifclassloaded{beamer}{%
+    \ifinsr@blindreview
+      \author{Anonymous Author}%
+      \institute{Institution withheld for blind review}%
+    \else
+      \if\relax\detokenize{#1}\relax\author{#2}\else\author[#1]{#2}\fi
+      \institute{#3}%
+    \fi
+  }{%
+    \ifinsr@blindreview
+      \author[ ]{Anonymous Author}%
+      \affil[ ]{Institution withheld for blind review}%
+    \else
+      \author[#1]{#2}%
+      \affil[#1]{#3}%
+    \fi
+  }}
 
 \newcommand{\INSRClinicalStop}[1]{\textcolor{INSRSoftRed}{\textbf{Clinical hard-stop:} #1}}
 \newcommand{\INSRSomaticHold}[1]{\textcolor{INSRAmber}{\textbf{Somatic hold:} #1}}
