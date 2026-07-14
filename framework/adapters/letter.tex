@@ -1,10 +1,10 @@
 \ExplSyntaxOn
-\cs_set_protected:Npn \insr_adapter_make_title: { \begin{letter}{INSR correspondence recipient}\opening{Dear colleague,} \INSRShowResolvedConfiguration }
-\cs_set_protected:Npn \insr_adapter_part:n #1 { \par\textbf{#1}\par }
-\cs_set_protected:Npn \insr_adapter_chapter:n #1 { \par\textbf{#1}\par }
-\cs_set_protected:Npn \insr_adapter_section:n #1 { \par\textbf{#1}\par }
-\cs_set_protected:Npn \insr_adapter_subsection:n #1 { \par\emph{#1}\par }
-\cs_set_protected:Npn \insr_adapter_subsubsection:n #1 { \par\emph{#1}\par }
-\cs_set_protected:Npn \insr_adapter_bibliography:n #1 { \par }
+\cs_set_protected:Npn \__insr_adapter_make_title: { \begin{letter}{INSR correspondence recipient}\opening{Dear colleague,}\INSRShowResolvedConfiguration }
+\cs_set_protected:Npn \__insr_adapter_part:n #1 { \par\textbf{#1}\par }
+\cs_set_protected:Npn \__insr_adapter_chapter:n #1 { \par\textbf{#1}\par }
+\cs_set_protected:Npn \__insr_adapter_section:n #1 { \par\textbf{#1}\par }
+\cs_set_protected:Npn \__insr_adapter_subsection:n #1 { \par\emph{#1}\par }
+\cs_set_protected:Npn \__insr_adapter_subsubsection:n #1 { \par\emph{#1}\par }
+\cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \par }
 \ExplSyntaxOff
-\AtEndDocument{\closing{Sincerely,} \end{letter}}
+\AtEndDocument{\closing{Sincerely,}\end{letter}}
