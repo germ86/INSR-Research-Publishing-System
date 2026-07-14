@@ -83,8 +83,3 @@ The v4 branch was rebased onto `origin/main` after fetching the current main bra
 2. `tools/validate_project.py`: main contained legacy checks for required repository files, legacy compatibility commands and wrapper options. The v4 branch contained checks for the new public entry, adapters, profiles, palettes, themes, typography and examples. The merged result keeps both: legacy resource checks and wrapper option checks were incorporated into the v4 validator, while the v4 bootstrap, conflict-marker and stable-root checks remain authoritative.
 
 No conflicted file was resolved by blindly selecting ours or theirs; each was merged semantically to preserve v4 architecture while retaining legitimate validation coverage from main.
-
-
-## Public API export hardening
-
-A subsequent Overleaf build reported `\INSRMakeTitle` and `\INSRRenderDocument` as undefined even though the v4 class defines them later in the runtime phase. To make the public API robust against stale adapter failures or early execution problems, both commands are now declared before `\LoadClass` and dispatch dynamically to the resolved adapter/template once those internals exist. The class also emits an API diagnostic banner listing the exported public symbols and a class/version banner during compilation. Static validation now enforces that there is exactly one authoritative `insr.cls` in the repository and that the public API is exported before base-class loading.
