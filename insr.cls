@@ -29,7 +29,6 @@
 \bool_new:N \g_insr_python_bool
 \bool_new:N \g_insr_high_contrast_bool
 \seq_new:N \g_insr_author_seq
-\seq_new:N \g_insr_author_display_seq
 \seq_new:N \g_insr_institution_seq
 \seq_new:N \g_insr_logo_seq
 \tl_gset:Nn \g_insr_document_type_tl { paper }
@@ -66,8 +65,7 @@
     unknown .code:n = { \msg_warning:nnn { insr } { unknown-option } { \l_keys_key_str } }
   }
 \NewDocumentCommand \INSRSetup { m } { \keys_set:nn { insr/setup } { #1 } }
-\NewDocumentCommand \INSRAuthor { O{} m m O{} O{} } { \seq_gput_right:Nn \g_insr_author_seq { {#1}{#2}{#3}{#4}{#5} } \seq_gput_right:Nn \g_insr_author_display_seq { #2 } }
-\NewDocumentCommand \INSRAddAuthor { O{} m m O{} O{} } { \INSRAuthor[#1]{#2}{#3}[#4][#5] }
+\NewDocumentCommand \INSRAuthor { O{} m m O{} O{} } { \seq_gput_right:Nn \g_insr_author_seq { {#1}{#2}{#3}{#4}{#5} } }
 \NewDocumentCommand \INSRInstitution { O{} m O{} } { \seq_gput_right:Nn \g_insr_institution_seq { {#1}{#2}{#3} } }
 \NewDocumentCommand \INSRLogo { O{} m m } { \seq_gput_right:Nn \g_insr_logo_seq { {#1}{#2}{#3} } }
 \DeclareOption*{\msg_warning:nnn { insr } { unknown-option } { \CurrentOption }}
@@ -85,22 +83,22 @@
     { poster } { \input{adapters/insr-adapter-poster.tex} }
     { letter } { \input{adapters/insr-adapter-letter.tex} }
   }
-  { \msg_warning:nnn { insr } { unknown-document-type } { safe-paper-fallback } \tl_gset:Nn \g_insr_document_type_tl { paper } \input{adapters/insr-adapter-paper.tex} }
+  { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \input{adapters/insr-adapter-paper.tex} }
 \ExplSyntaxOff
 \RequirePackage{ifluatex}
 \ifluatex\else\ClassError{insr}{INSR requires LuaLaTeX}{Select LuaLaTeX. The ordinary build also needs Biber for references.}\fi
 \RequirePackage{fontspec}
-\RequirePackage[bidi=basic,provide=*]{babel}
+\RequirePackage[bidi=basic,english,ngerman,arabic,hebrew]{babel}
 \babelprovide[import,main]{english}
 \babelprovide[import]{ngerman}
 \babelprovide[import]{arabic}
 \babelprovide[import]{hebrew}
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{Latin Modern Roman}}
-\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\setsansfont{Latin Modern Sans}}
+\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{TeX Gyre Pagella}}
+\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\setsansfont{TeX Gyre Heros}}
 \IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\setmonofont{Latin Modern Mono}}
-\IfFontExistsTF{Amiri}{\babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri}}{\babelfont[arabic]{rm}{Latin Modern Roman}}
-\IfFontExistsTF{FreeSerif}{\babelfont[hebrew]{rm}[Renderer=HarfBuzz]{FreeSerif}}{\babelfont[hebrew]{rm}{Latin Modern Roman}}
+\babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri}
+\babelfont[hebrew]{rm}[Renderer=HarfBuzz]{FreeSerif}
 \RequirePackage{xcolor}
 \definecolor{INSRNavy}{HTML}{0A2342}
 \definecolor{INSRTeal}{HTML}{17A2B8}
@@ -124,7 +122,7 @@
 \RequirePackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \ExplSyntaxOn
-\tl_if_empty:NF \g_insr_bibresource_tl { \addbibresource{\g_insr_bibresource_tl} }
+\tl_if_blank:VF \g_insr_bibresource_tl { \addbibresource{\g_insr_bibresource_tl} }
 \bool_if:NT \g_insr_python_bool { \IfFileExists{pyluatex.sty}{\RequirePackage{pyluatex}}{\msg_warning:nnn { insr } { unknown-option } { pyluatex-not-installed } } }
 \hypersetup{unicode=true,colorlinks=true,linkcolor=INSRNavy,citecolor=INSRTeal,urlcolor=INSRTeal,pdftitle={\g_insr_title_tl},pdfsubject={\g_insr_pdfsubject_tl},pdfauthor={INSR Consortium}}
 \ExplSyntaxOff
@@ -135,21 +133,21 @@
 }{\RequirePackage[a4paper,margin=2.7cm]{geometry}}
 \ExplSyntaxOn
 \cs_new_protected:Npn \insr_apply_title: {
-  \tl_if_empty:NF \g_insr_title_tl { \title{\g_insr_title_tl} }
-  \tl_if_empty:NF \g_insr_date_tl { \date{\g_insr_date_tl} }
-  \seq_if_empty:NF \g_insr_author_display_seq { \author{\seq_use:Nn \g_insr_author_display_seq { \and }} }
+  \tl_if_blank:NF \g_insr_title_tl { \title{\g_insr_title_tl} }
+  \tl_if_blank:NF \g_insr_date_tl { \date{\g_insr_date_tl} }
+  \seq_if_empty:NF \g_insr_author_seq { \author{\seq_use:Nn \g_insr_author_seq { \and }} }
 }
 \NewDocumentCommand \INSRMakeTitle {} { \insr_apply_title: \maketitle \INSRPrintLogos }
 \NewDocumentCommand \INSRPrintLogos {} { \seq_map_inline:Nn \g_insr_logo_seq { \insr_logo_render:nnn ##1 } }
 \cs_new_protected:Npn \insr_logo_render:nnn #1#2#3 { \IfFileExists{#2}{\includegraphics[height=1.2cm]{#2}}{\fbox{\footnotesize #1}}\quad }
 \NewDocumentCommand \INSRAbstract { m } { \begin{abstract}#1\end{abstract} }
-\NewDocumentCommand \INSRKeywords {} { \tl_if_empty:NF \g_insr_keywords_tl { \par\noindent\textbf{Keywords:~}\g_insr_keywords_tl\par } }
-\NewDocumentCommand \INSRDeclarations {} { \tl_if_empty:NF \g_insr_funding_tl { \section*{Funding}\g_insr_funding_tl } \tl_if_empty:NF \g_insr_ethics_tl { \section*{Ethics}\g_insr_ethics_tl } \tl_if_empty:NF \g_insr_registration_tl { \section*{Registration}\g_insr_registration_tl } \tl_if_empty:NF \g_insr_declarations_tl { \section*{Declarations}\g_insr_declarations_tl } }
+\NewDocumentCommand \INSRKeywords {} { \tl_if_blank:NF \g_insr_keywords_tl { \par\noindent\textbf{Keywords:~}\g_insr_keywords_tl\par } }
+\NewDocumentCommand \INSRDeclarations {} { \tl_if_blank:NF \g_insr_funding_tl { \section*{Funding}\g_insr_funding_tl } \tl_if_blank:NF \g_insr_ethics_tl { \section*{Ethics}\g_insr_ethics_tl } \tl_if_blank:NF \g_insr_registration_tl { \section*{Registration}\g_insr_registration_tl } \tl_if_blank:NF \g_insr_declarations_tl { \section*{Declarations}\g_insr_declarations_tl } }
 \NewDocumentCommand \INSRPrintBibliography { O{} } { \@ifclassloaded{beamer}{\begin{frame}[allowframebreaks]{References}\printbibliography[#1]\end{frame}}{\printbibliography[#1]} }
 \NewDocumentCommand \INSRSection { m } { \@ifclassloaded{beamer}{\begin{frame}[plain]\centering\vfill{\Huge\sffamily\bfseries\color{INSRNavy}#1}\vfill\end{frame}}{\section{#1}} }
 \NewDocumentCommand \INSRSubsection { m } { \@ifclassloaded{beamer}{\begin{frame}[plain]\centering\Large #1\end{frame}}{\subsection{#1}} }
 \NewDocumentCommand \INSRIfTargetTF { m m m } { \str_if_eq:VnTF \g_insr_document_type_tl {#1} {#2} {#3} }
-\NewDocumentCommand \INSRContentUnit { m m +m +m +m +m } { \str_if_eq:VnTF \g_insr_document_type_tl { slides } { \begin{frame}{#1}#4\par\medskip\alert{#5}\end{frame} } { #3\par } }
+\NewDocumentCommand \INSRContentUnit { m m m m m m } { \INSRIfTargetTF{slides}{\begin{frame}{#1}#4\par\medskip\alert{#5}\end{frame}}{#3\par} }
 \NewDocumentCommand \INSRKeyMessage { m } { \begin{tcolorbox}[colback=INSRTeal!8,colframe=INSRTeal,title=Key~message]#1\end{tcolorbox} }
 \NewDocumentCommand \INSRNote { m } { \marginpar{\scriptsize #1} }
 \NewDocumentCommand \INSRAltFigure { O{} m m } { \begin{figure}[htbp]\centering #3\caption[#1]{#2}\end{figure} }

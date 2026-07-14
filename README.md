@@ -1,58 +1,65 @@
-# INSR Scientific Publishing Platform (ISPP v4.0)
+# INSR LaTeX Framework
 
-ISPP v4.0 is a greenfield LuaLaTeX scientific publishing framework for INSR research. It exposes one public class, `insr.cls`, one public root document, `main.tex`, and one central configuration file, `config/project-config.tex`.
+A modular LuaLaTeX framework for the Integrative Neuro-Somatic Recalibration (INSR) research program. It supports scientific papers, Beamer presentations and clinical manuals with a shared corporate design, multilingual LTR/RTL typesetting, multi-author affiliation handling and Overleaf/GitHub workflows.
 
-## Architecture
+## Overleaf compatibility findings
 
-- **Two-phase bootstrap:** `insr.cls` defines configuration commands, reads `config/project-config.tex`, then selects the safe base class adapter (`article`, `beamer`, `report`, `book`, or `letter`).
-- **Safe Overleaf core:** the ordinary build requires only LuaLaTeX and Biber. No shell escape, Python, Node.js, network access, or external binary is mandatory.
-- **Single-source semantics:** `\INSRContentUnit` can emit full text for article-like outputs and compact frames for slides from the same source.
-- **Namespaced API:** public commands use the `\INSR...` prefix.
-- **Internationalization:** `babel` and LuaLaTeX provide LTR, RTL, and mixed-direction helpers.
-- **Accessibility:** metadata and semantic figure commands are built into the public API.
-- **Templates and plugins:** project-local templates, theme manifests, localization files, and soft-failing plugins provide extension points without competing public classes.
+These implementation notes were checked against the current Overleaf documentation on 14 July 2026. See the Overleaf pages on [selecting a TeX Live version and compiler](https://docs.overleaf.com/getting-started/recompiling-your-project/selecting-a-tex-live-version-and-latex-compiler), [typesetting non-Latin languages](https://docs.overleaf.com/troubleshooting-and-support/typesetting-non-latin-languages), [TeX Live support](https://docs.overleaf.com/troubleshooting-and-support/tex-live) and [compile timeouts](https://docs.overleaf.com/troubleshooting-and-support/fixing-and-preventing-compile-timeouts).
+
+- Overleaf lets projects choose pdfLaTeX, LaTeX, XeLaTeX or LuaLaTeX; LuaLaTeX is recommended here because it supports UTF-8, OpenType fonts and non-Latin scripts with `polyglossia`.
+- Overleaf uses TeX Live and supports standard packages including `fontspec`, TikZ, `biblatex` and Biber.
+- For non-Latin scripts such as Arabic, Farsi and Hebrew, Overleaf recommends XeLaTeX or LuaLaTeX with `babel` or `polyglossia`.
+- Python execution in cloud LaTeX projects should be treated as optional and security-sensitive. This framework exposes a `python` option that loads `pyluatex` when present, but the default workflow keeps analyses reproducible outside LaTeX and imports generated tables/figures.
+- For large TikZ/PGFPlots workloads, use the `externalize` option and Overleaf Premium compile time where available.
 
 ## Corporate design
 
-| Semantic color | Hex |
-| --- | --- |
-| INSR Navy | `#0A2342` |
-| Somatic Teal | `#17A2B8` |
-| Alert Amber | `#FFC107` |
-| Clean Slate | `#F8F9FA` |
+| Token | Hex | Intended use |
+| --- | --- | --- |
+| INSR Navy | `#0A2342` | primary identity, headings, presentation bars |
+| Somatic Teal | `#17A2B8` | links, methods, digital-health accents |
+| Alert Amber | `#FFC107` | somatic-hold and caution states |
+| Clean Slate | `#F8F9FA` | soft backgrounds |
+| Graphite | `#343A40` | body contrast and neutral text |
 
-## Build
+## Modules
+
+- `tex/latex/insr/insr-base.sty`: shared colors, typography, multilingual setup, acronyms, `biblatex`/APA, boxes and research macros.
+- `tex/latex/insr/insr-paper.cls`: journal-paper class with optional `blindreview`, `twocolumn`, `python` and `externalize` options.
+- `tex/latex/insr/insr-beamer.cls`: 16:9 presentation class with minimalist INSR navigation and speaker-ready design primitives.
+- `tex/latex/insr/insr-manual.cls`: clinical manual/protocol class with therapist notes and fidelity checklists.
+- `latexmkrc`: shared LuaLaTeX build settings for local builds, GitHub Actions and Overleaf.
+
+## Quick start
+
+Set the compiler to **LuaLaTeX** in Overleaf and keep `main.tex` in the project root.
+
+```tex
+\documentclass{insr-paper}
+\addbibresource{references.bib}
+\title{INSR Study Protocol}
+\INSRAddAuthor[1]{First Author}{Institution}
+\begin{document}
+\maketitle
+\section{Purpose}
+\gls{insr} is a \gls{cdss} research framework.
+\printglossary[type=\acronymtype]
+\printbibliography
+\end{document}
+```
+
+## Build commands
 
 ```bash
 latexmk main.tex
-biber main
-latexmk main.tex
+latexmk examples/paper-demo.tex
+latexmk examples/beamer-demo.tex
+latexmk examples/manual-demo.tex
 ```
 
-Local smoke tests:
+## GitHub and Overleaf workflow
 
-```bash
-./tests/run-tests.sh
-pwsh ./tests/run-tests.ps1
-```
-
-## Repository tree
-
-- `adapters/` — private base-class adapters for paper, slides, protocol, manual, report, thesis, poster, and letter outputs.
-- `content/` — semantic content manifest and shared content units.
-- `themes/` — design-token and palette extensions.
-- `templates/` — working templates for paper, scientific presentation, poster, grant, protocol, RCT, systematic review, thesis, and documentation.
-- `plugins/` — optional soft-failing extension modules.
-- `i18n/` — localization snippets for English, German, Arabic, and Hebrew.
-- `tools/` — optional offline validators and pyluatex example.
-- `tests/` — shell and PowerShell local test runners.
-
-## Public entry points
-
-- `main.tex` — public root document.
-- `insr.cls` — public class and two-phase bootstrap.
-- `config/project-config.tex` — central project configuration, metadata, authors, institutions, logos, funding, ethics, declarations, bibliography, theme and language settings.
-
-## Optional Python tooling
-
-Python tooling is optional and never required for the core build. The class supports `python=true`, which attempts to load `pyluatex` when present. Offline validators live in `tools/` and can be run locally before Overleaf synchronization.
+1. Develop and review the framework in GitHub.
+2. Sync the repository to Overleaf Premium through Overleaf's Git integration.
+3. Compile with LuaLaTeX using the included `latexmkrc`.
+4. Use CI to compile the root demonstrator PDF on each push.

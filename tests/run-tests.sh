@@ -7,7 +7,6 @@ for fixture in examples/*.tex; do
   echo "fixture: $fixture"
 done
 if command -v latexmk >/dev/null 2>&1; then
-  latexmk -C main.tex >/dev/null 2>&1 || true
   latexmk main.tex
 else
   echo "latexmk not installed; static tests completed"
