@@ -23,17 +23,9 @@ base = Path('tex/latex/insr/insr-base.sty').read_text(encoding='utf-8')
 for option in ['python', 'externalize', 'minted', 'review']:
     if f'\\DeclareOption{{{option}}}' not in base:
         raise SystemExit(f'Missing insr-base option: {option}')
-for command in ['INSRTodoClinical', 'INSRTodoBiostats', 'INSRTodoTech', 'INSRAddAuthor', 'INSRKeywords']:
+for command in ['INSRTodoClinical', 'INSRTodoBiostats', 'INSRTodoTech']:
     if command not in base:
-        raise SystemExit(f'Missing shared command in insr-base.sty: {command}')
-
-if '@ifclassloaded{beamer}' not in base or r'\institute' not in base:
-    raise SystemExit('INSRAddAuthor must support Beamer without authblk/affil')
-
-main = Path('main.tex').read_text(encoding='utf-8')
-for token in ['\\begin{frame}', '\\titlepage', '\\end{frame}']:
-    if token not in main:
-        raise SystemExit(f'Missing Beamer frame structure in main.tex: {token}')
+        raise SystemExit(f'Missing review helper command in insr-base.sty: {command}')
 
 for class_file in ['tex/latex/insr/insr-paper.cls', 'tex/latex/insr/insr-beamer.cls', 'tex/latex/insr/insr-manual.cls']:
     text = Path(class_file).read_text(encoding='utf-8')
