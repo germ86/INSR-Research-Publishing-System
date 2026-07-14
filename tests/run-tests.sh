@@ -10,9 +10,9 @@ python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
 
-for fixture in examples/*.tex; do
+while IFS= read -r fixture; do
   echo "fixture: $fixture"
-done
+done < <(find examples -name '*.tex' -print | sort)
 
 if [[ "$static_only" == true ]]; then
   echo "static tests completed"
@@ -20,12 +20,8 @@ if [[ "$static_only" == true ]]; then
 fi
 
 if command -v latexmk >/dev/null 2>&1; then
-  documents=(
-    main.tex
-    examples/paper-demo.tex
-    examples/beamer-demo.tex
-    examples/manual-demo.tex
-  )
+  documents=(main.tex)
+  while IFS= read -r document; do documents+=("$document"); done < <(find examples -path '*/main.tex' -print | sort)
   for document in "${documents[@]}"; do
     latexmk "$document"
   done
