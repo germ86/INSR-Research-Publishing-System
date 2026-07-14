@@ -74,3 +74,12 @@ Static validation, bibliography validation, palette validation and repository st
 ## Milestone assessment
 
 Milestones 0 through 3 are partially satisfied: the public entry model, central configuration, adapter foundation, document profiles, design tokens, palettes, themes, typography presets, semantic components, examples and static validation exist. The repository should not yet be called fully production-ready until the complete LuaLaTeX/Biber compilation matrix passes in CI and legacy wrappers are finished.
+
+## Rebase onto current main
+
+The v4 branch was rebased onto `origin/main` after fetching the current main branch. Git reported two textual conflicts:
+
+1. `main.tex`: main contained a legacy `insr-manual` document with Beamer `frame` environments. The v4 side contained the stable public entry document. The merged result preserves the v4 public entry model because this directly fixes the class-incompatible root document defect while keeping the legitimate intention from main that the root remains a demonstrator.
+2. `tools/validate_project.py`: main contained legacy checks for required repository files, legacy compatibility commands and wrapper options. The v4 branch contained checks for the new public entry, adapters, profiles, palettes, themes, typography and examples. The merged result keeps both: legacy resource checks and wrapper option checks were incorporated into the v4 validator, while the v4 bootstrap, conflict-marker and stable-root checks remain authoritative.
+
+No conflicted file was resolved by blindly selecting ours or theirs; each was merged semantically to preserve v4 architecture while retaining legitimate validation coverage from main.

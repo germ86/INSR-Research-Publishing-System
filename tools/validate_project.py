@@ -3,9 +3,11 @@ import re
 
 required = [
     '.github/workflows/latex.yml', 'insr.cls', 'main.tex', 'config/project-config.tex',
-    'references.bib', 'docs/CONFIGURATION_REFERENCE.md', 'docs/THEME_DEVELOPER_GUIDE.md',
+    'references.bib', 'content/manifest.tex', 'themes/manifest.tex', 'plugins/README.md',
+    'i18n/english.tex', 'docs/CONFIGURATION_REFERENCE.md', 'docs/THEME_DEVELOPER_GUIDE.md',
     'docs/PALETTE_DEVELOPER_GUIDE.md', 'docs/TEMPLATE_DEVELOPER_GUIDE.md',
-    'docs/TESTING_GUIDE.md', 'docs/OVERLEAF_GUIDE.md', 'docs/IMPLEMENTATION_REPORT_v4_FOUNDATION.md', 'tex/latex/insr/insr-base.sty'
+    'docs/TESTING_GUIDE.md', 'docs/OVERLEAF_GUIDE.md',
+    'docs/IMPLEMENTATION_REPORT_v4_FOUNDATION.md', 'tex/latex/insr/insr-base.sty',
 ]
 missing = [p for p in required if not Path(p).is_file()]
 if missing:
@@ -15,6 +17,8 @@ main = Path('main.tex').read_text(encoding='utf-8')
 expected_main = '\\documentclass{insr}\n\n\\begin{document}\n\n\\INSRMakeTitle\n\\INSRRenderDocument\n\n\\end{document}\n'
 if main != expected_main:
     raise SystemExit('main.tex must remain the stable v4 public entry document')
+if '\\begin{frame}' in main or '\\documentclass{insr-manual}' in main:
+    raise SystemExit('main.tex must not contain class-incompatible Beamer/manual merge artefacts')
 
 config = Path('config/project-config.tex').read_text(encoding='utf-8')
 for token in ['\\INSRConfigure', 'document/type', 'design/theme', 'design/palette', 'design/font']:
@@ -31,6 +35,9 @@ for token in order:
     pos.append(i)
 if pos != sorted(pos):
     raise SystemExit('insr.cls bootstrap order does not match v4 two-phase requirements')
+for legacy_token in ['INSRContentUnit', 'INSRAltFigure', 'INSRLoadPlugin']:
+    if legacy_token not in cls:
+        raise SystemExit(f'Missing legacy compatibility token in insr.cls: {legacy_token}')
 
 required_types = ['article','paper','position-paper','whitepaper','report','book','monograph','thesis','slides','handout','poster','letter','grant','protocol','clinical-trial-protocol','rct','systematic-review','narrative-review','technical-documentation','developer-documentation','manual']
 for doc_type in required_types:
@@ -53,6 +60,19 @@ for command in ['INSRMakeTitle','INSRRenderDocument','INSRShowResolvedConfigurat
     if command not in cls:
         raise SystemExit(f'Missing public/semantic command in insr.cls: {command}')
 
+base = Path('tex/latex/insr/insr-base.sty').read_text(encoding='utf-8')
+for option in ['python', 'externalize', 'minted', 'review']:
+    if f'\\DeclareOption{{{option}}}' not in base:
+        raise SystemExit(f'Missing legacy wrapper option in insr-base.sty: {option}')
+for command in ['INSRTodoClinical', 'INSRTodoBiostats', 'INSRTodoTech']:
+    if command not in base:
+        raise SystemExit(f'Missing review helper command in insr-base.sty: {command}')
+for class_file in ['tex/latex/insr/insr-paper.cls', 'tex/latex/insr/insr-beamer.cls', 'tex/latex/insr/insr-manual.cls']:
+    text = Path(class_file).read_text(encoding='utf-8')
+    for option in ['python', 'minted', 'review']:
+        if f'\\DeclareOption{{{option}}}' not in text:
+            raise SystemExit(f'Missing {option} option forwarding in {class_file}')
+
 for palette in ['neuroclinical','clinical','research','editorial','ocean','forest','slate','graphite','monochrome','high-contrast','colourblind-safe','print','warm-clinical','calm-trauma','neurodiversity','academic-blue','biomedical','public-health','digital-health','midnight','light-minimal']:
     if not Path(f'palettes/{palette}.tex').is_file():
         raise SystemExit(f'Missing palette: {palette}')
@@ -74,6 +94,12 @@ workflow = Path('.github/workflows/latex.yml').read_text(encoding='utf-8')
 for job in ['static-validation:', 'root-smoke:', 'paper:', 'beamer:', 'manual:']:
     if re.search(rf'^  {re.escape(job)}', workflow, flags=re.MULTILINE) is None:
         raise SystemExit(f'Missing independent CI job: {job}')
+
+for path in Path('.').rglob('*'):
+    if path.is_file() and path.suffix in {'.tex', '.py', '.md', '.yml', '.yaml', '.sh', '.ps1'}:
+        text = path.read_text(encoding='utf-8', errors='ignore')
+        if any(marker in text for marker in ['<' * 7, '=' * 7, '>' * 7]):
+            raise SystemExit(f'Merge conflict marker left in {path}')
 
 readme = Path('README.md').read_text(encoding='utf-8')
 for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type']:
