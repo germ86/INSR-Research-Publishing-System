@@ -1,19 +1,8 @@
-\documentclass{insr-beamer}
-\addbibresource{references.bib}
-\title{INSR Research Framework Demonstrator}
-\INSRAddAuthor[1]{INSR Research Consortium}{Independent translational research program}
-\date{14 July 2026}
+\documentclass{insr}
+
 \begin{document}
-\maketitle
-\begin{abstract}
-This root document validates the Overleaf-compatible INSR paper class with multilingual, acronym, bibliography and corporate-design defaults.
-\end{abstract}
-\INSRKeywords{C-PTSD; clinical decision support; HRV; state detection; trauma research}
-\section{Purpose}
-\gls{insr} is designed as a modular \gls{cdss} research framework with human-governed decision support, multilingual typesetting and reproducible bibliography handling. The neurobiological rationale can cite the neurovisceral integration model \parencite{thayer2000neurovisceral}.
-\begin{insrmethod}{Operational principle}
-State recommendations must remain assistive: \INSRHumanLoop{} semantics preserve clinical accountability.
-\end{insrmethod}
-\printglossary[type=\acronymtype]
-\printbibliography
+
+\INSRMakeTitle
+\INSRRenderDocument
+
 \end{document}

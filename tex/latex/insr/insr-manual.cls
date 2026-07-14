@@ -3,6 +3,9 @@
 \DeclareOption{blindreview}{\PassOptionsToPackage{blindreview}{insr-base}}
 \DeclareOption{rtl}{\PassOptionsToPackage{rtl}{insr-base}}
 \DeclareOption{python}{\PassOptionsToPackage{python}{insr-base}}
+\DeclareOption{externalize}{\PassOptionsToPackage{externalize}{insr-base}}
+\DeclareOption{review}{\PassOptionsToPackage{review}{insr-base}}
+\DeclareOption{minted}{\PassOptionsToPackage{minted}{insr-base}}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions\relax
 \LoadClass[11pt,openany]{report}
