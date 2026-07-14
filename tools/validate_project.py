@@ -9,10 +9,6 @@ required = [
     'docs/TESTING_GUIDE.md', 'docs/OVERLEAF_GUIDE.md',
     'docs/IMPLEMENTATION_REPORT_v4_FOUNDATION.md', 'tex/latex/insr/insr-base.sty',
 ]
-insr_class_copies = [str(p) for p in Path('.').rglob('insr.cls') if '.git' not in p.parts]
-if insr_class_copies != ['insr.cls']:
-    raise SystemExit(f'Expected exactly one authoritative insr.cls, found: {insr_class_copies}')
-
 missing = [p for p in required if not Path(p).is_file()]
 if missing:
     raise SystemExit(f'Missing required files: {missing}')
@@ -60,13 +56,6 @@ for adapter in ['article','paper','report','book','slides','poster','letter','ma
         if command not in text:
             raise SystemExit(f'Missing adapter command {command} in {path}')
 
-early_api_pos = cls.find('\\DeclareRobustCommand{\\INSRMakeTitle}')
-loadclass_pos = cls.find('\\LoadClass')
-if early_api_pos < 0 or early_api_pos > loadclass_pos:
-    raise SystemExit('INSRMakeTitle must be exported before LoadClass')
-if '\\DeclareRobustCommand{\\INSRRenderDocument}' not in cls or 'INSR v4 public API exports' not in cls:
-    raise SystemExit('INSR public API banner or early render command is missing')
-
 for command in ['INSRMakeTitle','INSRRenderDocument','INSRShowResolvedConfiguration','ResearchQuestion','KeyFinding','SafetyStatement']:
     if command not in cls:
         raise SystemExit(f'Missing public/semantic command in insr.cls: {command}')
@@ -80,8 +69,9 @@ for command in ['INSRTodoClinical', 'INSRTodoBiostats', 'INSRTodoTech']:
         raise SystemExit(f'Missing review helper command in insr-base.sty: {command}')
 for class_file in ['tex/latex/insr/insr-paper.cls', 'tex/latex/insr/insr-beamer.cls', 'tex/latex/insr/insr-manual.cls']:
     text = Path(class_file).read_text(encoding='utf-8')
-    if 'deprecated wrapper' not in text or '\\LoadClass{insr}' not in text:
-        raise SystemExit(f'{class_file} must be a thin deprecated wrapper delegating to insr.cls')
+    for option in ['python', 'minted', 'review']:
+        if f'\\DeclareOption{{{option}}}' not in text:
+            raise SystemExit(f'Missing {option} option forwarding in {class_file}')
 
 for palette in ['neuroclinical','clinical','research','editorial','ocean','forest','slate','graphite','monochrome','high-contrast','colourblind-safe','print','warm-clinical','calm-trauma','neurodiversity','academic-blue','biomedical','public-health','digital-health','midnight','light-minimal']:
     if not Path(f'palettes/{palette}.tex').is_file():
@@ -99,15 +89,6 @@ for example in ['minimal-paper','minimal-slides','position-paper','clinical-manu
     path = Path(f'examples/{example}/main.tex')
     if not path.is_file():
         raise SystemExit(f'Missing focused example: {example}')
-
-for content_path in ['content/manifest.tex', 'content/shared/core-question.tex', 'content/shared/method-foundation.tex', 'content/shared/safety-note.tex']:
-    if not Path(content_path).is_file():
-        raise SystemExit(f'Missing single-source content file: {content_path}')
-if 'How can INSR maintain one source' in cls or 'Changing \\texttt{config/project-config.tex}' in cls:
-    raise SystemExit('insr.cls must not contain hard-coded demonstrator prose')
-for api in ['INSRContentUnit', 'INSRFullText', 'INSRSummary', 'INSRKeyMessage', 'INSROnlyFor', 'INSRExceptFor']:
-    if api not in cls:
-        raise SystemExit(f'Missing content API in insr.cls: {api}')
 
 workflow = Path('.github/workflows/latex.yml').read_text(encoding='utf-8')
 for job in ['static-validation:', 'root-smoke:', 'paper:', 'beamer:', 'manual:']:

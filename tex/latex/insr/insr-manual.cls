@@ -1,7 +1,10 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{insr-manual}[2026/07/14 v0.2 deprecated wrapper for INSR v4]
-\ClassWarningNoLine{insr-manual}{insr-manual is deprecated; use \string\documentclass{insr} with document/type=manual in config/project-config.tex}
-\PassOptionsToClass{document/type=manual}{insr}
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{insr}}
+\ProvidesClass{insr-manual}[2026/07/14 v0.1 INSR clinical manual class]
+\DeclareOption{blindreview}{\PassOptionsToPackage{blindreview}{insr-base}}
+\DeclareOption{rtl}{\PassOptionsToPackage{rtl}{insr-base}}
+\DeclareOption{python}{\PassOptionsToPackage{python}{insr-base}}
+\DeclareOption{review}{\PassOptionsToPackage{review}{insr-base}}
+\DeclareOption{minted}{\PassOptionsToPackage{minted}{insr-base}}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions\relax
 \LoadClass{insr}

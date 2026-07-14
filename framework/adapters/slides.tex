@@ -1,5 +1,5 @@
 \ExplSyntaxOn
-\cs_set_protected:Npn \insr_adapter_make_title: { \title[\tl_use:N\g_insr_short_title_tl]{\tl_use:N\g_insr_title_tl} \subtitle{\tl_use:N\g_insr_subtitle_tl} \author{\insr_author_block:} \institute{\insr_institution_block:} \date{\tl_use:N\g_insr_date_tl} \begin{frame}\titlepage\end{frame} }
+\cs_set_protected:Npn \insr_adapter_make_title: { \title[\tl_use:N\g_insr_short_title_tl]{\tl_use:N\g_insr_title_tl} \subtitle{\tl_use:N\g_insr_subtitle_tl} \author{\tl_use:N\g_insr_author_tl} \institute{\tl_use:N\g_insr_institution_tl} \date{\tl_use:N\g_insr_date_tl} \begin{frame}\titlepage\end{frame} }
 \cs_set_protected:Npn \insr_adapter_part:n #1 { \section{#1} }
 \cs_set_protected:Npn \insr_adapter_chapter:n #1 { \section{#1}\begin{frame}[plain]\centering\vfill{\Huge\bfseries #1}\vfill\end{frame} }
 \cs_set_protected:Npn \insr_adapter_section:n #1 { \begin{frame}[plain]\centering\vfill{\Large\bfseries #1}\vfill\end{frame} }

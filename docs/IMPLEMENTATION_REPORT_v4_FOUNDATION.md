@@ -83,16 +83,3 @@ The v4 branch was rebased onto `origin/main` after fetching the current main bra
 2. `tools/validate_project.py`: main contained legacy checks for required repository files, legacy compatibility commands and wrapper options. The v4 branch contained checks for the new public entry, adapters, profiles, palettes, themes, typography and examples. The merged result keeps both: legacy resource checks and wrapper option checks were incorporated into the v4 validator, while the v4 bootstrap, conflict-marker and stable-root checks remain authoritative.
 
 No conflicted file was resolved by blindly selecting ours or theirs; each was merged semantically to preserve v4 architecture while retaining legitimate validation coverage from main.
-
-
-## Public API export hardening
-
-A subsequent Overleaf build reported `\INSRMakeTitle` and `\INSRRenderDocument` as undefined even though the v4 class defines them later in the runtime phase. To make the public API robust against stale adapter failures or early execution problems, both commands are now declared before `\LoadClass` and dispatch dynamically to the resolved adapter/template once those internals exist. The class also emits an API diagnostic banner listing the exported public symbols and a class/version banner during compilation. Static validation now enforces that there is exactly one authoritative `insr.cls` in the repository and that the public API is exported before base-class loading.
-
-## Working-system hardening pass
-
-This pass focused on making the v4 foundation usable rather than adding more palettes/themes. Runtime demonstrator prose was removed from `insr.cls` and moved into ordered content files under `content/shared/`, loaded by `content/manifest.tex`. The class now exposes a first version of the content-unit API with `INSRContentUnit`, `INSRFullText`, `INSRSummary`, `INSRKeyMessage`, `INSRSpeakerNotes`, `INSROnlyFor` and `INSRExceptFor`.
-
-Legacy `insr-paper`, `insr-beamer` and `insr-manual` were consolidated into deprecated compatibility wrappers that delegate to `insr.cls` instead of carrying duplicate implementations. Basic author and institution registries were added through `INSRAddAuthor` and `INSRAddInstitution`; these provide a foundation for ORCID/CRediT validation and richer title-page layouts in later work.
-
-Local test entry points now accept the requested modes: `scripts/test.sh --static-only`, `scripts/test.sh --compile`, `scripts/test.sh --all`, plus PowerShell switches `-StaticOnly`, `-Compile` and `-All`. `l3build.lua` was added as the initial l3build entry point. Full compilation remains pending in this container because TeX Live/latexmk are unavailable.
