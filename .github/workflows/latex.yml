@@ -4,17 +4,126 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+env:
+  TEXINPUTS: .//:./tex/latex/insr//:./examples//:
+  BIBINPUTS: .//:
+
 jobs:
-  build:
+  static-validation:
+    name: Static repository validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run static validators
+        run: |
+          python3 tools/overleaf_doctor.py check
+          python3 tools/validate_project.py
+          python3 tools/validate_bibliography.py references.bib
+          python3 tools/validate_palette.py
+          python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
+          ./tests/run-tests.sh --static-only
+
+  root-smoke:
+    name: Root smoke document
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
         with:
-          root_file: |
-            main.tex
-            examples/paper-demo.tex
-            examples/beamer-demo.tex
-            examples/manual-demo.tex
+          root_file: main.tex
           latexmk_use_lualatex: true
-          extra_system_packages: py3-pygments
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
+
+  paper-examples:
+    name: Paper examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/minimal-paper/main.tex
+          - examples/paper-demo.tex
+          - examples/minimal-english-paper.tex
+          - examples/position-paper/main.tex
+          - examples/arabic-rtl-paper.tex
+          - examples/multi-institution-consortium-paper.tex
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
+
+  slides-examples:
+    name: Slides examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/minimal-slides/main.tex
+          - examples/beamer-demo.tex
+          - examples/german-scientific-presentation.tex
+          - examples/hebrew-rtl-slides.tex
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
+
+  manual-examples:
+    name: Manual examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/clinical-manual/main.tex
+          - examples/manual-demo.tex
+          - doc/latex/insr/insr-latex-manual.tex
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
+
+  focused-example-matrix:
+    name: Focused examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/clinical-protocol/main.tex
+          - examples/rct-protocol/main.tex
+          - examples/clinical-trial-protocol.tex
+          - examples/systematic-review/main.tex
+          - examples/conference-poster/main.tex
+          - examples/technical-documentation/main.tex
+          - examples/theme-gallery/main.tex
+          - examples/custom-theme/main.tex
+          - examples/custom-palette/main.tex
+          - examples/custom-theme-palette.tex
+          - examples/mixed-german-arabic-report.tex
+          - examples/grant-proposal/main.tex
+          - examples/thesis/main.tex
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error

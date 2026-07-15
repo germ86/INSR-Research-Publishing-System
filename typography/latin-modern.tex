@@ -1,0 +1,7 @@
+% INSR typography preset: latin-modern
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\IfFontExistsTF{Latin Modern Roman}{\setmainfont{Latin Modern Roman}}{\setmainfont{TeX Gyre Pagella}}
+\IfFontExistsTF{Latin Modern Sans}{\setsansfont{Latin Modern Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Latin Modern Mono}{\setmonofont{Latin Modern Mono}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}}
+\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}

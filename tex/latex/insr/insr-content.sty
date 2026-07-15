@@ -1,0 +1,92 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-content}[2026/07/15 INSR content units]
+\ExplSyntaxOn
+\tl_new:N \l_insr_unit_id_tl
+\tl_new:N \l_insr_unit_title_tl
+\tl_new:N \l_insr_unit_outputs_tl
+\tl_new:N \l_insr_unit_full_tl
+\tl_new:N \l_insr_unit_summary_tl
+\tl_new:N \l_insr_unit_key_tl
+\tl_new:N \l_insr_unit_notes_tl
+\keys_define:nn { insr/content-unit }
+  {
+    id .tl_set:N = \l_insr_unit_id_tl,
+    title .tl_set:N = \l_insr_unit_title_tl,
+    outputs .tl_set:N = \l_insr_unit_outputs_tl,
+    unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { content-unit/#1 } }
+  }
+\cs_new_protected:Npn \__insr_template_render:
+  {
+    \file_if_exist:nTF { content/manifest.tex }
+      { \file_input:n { content/manifest.tex } }
+      { \msg_warning:nnn { insr } { missing-slot } { content/manifest.tex } }
+  }
+\cs_new_protected:Npn \__insr_unit_reset:
+  {
+    \tl_clear:N \l_insr_unit_id_tl
+    \tl_clear:N \l_insr_unit_title_tl
+    \tl_clear:N \l_insr_unit_outputs_tl
+    \tl_clear:N \l_insr_unit_full_tl
+    \tl_clear:N \l_insr_unit_summary_tl
+    \tl_clear:N \l_insr_unit_key_tl
+    \tl_clear:N \l_insr_unit_notes_tl
+  }
+\NewDocumentCommand \INSRFullText { +m } { \tl_set:Nn \l_insr_unit_full_tl {#1} }
+\NewDocumentCommand \INSRSummary { +m } { \tl_set:Nn \l_insr_unit_summary_tl {#1} }
+\NewDocumentCommand \INSRKeyMessage { +m } { \tl_set:Nn \l_insr_unit_key_tl {#1} }
+\NewDocumentCommand \INSRSpeakerNotes { +m } { \tl_set:Nn \l_insr_unit_notes_tl {#1} }
+\NewDocumentCommand \INSROnlyFor { m +m }
+  { \clist_if_in:nnT {#1} { \tl_use:N \g_insr_document_type_tl } {#2} }
+\NewDocumentCommand \INSRExceptFor { m +m }
+  { \clist_if_in:nnF {#1} { \tl_use:N \g_insr_document_type_tl } {#2} }
+\NewDocumentEnvironment { INSRContentUnit } { O{} +b }
+  {
+    \group_begin:
+    \__insr_unit_reset:
+    \keys_set:nn { insr/content-unit } { #1 }
+    #2
+    \insr_content_unit_render:
+    \group_end:
+  }
+  { }
+\cs_new_protected:Npn \insr_content_unit_render:
+  {
+    \tl_if_blank:VTF \l_insr_unit_title_tl
+      { \msg_warning:nnn { insr } { missing-slot } { content-unit/title } }
+      {
+        \tl_if_blank:VTF \l_insr_unit_outputs_tl
+          { \insr_content_unit_render_selected: }
+          {
+            \clist_if_in:VVTF \l_insr_unit_outputs_tl \g_insr_document_type_tl
+              { \insr_content_unit_render_selected: }
+              { }
+          }
+      }
+  }
+\cs_new_protected:Npn \insr_content_unit_render_selected:
+  { \__insr_adapter_render_content_unit: }
+\cs_new_protected:Npn \__insr_render_content_unit_block:
+  {
+    \INSRSection{\tl_use:N \l_insr_unit_title_tl}
+    \tl_if_blank:VTF \l_insr_unit_full_tl
+      {
+        \tl_if_blank:VTF \l_insr_unit_summary_tl
+          {
+            \par\medskip\noindent\textbf{Pending~content:}~
+            \tl_if_blank:VTF \l_insr_unit_title_tl { \tl_use:N \l_insr_unit_id_tl } { \tl_use:N \l_insr_unit_title_tl }
+            \par
+          }
+          { \tl_use:N \l_insr_unit_summary_tl }
+      }
+      { \tl_use:N \l_insr_unit_full_tl }
+  }
+\NewDocumentCommand \INSRAbstract { m }
+  {
+    \str_if_eq:VnTF \g_insr_base_class_tl { beamer }
+      { \begin{frame}{Abstract}#1\end{frame} }
+      { \begin{abstract}#1\end{abstract} }
+  }
+\NewDocumentCommand \INSRKeywords { o } { \par\noindent\textbf{Keywords:~}\tl_use:N\g_insr_keywords_tl\par }
+\NewDocumentCommand \INSRDeclarations {} { \par\noindent\textbf{Declarations:}~No conflicts declared for the demonstrator.\par }
+\ExplSyntaxOff
+\endinput

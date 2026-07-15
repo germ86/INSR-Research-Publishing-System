@@ -1,0 +1,9 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-bibliography}[2026/07/15 INSR bibliography]
+\RequirePackage{csquotes}
+\RequirePackage[backend=biber,style=apa,sortcites=true]{biblatex}
+\ExplSyntaxOn
+\cs_new_protected:Npn \__insr_setup_bibliography: { \tl_if_blank:VF \g_insr_bibresource_tl { \exp_args:NV \addbibresource \g_insr_bibresource_tl } }
+\cs_new_protected:Npn \__insr_print_bibliography:n #1 { \tl_if_blank:VF \g_insr_bibresource_tl { \printbibliography[#1] } }
+\ExplSyntaxOff
+\endinput
