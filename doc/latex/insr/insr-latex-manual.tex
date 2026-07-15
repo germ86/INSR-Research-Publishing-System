@@ -1,40 +1,12 @@
-\documentclass[document/type=manual,localization/language=english]{insr}
-
-\INSRConfigure{
-  metadata/title = {INSR~LaTeX~Package~Manual},
-  metadata/subtitle = {Public~v4~class~and~runtime},
-  metadata/short-title = {INSR~Manual},
-  metadata/author = {INSR~Research~Team},
-  metadata/institution = {INSR~Research~Consortium}
-}
-
+\documentclass[document/type=manual,metadata/title={INSR LaTeX Package Manual},metadata/author={INSR Research Consortium}]{insr}
 \begin{document}
-
 \INSRMakeTitle
 \tableofcontents
-
 \INSRChapter{Package Overview}
-
-The INSR LaTeX package provides a LuaLaTeX-first document system for interdisciplinary trauma research. It includes scientific-paper, presentation, and clinical-manual adapters, Overleaf-compatible build settings, and GitHub CI integration.
-
+The INSR LaTeX package provides a LuaLaTeX-first document system with one public class, modular style packages, adapters, examples, Overleaf-compatible build settings and GitHub CI integration.
 \INSRChapter{Configuration}
-
-Document type, design, localization, metadata, and bibliography resources are configured through the public INSR key-value API. Productive documents should use the canonical root class rather than deprecated legacy classes.
-
-\begin{itemize}
-  \item Select the output through \texttt{document/type}.
-  \item Select language through \texttt{localization/language}.
-  \item Keep project-wide metadata in \texttt{config/project-config.tex}.
-  \item Keep document content outside the class implementation.
-\end{itemize}
-
-\INSRChapter{Clinical Review Helpers}
-
-\begin{itemize}
-  \item Document clinical review items explicitly.
-  \item Document statistical-review items separately.
-  \item Document technical-review items separately.
-  \item Preserve human oversight for every safety-relevant decision.
-\end{itemize}
-
+Select output in \texttt{config/project-config.tex} or with explicit class options for focused examples.
+\begin{ClinicalNote}
+Use current v4 commands such as \texttt{\textbackslash INSRConfigure}, \texttt{\textbackslash INSRMakeTitle}, and \texttt{\textbackslash INSRRenderDocument}.
+\end{ClinicalNote}
 \end{document}

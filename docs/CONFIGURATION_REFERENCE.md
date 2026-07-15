@@ -17,3 +17,16 @@ Core keys:
 - `bibliography/resource`: BibLaTeX resource path.
 
 Unknown document types, themes, palettes and fonts warn and fall back safely.
+
+## Normal spaces in metadata
+
+Configuration is read with normal LaTeX document syntax, so human-readable metadata may use ordinary spaces:
+
+```tex
+\INSRConfigure{
+  metadata/title = {A Title With Normal Spaces},
+  metadata/author = {First Last}
+}
+```
+
+Tildes are not required for ordinary metadata spacing.
