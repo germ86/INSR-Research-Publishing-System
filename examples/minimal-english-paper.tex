@@ -1,3 +1,20 @@
-\documentclass{../insr}
-\INSRSetup{document-type=paper,language=english,title={Minimal English Paper},keywords={INSR, example}}
-\begin{document}\INSRBeginDocument\INSRMakeTitle\INSRAbstract{A minimal paper.}\INSRSection{Introduction}English single-source text.\INSRPrintBibliography\end{document}
+\documentclass[document/type=paper]{insr}
+
+\INSRConfigure{
+  localization/language = english,
+  metadata/title = {Minimal~English~Paper},
+  metadata/subtitle = {INSR~v4~smoke~test},
+  metadata/short-title = {Minimal~Paper},
+  metadata/author = {INSR~Research~Team},
+  metadata/institution = {INSR~Research~Consortium},
+  metadata/keywords = {INSR,~example}
+}
+
+\begin{document}
+
+\INSRMakeTitle
+\INSRAbstract{A minimal English paper compiled through the public INSR v4 class.}
+\INSRSection{Introduction}
+English single-source text.
+
+\end{document}
