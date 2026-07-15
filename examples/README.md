@@ -1,15 +1,18 @@
 # INSR examples
 
-All listed files are independent LuaLaTeX entry documents and are compiled in CI.
+Every official example uses the public `insr` class and sets `config/load-project=false` so it does not inherit productive position-paper metadata from `config/project-config.tex`.
 
-## Overleaf
+Compile from the repository root with LuaLaTeX, for example:
 
-Overleaf compiles the file selected under **Menu → Main document**. Opening a file in the editor does not change the main document.
+```bash
+latexmk -lualatex examples/minimal-paper/main.tex
+latexmk -lualatex examples/minimal-slides/main.tex
+```
 
-1. Set **Compiler** to **LuaLaTeX**.
-2. Select the exact entrypoint, for example `examples/position-paper/main.tex`.
-3. Clear cached files.
-4. Recompile from scratch.
-5. Return to `main.tex` for productive project work.
+List the complete official example matrix with:
 
-The root `main.tex` must remain canonical and configuration-driven. Do not hard-code document type, theme, palette, or font in it.
+```bash
+python3 tools/overleaf_doctor.py list-entrypoints --plain
+```
+
+The root `main.tex` remains the canonical Overleaf entrypoint. Focused examples may use class options such as `document/type=slides` to demonstrate a specific adapter without changing productive configuration.

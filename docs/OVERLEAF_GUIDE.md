@@ -15,3 +15,9 @@ python3 tools/overleaf_doctor.py generate-overleaf-report
 ```
 
 The helper is diagnostic only. Normal LaTeX builds do not require Python.
+
+## Position-paper content
+
+The productive root build reads `content/manifest.tex`, which currently orders the INSR position-paper files in `content/insr-position-paper/`. Those files may contain explicit placeholders while substantive scientific drafting is pending, but they must remain syntactically valid so the root document can compile.
+
+Official examples use `config/load-project=false` and provide local metadata in class options. This prevents examples from accidentally inheriting the productive position-paper title, author, institution, template or bibliography settings.

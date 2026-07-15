@@ -1,8 +1,5 @@
 % INSR Scientific Publishing Platform v4.0 configuration.
-% Main document: main.tex
-% Compiler: LuaLaTeX
-% Change output and design here; do not edit main.tex.
-
+% Switch output here; do not edit main.tex for document-type changes.
 \INSRConfigure{
   document/type = position-paper,
   document/density = standard,
@@ -12,34 +9,31 @@
   design/font = libertinus,
   design/mode = light,
   accessibility/high-contrast = false,
-  localization/language = ngerman,
+  localization/language = english,
   localization/direction = ltr,
-  metadata/title = {Integrative Neuro-Somatic Recalibration},
-  metadata/subtitle = {A State-Adaptive Decision Architecture for Sequencing, Safety Gating, and Empirical Validation in Complex Trauma Research},
-  metadata/short-title = {INSR Framework},
+  metadata/title = {Integrative Neuro-Somatic Recalibration Position Paper},
+  metadata/subtitle = {Conceptual framework and research roadmap},
+  metadata/short-title = {INSR Position Paper},
   metadata/date = {14 July 2026},
-  metadata/author = {Fabio Schmeil},
-  metadata/institution = {Independent Research Development},
-  metadata/keywords = {complex post-traumatic stress disorder, state-adaptive psychotherapy, intervention sequencing, safety gating, adaptive information processing, mentalization, Internal Family Systems, autonomic regulation, heart rate variability, neurotechnology},
-  bibliography/resource = references.bib,
-  content/template = position-paper
+  metadata/author = {INSR Research Team},
+  metadata/institution = {INSR Research Consortium},
+  metadata/keywords = {INSR, position paper, trauma research, neuro-somatic calibration},
+  bibliography/resource = {},
+  content/template = auto
 }
+
 
 \INSRAddInstitution{
-  id = independent-research-development,
-  name = {Independent Research Development},
-  short-name = {IRD},
-  city = {Merchweiler},
-  country = {Germany},
-  type = {independent-research}
+  id = insr-consortium,
+  name = {INSR Research Consortium},
+  short-name = {INSR},
+  type = {research-consortium}
 }
-
 \INSRAddAuthor{
-  id = fabio-schmeil,
-  name = {Fabio Schmeil},
-  short-name = {F. Schmeil},
-  orcid = {0009-0009-1802-8937},
-  affiliations = {independent-research-development},
-  corresponding = true,
-  roles = {conceptualization, methodology, software, visualization, writing-original-draft, writing-review-editing, project-administration}
+  id = insr-research-team,
+  name = {INSR Research Team},
+  short-name = {INSR Team},
+  orcid = {0000-0000-0000-0000},
+  affiliations = {insr-consortium},
+  roles = {conceptualization,methodology,software,writing-original-draft}
 }

@@ -1,20 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export TEXINPUTS=".//:./tex/latex/insr//:./examples//:${TEXINPUTS:-}"
+export BIBINPUTS=".//:${BIBINPUTS:-}"
+
 static_only=false
-if [[ "${1:-}" == "--static-only" ]]; then static_only=true; fi
+if [[ "${1:-}" == "--static-only" ]]; then
+  static_only=true
+fi
 
 python3 tools/overleaf_doctor.py check
 python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
-python3 -m unittest tests/test_overleaf_doctor.py
+python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
 
-mapfile -t supported_documents < <(python3 tools/overleaf_doctor.py list-entrypoints --plain)
-
-for fixture in "${supported_documents[@]}"; do
-  [[ -f "$fixture" ]] || { echo "missing supported fixture: $fixture" >&2; exit 1; }
-  echo "fixture: $fixture"
+mapfile -t documents < <(python3 tools/overleaf_doctor.py list-entrypoints --plain)
+for document in "${documents[@]}"; do
+  if [[ ! -f "$document" ]]; then
+    echo "missing entrypoint: $document" >&2
+    exit 1
+  fi
+  echo "fixture: $document"
 done
 
 if [[ "$static_only" == true ]]; then
@@ -23,10 +30,7 @@ if [[ "$static_only" == true ]]; then
 fi
 
 if command -v latexmk >/dev/null 2>&1; then
-  export TEXINPUTS=".//:./tex/latex/insr//:./examples//:${TEXINPUTS:-}"
-  export BIBINPUTS=".//:${BIBINPUTS:-}"
-  for document in "${supported_documents[@]}"; do
-    echo "compiling: $document"
+  for document in "${documents[@]}"; do
     latexmk -C "$document"
     latexmk -lualatex -interaction=nonstopmode -halt-on-error "$document"
   done
