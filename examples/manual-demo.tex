@@ -1,19 +1,33 @@
-\documentclass{insr-manual}
-\title{INSR Clinical Manual Demo}
-\author{INSR Research Consortium}
-\date{14 July 2026}
+\documentclass[document/type=manual]{insr}
+
+\INSRConfigure{
+  metadata/title = {INSR~Clinical~Manual~Demo},
+  metadata/subtitle = {Safety-oriented~manual~output},
+  metadata/short-title = {INSR~Manual},
+  metadata/author = {INSR~Research~Team},
+  metadata/institution = {INSR~Research~Consortium}
+}
+
 \begin{document}
-\maketitle
-\chapter{Session Safety}
-\INSRTherapistNote{Use clinical judgement before any exposure step.}
-\begin{INSRSessionProtocol}
-\item Confirm informed consent and current risk status.
-\item Check signal quality before interpreting \gls{hrv} or \gls{eda}.
-\item Apply \INSRSomaticHold{stabilization before exposure} when indicated.
-\end{INSRSessionProtocol}
-\begin{INSRFidelityChecklist}
-\INSRFidelityCheck{Baseline recorded.}
-\INSRFidelityCheck{Hard-stops reviewed.}
-\INSRFidelityCheck{Human-in-the-loop decision documented.}
-\end{INSRFidelityChecklist}
+
+\INSRMakeTitle
+
+\INSRChapter{Session Safety}
+
+\ClinicalImplication{Use clinical judgement before any exposure step.}
+
+\begin{ClinicalNote}
+Confirm informed consent and current risk status before processing-oriented interventions.
+\end{ClinicalNote}
+
+\begin{SafetyBox}
+Check signal quality before interpreting HRV or EDA data. Apply a somatic hold and return to stabilization when clinically indicated.
+\end{SafetyBox}
+
+\begin{itemize}
+  \item Baseline recorded.
+  \item Hard stops reviewed.
+  \item Human-in-the-loop decision documented.
+\end{itemize}
+
 \end{document}
