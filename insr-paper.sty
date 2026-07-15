@@ -1,0 +1,40 @@
+%% INSR paper style module
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-paper}[2026/07/15 v0.1 INSR paper styling]
+
+\RequirePackage{etoolbox}
+
+% Apply paper-specific typography and spacing without taking ownership of
+% metadata, content selection, palettes, or bibliography configuration.
+\newcommand*{\INSRApplyPaperStyle}{%
+  \@ifclassloaded{scrartcl}{%
+    \KOMAoptions{%
+      parskip=half,
+      headings=normal,
+      numbers=noendperiod
+    }%
+    \setkomafont{title}{\normalfont\bfseries\LARGE}%
+    \setkomafont{subtitle}{\normalfont\large}%
+    \setkomafont{author}{\normalfont\normalsize}%
+    \setkomafont{date}{\normalfont\small}%
+    \setkomafont{section}{\normalfont\bfseries\Large}%
+    \setkomafont{subsection}{\normalfont\bfseries\large}%
+    \setkomafont{subsubsection}{\normalfont\bfseries\normalsize}%
+    \RedeclareSectionCommand[
+      beforeskip=2.5ex plus 1ex minus .2ex,
+      afterskip=1.0ex plus .2ex
+    ]{section}%
+    \RedeclareSectionCommand[
+      beforeskip=2.0ex plus .8ex minus .2ex,
+      afterskip=.8ex plus .2ex
+    ]{subsection}%
+    \RedeclareSectionCommand[
+      beforeskip=1.5ex plus .6ex minus .2ex,
+      afterskip=.6ex plus .2ex
+    ]{subsubsection}%
+  }{%
+    \PackageWarning{insr-paper}{The paper style expects a KOMA-Script article class; no paper-specific class settings were applied}%
+  }%
+}
+
+\endinput
