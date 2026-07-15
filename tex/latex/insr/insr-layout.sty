@@ -9,7 +9,7 @@
 \RequirePackage{tikz}
 \ExplSyntaxOn
 \str_if_eq:VnF \g_insr_base_class_tl { beamer }
-  { \RequirePackage[a4paper,margin=2.7cm]{geometry} }
+  { \RequirePackage[a4paper,margin=2.7cm]{geometry} \RequirePackage[automark]{scrlayer-scrpage} \RequirePackage{lastpage} }
 \cs_new_protected:Npn \__insr_load_theme:
   {
     \__insr_load_file_with_fallback:nnn
@@ -22,7 +22,20 @@
   }
 \__insr_load_theme:
 \__insr_select_language:
+
+\tl_new:N \l__insr_layout_placeholder_tl
+\cs_new:Npn \__insr_layout_placeholder:n #1
+  { \tl_set:Nx \l__insr_layout_placeholder_tl {#1} \str_case:VnF \l__insr_layout_placeholder_tl { {current-section}{\headmark} {running-title}{\INSRRunningTitle} {page-number}{\thepage} {total-pages}{\pageref{LastPage}} {version}{v\tl_use:N\g_insr_publication_version_tl} {doi}{\INSRDOILabel} } {#1} }
+\cs_new_protected:Npn \__insr_setup_page_style:
+  {
+    \str_if_eq:VnF \g_insr_base_class_tl { beamer }
+      { \clearpairofpagestyles
+        \bool_if:NT \g_insr_layout_header_bool { \ihead{\__insr_layout_placeholder:n {\tl_use:N\g_insr_layout_header_left_tl}} \chead{\__insr_layout_placeholder:n {\tl_use:N\g_insr_layout_header_center_tl}} \ohead{\__insr_layout_placeholder:n {\tl_use:N\g_insr_layout_header_right_tl}} }
+        \bool_if:NT \g_insr_layout_footer_bool { \ifoot{\__insr_layout_placeholder:n {\tl_use:N\g_insr_layout_footer_left_tl}} \cfoot{\__insr_layout_placeholder:n {\tl_use:N\g_insr_layout_footer_center_tl}/\__insr_layout_placeholder:n {total-pages}} \ofoot{\__insr_layout_placeholder:n {\tl_use:N\g_insr_layout_footer_right_tl}} }
+        \pagestyle{scrheadings} }
+  }
 \__insr_setup_pdf_metadata:
+\__insr_setup_page_style:
 \ExplSyntaxOff
 \newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
 \newacronym{cdss}{CDSS}{Clinical Decision Support System}
