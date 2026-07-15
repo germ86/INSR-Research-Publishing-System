@@ -1,16 +1,26 @@
-\documentclass[blindreview]{insr-paper}
-\addbibresource{../references.bib}
-\title{Blind-Review INSR Paper Demo}
-\INSRAddAuthor[1]{Named Author}{Named Institution}
+\documentclass[document/type=paper]{insr}
+
+\INSRConfigure{
+  metadata/title = {INSR~Paper~Demo},
+  metadata/subtitle = {Current~public~v4~API},
+  metadata/short-title = {INSR~Paper},
+  metadata/author = {INSR~Research~Team},
+  metadata/institution = {INSR~Research~Consortium},
+  metadata/keywords = {complex~trauma,~state-adaptive~care,~INSR}
+}
+
 \begin{document}
-\maketitle
-\begin{INSRStructuredAbstract}
-\item[Background] C-PTSD research requires state-sensitive designs.
-\item[Methods] This template demonstrates blind-review author masking.
-\item[Conclusion] The class supports journal-oriented submissions.
-\end{INSRStructuredAbstract}
-\section{Example}
-Acronyms such as \gls{hrv}, \gls{rmssd}, and \gls{eda} are managed centrally.
-\printglossary[type=\acronymtype]
-\printbibliography
+
+\INSRMakeTitle
+
+\INSRAbstract{
+This smoke document verifies title rendering, abstract handling, semantic sectioning, and scientific content blocks through the public INSR v4 class.
+}
+
+\INSRSection{Example}
+
+\ResearchQuestion{How can a single scientific source produce class-safe outputs?}
+\Method{The runtime resolves the document type before loading its adapter and renderer.}
+\KeyFinding{The example compiles without relying on deprecated v3 classes or commands.}
+
 \end{document}
