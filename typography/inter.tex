@@ -1,0 +1,7 @@
+% INSR typography preset: inter
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{TeX Gyre Pagella}}
+\IfFontExistsTF{Inter}{\setsansfont{Inter}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Inconsolata}{\setmonofont{Inconsolata}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}}
+\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}

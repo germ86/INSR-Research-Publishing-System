@@ -1,0 +1,17 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-localization}[2026/07/15 INSR localization]
+\RequirePackage{ifluatex}
+\ifluatex\else\ClassError{insr}{INSR requires LuaLaTeX}{Select LuaLaTeX in Overleaf or run latexmk -lualatex locally.}\fi
+\RequirePackage{fontspec}
+\RequirePackage[english]{babel}
+\babelprovide[import,main]{english}
+\babelprovide[import]{ngerman}
+\babelprovide[import]{arabic}
+\babelprovide[import]{hebrew}
+\ExplSyntaxOn
+\cs_new_protected:Npn \__insr_select_language: { \str_if_eq:VnT \g_insr_language_tl { german } { \ClassWarning{insr}{localization/language=german normalized to ngerman} \tl_gset:Nn \g_insr_language_tl { ngerman } } \exp_args:NV \selectlanguage \g_insr_language_tl }
+\NewDocumentCommand \INSRRTL { m } { \foreignlanguage{arabic}{#1} }
+\NewDocumentCommand \INSRLTR { m } { \foreignlanguage{english}{#1} }
+\NewDocumentCommand \INSRMixed { m m } { \foreignlanguage{#1}{#2} }
+\ExplSyntaxOff
+\endinput
