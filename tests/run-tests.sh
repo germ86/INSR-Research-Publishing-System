@@ -10,9 +10,23 @@ python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
 
-while IFS= read -r fixture; do
+supported_documents=(
+  main.tex
+  examples/paper-demo.tex
+  examples/minimal-english-paper.tex
+  examples/beamer-demo.tex
+  examples/german-scientific-presentation.tex
+  examples/manual-demo.tex
+  doc/latex/insr/insr-latex-manual.tex
+)
+
+for fixture in "${supported_documents[@]}"; do
+  if [[ ! -f "$fixture" ]]; then
+    echo "missing supported fixture: $fixture" >&2
+    exit 1
+  fi
   echo "fixture: $fixture"
-done < <(find examples -name '*.tex' -print | sort)
+done
 
 if [[ "$static_only" == true ]]; then
   echo "static tests completed"
@@ -20,10 +34,9 @@ if [[ "$static_only" == true ]]; then
 fi
 
 if command -v latexmk >/dev/null 2>&1; then
-  documents=(main.tex)
-  while IFS= read -r document; do documents+=("$document"); done < <(find examples -path '*/main.tex' -print | sort)
-  for document in "${documents[@]}"; do
-    latexmk "$document"
+  for document in "${supported_documents[@]}"; do
+    echo "compiling: $document"
+    latexmk -lualatex -interaction=nonstopmode -halt-on-error "$document"
   done
 else
   echo "latexmk not installed; static tests completed"
