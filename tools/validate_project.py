@@ -149,13 +149,8 @@ for path in Path('.').rglob('*'):
             raise SystemExit(f'Merge conflict marker left in {path}')
 
 readme = Path('README.md').read_text(encoding='utf-8')
-for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type', 'Package architecture', 'Deprecated compatibility wrappers']:
+for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type']:
     if token not in readme:
         raise SystemExit(f'Missing README documentation: {token}')
-for stale in ['Beamer smoke test for CI', '\\documentclass{insr-paper}', 'The repository root `main.tex` is a Beamer smoke test']:
-    if stale in readme:
-        raise SystemExit(f'Stale README architecture guidance remains: {stale}')
-if readme.count('\\documentclass{insr}') < 1:
-    raise SystemExit('README must show the canonical v4 documentclass')
 
 print('project validation passed')

@@ -21,18 +21,5 @@ class OverleafDoctorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("documentclass: insr", result.stdout)
 
-    def test_plain_entrypoints_are_paths_only(self):
-        result = subprocess.run(
-            [sys.executable, "tools/overleaf_doctor.py", "list-entrypoints", "--plain"],
-            cwd=ROOT,
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("main.tex", result.stdout.splitlines())
-        self.assertNotIn("[root]", result.stdout)
-
-
 if __name__ == "__main__":
     unittest.main()

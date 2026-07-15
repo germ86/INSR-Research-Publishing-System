@@ -8,42 +8,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ENTRYPOINTS = {
     "root": ["main.tex"],
-    "paper": [
-        "examples/minimal-paper/main.tex",
-        "examples/paper-demo.tex",
-        "examples/minimal-english-paper.tex",
-        "examples/position-paper/main.tex",
-        "examples/arabic-rtl-paper.tex",
-        "examples/multi-institution-consortium-paper.tex",
-    ],
-    "slides": [
-        "examples/minimal-slides/main.tex",
-        "examples/beamer-demo.tex",
-        "examples/german-scientific-presentation.tex",
-        "examples/hebrew-rtl-slides.tex",
-    ],
-    "manual": [
-        "examples/clinical-manual/main.tex",
-        "examples/manual-demo.tex",
-        "doc/latex/insr/insr-latex-manual.tex",
-    ],
-    "protocol": [
-        "examples/clinical-protocol/main.tex",
-        "examples/rct-protocol/main.tex",
-        "examples/clinical-trial-protocol.tex",
-    ],
+    "paper": ["examples/minimal-paper/main.tex", "examples/paper-demo.tex", "examples/minimal-english-paper.tex"],
+    "slides": ["examples/minimal-slides/main.tex", "examples/beamer-demo.tex", "examples/german-scientific-presentation.tex"],
+    "manual": ["examples/clinical-manual/main.tex", "examples/manual-demo.tex", "doc/latex/insr/insr-latex-manual.tex"],
+    "protocol": ["examples/clinical-protocol/main.tex", "examples/rct-protocol/main.tex", "examples/clinical-trial-protocol.tex"],
     "review": ["examples/systematic-review/main.tex"],
     "poster": ["examples/conference-poster/main.tex"],
-    "documentation": [
-        "examples/technical-documentation/main.tex",
-        "examples/theme-gallery/main.tex",
-        "examples/custom-theme/main.tex",
-        "examples/custom-palette/main.tex",
-        "examples/custom-theme-palette.tex",
-        "examples/mixed-german-arabic-report.tex",
-        "examples/grant-proposal/main.tex",
-        "examples/thesis/main.tex",
-    ],
+    "documentation": ["examples/technical-documentation/main.tex", "examples/theme-gallery/main.tex", "examples/custom-theme/main.tex", "examples/custom-palette/main.tex"],
 }
 REQUIRED_STY = [
     "insr-core", "insr-config", "insr-metadata", "insr-content", "insr-adapters",
@@ -127,12 +98,11 @@ def collect_problems() -> list[str]:
     return sorted(set(problems))
 
 
-def list_entrypoints(args: argparse.Namespace) -> int:
+def list_entrypoints(_: argparse.Namespace) -> int:
     for group, files in ENTRYPOINTS.items():
-        if not args.plain:
-            print(f"[{group}]")
+        print(f"[{group}]")
         for item in files:
-            print(item if args.plain else item)
+            print(item)
     return 0
 
 
@@ -206,7 +176,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check").set_defaults(func=check)
-    le = sub.add_parser("list-entrypoints"); le.add_argument("--plain", action="store_true", help="print only paths for scripts"); le.set_defaults(func=list_entrypoints)
+    sub.add_parser("list-entrypoints").set_defaults(func=list_entrypoints)
     ce = sub.add_parser("check-entrypoint"); ce.add_argument("path"); ce.set_defaults(func=check_entrypoint)
     sub.add_parser("generate-overleaf-report").set_defaults(func=report)
     sub.add_parser("clean").set_defaults(func=clean)
