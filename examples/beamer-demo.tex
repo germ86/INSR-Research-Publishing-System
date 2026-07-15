@@ -1,13 +1,25 @@
-\documentclass{insr-beamer}
-\title[INSR demo]{INSR Beamer Demo}
-\author{INSR Research Consortium}
-\date{14 July 2026}
+\documentclass[document/type=slides]{insr}
+
+\INSRConfigure{
+  metadata/title = {INSR~Beamer~Demo},
+  metadata/subtitle = {Human-governed~state~detection},
+  metadata/short-title = {INSR~Demo},
+  metadata/author = {INSR~Research~Team},
+  metadata/institution = {INSR~Research~Consortium}
+}
+
 \begin{document}
-\begin{frame}\titlepage\end{frame}
-\INSRSectionFrame{Clinical Decision Support}
-\begin{frame}{Human-governed state detection}
-\begin{INSRTakeaway}
-The digital layer is framed as a \gls{cdss}, not as autonomous therapy.
-\end{INSRTakeaway}
-\end{frame}
+
+\INSRMakeTitle
+
+\begin{INSRContentUnit}[
+  id = cdss,
+  title = {Clinical~Decision~Support},
+  outputs = {slides,handout}
+]
+\INSRFullText{The digital layer is framed as a clinical decision-support system rather than autonomous therapy.}
+\INSRSummary{The digital layer supports, but does not replace, clinician judgement.}
+\INSRKeyMessage{Human oversight remains mandatory.}
+\end{INSRContentUnit}
+
 \end{document}
