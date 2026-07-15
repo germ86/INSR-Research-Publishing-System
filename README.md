@@ -158,3 +158,7 @@ The default neuroclinical design uses restrained navy/teal/cyan accents and sema
 - `docs/THEME_DEVELOPER_GUIDE.md` — theme extension notes.
 - `docs/PALETTE_DEVELOPER_GUIDE.md` — palette extension notes.
 - `docs/TEMPLATE_DEVELOPER_GUIDE.md` — template/profile extension notes.
+
+## Publication-ready front matter
+
+INSR includes a dedicated publication layer for journal manuscripts, position papers, white papers, reports, manuals, books, theses and grant proposals. Configure it with `publication/*`, `metadata/*` and `layout/*` keys, then call the stable public API `\INSRMakeTitle`. See `FRONTMATTER_GUIDE.md` for DOI handling, blind-review suppression, running headers/footers and examples.
