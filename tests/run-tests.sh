@@ -17,6 +17,20 @@ supported_documents=(
   examples/beamer-demo.tex
   examples/german-scientific-presentation.tex
   examples/manual-demo.tex
+  examples/minimal-paper/main.tex
+  examples/minimal-slides/main.tex
+  examples/position-paper/main.tex
+  examples/clinical-manual/main.tex
+  examples/clinical-protocol/main.tex
+  examples/rct-protocol/main.tex
+  examples/systematic-review/main.tex
+  examples/thesis/main.tex
+  examples/conference-poster/main.tex
+  examples/grant-proposal/main.tex
+  examples/technical-documentation/main.tex
+  examples/custom-theme/main.tex
+  examples/custom-palette/main.tex
+  examples/theme-gallery/main.tex
   doc/latex/insr/insr-latex-manual.tex
 )
 
@@ -34,8 +48,12 @@ if [[ "$static_only" == true ]]; then
 fi
 
 if command -v latexmk >/dev/null 2>&1; then
+  export TEXINPUTS=".//:./tex/latex/insr//:./examples//:${TEXINPUTS:-}"
+  export BIBINPUTS=".//:${BIBINPUTS:-}"
+
   for document in "${supported_documents[@]}"; do
     echo "compiling: $document"
+    latexmk -C "$document"
     latexmk -lualatex -interaction=nonstopmode -halt-on-error "$document"
   done
 else
