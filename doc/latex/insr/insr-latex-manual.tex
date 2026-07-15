@@ -1,36 +1,40 @@
-\documentclass{insr}
-\addbibresource{../../../references.bib}
-\title{INSR LaTeX Package Manual}
-\author{INSR Research Consortium}
-\date{14 July 2026}
+\documentclass[document/type=manual,localization/language=english]{insr}
+
+\INSRConfigure{
+  metadata/title = {INSR~LaTeX~Package~Manual},
+  metadata/subtitle = {Public~v4~class~and~runtime},
+  metadata/short-title = {INSR~Manual},
+  metadata/author = {INSR~Research~Team},
+  metadata/institution = {INSR~Research~Consortium}
+}
 
 \begin{document}
 
-\maketitle
+\INSRMakeTitle
 \tableofcontents
 
-\section{Package Overview}
+\INSRChapter{Package Overview}
 
-The INSR LaTeX package provides a LuaLaTeX-first document system for interdisciplinary trauma research. It includes shared style definitions, scientific-paper, presentation and clinical-manual classes, Overleaf-compatible build settings, and GitHub CI integration.
+The INSR LaTeX package provides a LuaLaTeX-first document system for interdisciplinary trauma research. It includes scientific-paper, presentation, and clinical-manual adapters, Overleaf-compatible build settings, and GitHub CI integration.
 
-\section{Class Options}
+\INSRChapter{Configuration}
 
-\begin{description}
-  \item[blindreview] Masks author and institution metadata where supported.
-  \item[twocolumn] Enables a compact two-column article layout for \texttt{insr-paper}.
-  \item[rtl] Switches the default language direction for RTL workflows.
-  \item[python] Loads \texttt{pyluatex} if available.
-  \item[minted] Loads \texttt{minted} if available and should be used with shell escape enabled.
-  \item[review] Loads \texttt{todonotes} if available and enables colored review-note commands.
-  \item[externalize] Enables TikZ externalization for large PGFPlots or TikZ workloads.
-\end{description}
-
-\section{Clinical Review Helpers}
+Document type, design, localization, metadata, and bibliography resources are configured through the public INSR key-value API. Productive documents should use the canonical root class rather than deprecated legacy classes.
 
 \begin{itemize}
-  \item Use \texttt{\textbackslash INSRTodoClinical} for clinical review items.
-  \item Use \texttt{\textbackslash INSRTodoBiostats} for statistical-review items.
-  \item Use \texttt{\textbackslash INSRTodoTech} for technical-review items.
+  \item Select the output through \texttt{document/type}.
+  \item Select language through \texttt{localization/language}.
+  \item Keep project-wide metadata in \texttt{config/project-config.tex}.
+  \item Keep document content outside the class implementation.
+\end{itemize}
+
+\INSRChapter{Clinical Review Helpers}
+
+\begin{itemize}
+  \item Document clinical review items explicitly.
+  \item Document statistical-review items separately.
+  \item Document technical-review items separately.
+  \item Preserve human oversight for every safety-relevant decision.
 \end{itemize}
 
 \end{document}
