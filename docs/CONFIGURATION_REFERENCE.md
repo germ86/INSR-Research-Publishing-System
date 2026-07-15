@@ -30,3 +30,17 @@ Configuration is read with normal LaTeX document syntax, so human-readable metad
 ```
 
 Tildes are not required for ordinary metadata spacing.
+
+## Project-config loading and precedence
+
+Configuration precedence is:
+
+1. safe internal defaults;
+2. `config/project-config.tex` when `config/load-project=true`;
+3. explicit class options;
+4. profile defaults for values that are still unset;
+5. theme, palette, typography and adapter finalisation.
+
+`config/load-project` defaults to `true`. Official examples set `config/load-project=false` in their class options so they do not inherit productive position-paper metadata or content settings from the root project configuration.
+
+The alias `localization/language = german` is normalized to `ngerman`; `english`, `ngerman`, `arabic` and `hebrew` remain the supported canonical language identifiers.

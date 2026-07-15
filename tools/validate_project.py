@@ -54,6 +54,9 @@ for implementation_token in ['NewDocumentEnvironment { INSRContentUnit }', 'Requ
     if implementation_token in cls:
         raise SystemExit(f'Implementation detail remains in insr.cls: {implementation_token}')
 
+if 'config/load-project=false' not in cls or cls.find('config/load-project=false') > cls.find('config/project-config.tex'):
+    raise SystemExit('insr.cls must detect config/load-project=false before reading project config')
+
 package_text = '\n'.join(Path(f'tex/latex/insr/{package}.sty').read_text(encoding='utf-8') for package in required_packages)
 if '\\__insr_load_adapter:' not in package_text or 'INSR #2:' not in package_text:
     raise SystemExit('Dedicated adapter loader or runtime file banner is missing')
@@ -128,7 +131,13 @@ for example in ['minimal-paper','minimal-slides','position-paper','clinical-manu
     if not path.is_file():
         raise SystemExit(f'Missing focused example: {example}')
 
-for content_path in ['content/manifest.tex', 'content/shared/core-question.tex', 'content/shared/method-foundation.tex', 'content/shared/safety-note.tex']:
+for entrypoint in __import__('subprocess').check_output(['python3', 'tools/overleaf_doctor.py', 'list-entrypoints', '--plain'], text=True).splitlines():
+    if entrypoint != 'main.tex':
+        text = Path(entrypoint).read_text(encoding='utf-8')
+        if 'config/load-project=false' not in text:
+            raise SystemExit(f'Official example does not opt out of productive config: {entrypoint}')
+
+for content_path in ['content/manifest.tex', 'content/insr-position-paper/00-title.tex', 'content/insr-position-paper/01-abstract.tex', 'content/insr-position-paper/19-declarations.tex']:
     if not Path(content_path).is_file():
         raise SystemExit(f'Missing single-source content file: {content_path}')
 if 'How can INSR maintain one source' in cls or 'Changing \\texttt{config/project-config.tex}' in cls:
@@ -138,7 +147,7 @@ for api in ['INSRContentUnit', 'INSRFullText', 'INSRSummary', 'INSRKeyMessage', 
         raise SystemExit(f'Missing content API in modular packages: {api}')
 
 workflow = Path('.github/workflows/latex.yml').read_text(encoding='utf-8')
-for job in ['static-validation:', 'root-smoke:', 'paper:', 'beamer:', 'manual:']:
+for job in ['static-validation:', 'root-smoke:', 'paper-examples:', 'slides-examples:', 'manual-examples:', 'focused-example-matrix:']:
     if re.search(rf'^  {re.escape(job)}', workflow, flags=re.MULTILINE) is None:
         raise SystemExit(f'Missing independent CI job: {job}')
 
@@ -149,8 +158,13 @@ for path in Path('.').rglob('*'):
             raise SystemExit(f'Merge conflict marker left in {path}')
 
 readme = Path('README.md').read_text(encoding='utf-8')
-for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type']:
+for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type', 'Package architecture', 'Deprecated compatibility wrappers', 'config/load-project=false', 'content/insr-position-paper']:
     if token not in readme:
         raise SystemExit(f'Missing README documentation: {token}')
+for stale in ['Beamer smoke test for CI', '\\documentclass{insr-paper}', 'The repository root `main.tex` is a Beamer smoke test']:
+    if stale in readme:
+        raise SystemExit(f'Stale README architecture guidance remains: {stale}')
+if readme.count('\\documentclass{insr}') < 1:
+    raise SystemExit('README must show the canonical v4 documentclass')
 
 print('project validation passed')

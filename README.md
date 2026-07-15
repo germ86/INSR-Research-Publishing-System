@@ -2,18 +2,7 @@
 
 INSR is a modular, LuaLaTeX-first scientific publishing framework for the Integrative Neuro-Somatic Recalibration research program. It is designed around one stable public entry point, central configuration, class-safe adapters, reusable style packages, Overleaf compatibility, and reproducible local/CI builds.
 
-
 ## INSR v4.0 public entry model
-
-The production entry architecture is:
-
-- one public class: `insr.cls`;
-- one public entry document: `main.tex`;
-- one authoritative configuration file: `config/project-config.tex`.
-
-Switch paper, slides, poster, book, manual or protocol output by changing `document/type` in `config/project-config.tex`, not by editing `main.tex`. Legacy classes under `tex/latex/insr/` are deprecated compatibility surfaces while the v4.0 `insr.cls` architecture becomes authoritative.
-
-## Overleaf compatibility findings
 
 The production entry architecture is intentionally small:
 
@@ -33,15 +22,17 @@ The canonical root document is always:
 \INSRMakeTitle
 \INSRRenderDocument
 
-- `tex/latex/insr/insr-base.sty`: shared colors, typography, multilingual setup, acronyms, `biblatex`/APA, boxes and research macros.
-- `tex/latex/insr/insr-paper.cls`: journal-paper class with optional `blindreview`, `twocolumn`, `python`, `externalize`, `minted` and `review` options.
-- `tex/latex/insr/insr-beamer.cls`: 16:9 presentation class with minimalist INSR navigation, speaker-ready design primitives and the same shared optional feature flags.
-- `tex/latex/insr/insr-manual.cls`: clinical manual/protocol class with therapist notes, fidelity checklists and the same shared optional feature flags.
-- `latexmkrc`: shared LuaLaTeX build settings for local builds, GitHub Actions and Overleaf.
+\end{document}
+```
 
 ## Quick start
 
-Set the compiler to **LuaLaTeX** in Overleaf. The repository root `main.tex` is a Beamer smoke test for CI; use the dedicated files under `examples/` as starting points for papers, presentations and manuals.
+1. Set the compiler to **LuaLaTeX**.
+2. Keep `main.tex` unchanged.
+3. Edit `config/project-config.tex` to select output type, theme, palette, typography and metadata.
+4. Compile `main.tex`.
+
+A minimal configuration looks like this:
 
 ```tex
 \INSRConfigure{
@@ -83,7 +74,7 @@ Runtime adapters remain small `.tex` modules in `framework/adapters/` and docume
 
 ## Content model
 
-`\INSRRenderDocument` loads `content/manifest.tex` by default. The manifest should include reusable content units from `content/shared/` or future document-specific content directories. Public content commands include:
+`\INSRRenderDocument` loads `content/manifest.tex` by default. The productive manifest currently orders the INSR position-paper files under `content/insr-position-paper/`; placeholders are allowed only to keep the build syntactically complete until substantive paper drafting begins. Public content commands include:
 
 - `INSRContentUnit`;
 - `\INSRFullText`;
@@ -97,7 +88,7 @@ The runtime packages must not contain hard-coded manuscript prose. Scientific co
 
 ## Examples
 
-Official examples use the public `insr` class. Focused examples may pass class options such as `document/type=slides` to demonstrate a specific adapter without editing the production `config/project-config.tex`.
+Official examples use the public `insr` class and set `config/load-project=false` so they do not inherit productive position-paper metadata, templates or bibliography settings. Focused examples may pass class options such as `document/type=slides` to demonstrate a specific adapter without editing the production `config/project-config.tex`.
 
 ```bash
 latexmk -lualatex main.tex
@@ -124,20 +115,7 @@ python3 tools/overleaf_doctor.py list-entrypoints
 python3 tools/overleaf_doctor.py generate-overleaf-report
 ```
 
-
-## Class-adaptive metadata helpers
-
-The shared base package provides metadata commands that adapt to the active document class:
-
-- `\INSRAddAuthor[short]{name}{institution}` uses `authblk` affiliations in article/report-style classes and Beamer author/institute metadata in presentations.
-- `\INSRInstitute[short]{institution}` records an institution without forcing a document-class-specific command in user documents.
-- `\INSRORCID{id}` links an ORCID identifier.
-- `\INSRTitlePage` emits `\maketitle` for non-Beamer documents and a title frame for Beamer documents.
-- `\INSRKeywords{...}` and `\INSRAcknowledgements{...}` are available across classes with class-appropriate rendering.
-
-See `docs/repository-audit-report.md` for the latest architecture and CI audit.
-
-## Build commands
+## Local validation
 
 ```bash
 python3 tools/overleaf_doctor.py check
@@ -174,13 +152,9 @@ The default neuroclinical design uses restrained navy/teal/cyan accents and sema
 
 ## Further documentation
 
-1. Develop and review the framework in GitHub.
-2. Sync the repository to Overleaf Premium through Overleaf's Git integration.
-3. Compile with LuaLaTeX using the included `latexmkrc`.
-4. Use CI to compile static checks, the root smoke document, paper examples, Beamer examples and manual/documentation examples as separate jobs.
-
-## Modular package architecture
-
-`insr.cls` is the only public class. It now acts as a bootstrap layer: it loads early configuration and metadata support, resolves the base class, and then delegates implementation to modular packages under `tex/latex/insr/` (`insr-core`, `insr-config`, `insr-metadata`, `insr-content`, `insr-adapters`, `insr-bibliography`, `insr-localization`, `insr-typography`, `insr-colors`, `insr-layout`, `insr-boxes`, `insr-accessibility`, `insr-neuro`, and `insr-utils`). Runtime document adapters remain in `framework/adapters/` and are finalized through `insr-adapters.sty`.
-
-For Overleaf diagnostics, run `python3 tools/overleaf_doctor.py check`. This helper is optional and never required for normal LuaLaTeX compilation.
+- `docs/CONFIGURATION_REFERENCE.md` — configuration keys and defaults.
+- `docs/OVERLEAF_GUIDE.md` — Overleaf setup and diagnostics.
+- `docs/TESTING_GUIDE.md` — local and CI validation commands.
+- `docs/THEME_DEVELOPER_GUIDE.md` — theme extension notes.
+- `docs/PALETTE_DEVELOPER_GUIDE.md` — palette extension notes.
+- `docs/TEMPLATE_DEVELOPER_GUIDE.md` — template/profile extension notes.

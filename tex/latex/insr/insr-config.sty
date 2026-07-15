@@ -1,6 +1,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insr-config}[2026/07/15 INSR configuration]
 \ExplSyntaxOn
+\bool_gset_true:N \g_insr_load_project_config_bool
 \tl_gset:Nn \g_insr_document_type_tl { paper }
 \tl_gset:Nn \g_insr_density_tl { standard }
 \tl_gset:Nn \g_insr_build_profile_tl { development }
@@ -20,6 +21,7 @@
 \tl_gset:Nn \g_insr_keywords_tl { INSR, scientific publishing, LuaLaTeX }
 \keys_define:nn { insr }
   {
+    config/load-project .bool_gset:N = \g_insr_load_project_config_bool,
     document/type .tl_gset:N = \g_insr_document_type_tl,
     document/density .tl_gset:N = \g_insr_density_tl,
     document/build-profile .tl_gset:N = \g_insr_build_profile_tl,

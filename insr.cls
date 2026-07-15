@@ -7,7 +7,19 @@
 \input{tex/latex/insr/insr-config.sty}
 \input{tex/latex/insr/insr-metadata.sty}
 \ExplSyntaxOff
-\InputIfFileExists{config/project-config.tex}{}{\ClassWarning{insr}{Missing config/project-config.tex; using safe defaults}}
+\makeatletter
+\def\insr@loadproject{true}%
+\def\insr@skipprojectoption{config/load-project=false}%
+\@for\insr@option:=\@classoptionslist\do{%
+  \ifx\insr@option\insr@skipprojectoption\def\insr@loadproject{false}\fi
+}%
+\def\insr@true{true}%
+\ifx\insr@loadproject\insr@true
+  \InputIfFileExists{config/project-config.tex}{}{\ClassWarning{insr}{Missing config/project-config.tex; using safe defaults}}%
+\else
+  \ClassInfo{insr}{Skipping config/project-config.tex because config/load-project=false was supplied}%
+\fi
+\makeatother
 \ExplSyntaxOn
 \DeclareOption*{\exp_args:Nno \keys_set:nn { insr } { \CurrentOption }}
 \ProcessOptions\relax
