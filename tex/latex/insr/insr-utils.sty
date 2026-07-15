@@ -1,0 +1,6 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-utils}[2026/07/15 INSR utility helpers]
+\ExplSyntaxOn
+\cs_new_protected:Npn \__insr_load_file_with_fallback:nnn #1#2#3 { \tl_set:Nx \l__insr_runtime_file_tl { #1 } \typeout{INSR #2: \tl_use:N \l__insr_runtime_file_tl} \file_if_exist:VTF \l__insr_runtime_file_tl { \file_input:V \l__insr_runtime_file_tl \ExplSyntaxOn } { #3 \ExplSyntaxOn } }
+\ExplSyntaxOff
+\endinput

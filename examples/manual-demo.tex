@@ -1,19 +1,9 @@
-\documentclass{insr-manual}
-\title{INSR Clinical Manual Demo}
-\author{INSR Research Consortium}
-\date{14 July 2026}
+\documentclass[document/type=manual,metadata/title={INSR Clinical Manual Demo}]{insr}
 \begin{document}
-\maketitle
-\chapter{Session Safety}
-\INSRTherapistNote{Use clinical judgement before any exposure step.}
-\begin{INSRSessionProtocol}
-\item Confirm informed consent and current risk status.
-\item Check signal quality before interpreting \gls{hrv} or \gls{eda}.
-\item Apply \INSRSomaticHold{stabilization before exposure} when indicated.
-\end{INSRSessionProtocol}
-\begin{INSRFidelityChecklist}
-\INSRFidelityCheck{Baseline recorded.}
-\INSRFidelityCheck{Hard-stops reviewed.}
-\INSRFidelityCheck{Human-in-the-loop decision documented.}
-\end{INSRFidelityChecklist}
+\INSRMakeTitle
+\INSRChapter{Session Safety}
+\begin{ClinicalNote}
+Use clinical judgement before any exposure step.
+\end{ClinicalNote}
+\INSRSomaticHold{stabilization before exposure}
 \end{document}
