@@ -5,5 +5,5 @@
 \cs_set_protected:Npn \__insr_adapter_section:n #1 { \begin{frame}[plain]\centering\vfill{\Large\bfseries #1}\vfill\end{frame} }
 \cs_set_protected:Npn \__insr_adapter_subsection:n #1 { \subsection{#1} }
 \cs_set_protected:Npn \__insr_adapter_subsubsection:n #1 { \subsubsection{#1} }
-\cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \tl_if_blank:VF \g_insr_bibresource_tl { \begin{frame}[allowframebreaks]{References}\printbibliography[#1]\end{frame} } }
+\cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \begin{frame}[allowframebreaks]{References}\__insr_print_bibliography:n {#1}\end{frame} }
 \ExplSyntaxOff

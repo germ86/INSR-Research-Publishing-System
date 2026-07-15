@@ -2,43 +2,18 @@
 set -euo pipefail
 
 static_only=false
-if [[ "${1:-}" == "--static-only" ]]; then
-  static_only=true
-fi
+if [[ "${1:-}" == "--static-only" ]]; then static_only=true; fi
 
+python3 tools/overleaf_doctor.py check
 python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
+python3 -m unittest tests/test_overleaf_doctor.py
 
-supported_documents=(
-  main.tex
-  examples/paper-demo.tex
-  examples/minimal-english-paper.tex
-  examples/beamer-demo.tex
-  examples/german-scientific-presentation.tex
-  examples/manual-demo.tex
-  examples/minimal-paper/main.tex
-  examples/minimal-slides/main.tex
-  examples/position-paper/main.tex
-  examples/clinical-manual/main.tex
-  examples/clinical-protocol/main.tex
-  examples/rct-protocol/main.tex
-  examples/systematic-review/main.tex
-  examples/thesis/main.tex
-  examples/conference-poster/main.tex
-  examples/grant-proposal/main.tex
-  examples/technical-documentation/main.tex
-  examples/custom-theme/main.tex
-  examples/custom-palette/main.tex
-  examples/theme-gallery/main.tex
-  doc/latex/insr/insr-latex-manual.tex
-)
+mapfile -t supported_documents < <(python3 tools/overleaf_doctor.py list-entrypoints --plain)
 
 for fixture in "${supported_documents[@]}"; do
-  if [[ ! -f "$fixture" ]]; then
-    echo "missing supported fixture: $fixture" >&2
-    exit 1
-  fi
+  [[ -f "$fixture" ]] || { echo "missing supported fixture: $fixture" >&2; exit 1; }
   echo "fixture: $fixture"
 done
 
@@ -50,7 +25,6 @@ fi
 if command -v latexmk >/dev/null 2>&1; then
   export TEXINPUTS=".//:./tex/latex/insr//:./examples//:${TEXINPUTS:-}"
   export BIBINPUTS=".//:${BIBINPUTS:-}"
-
   for document in "${supported_documents[@]}"; do
     echo "compiling: $document"
     latexmk -C "$document"

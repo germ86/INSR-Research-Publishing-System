@@ -1,6 +1,10 @@
-\documentclass{../insr}
-\INSRSetup{document-type=paper,title={Multi-Institution Consortium Paper}}
-\INSRInstitution[charite]{Charité -- Universitätsmedizin Berlin}[Berlin]\INSRInstitution[psylux]{Psylux}[Merchweiler]
-\INSRAuthor[charite]{A. Researcher}{charite}[0000-0001][Methodology]\INSRAuthor[psylux]{B. Clinician}{psylux}[0000-0002][Investigation]
-\INSRLogo[Charité]{examples/assets/charite-logo.pdf}{Charité logo}\INSRLogo[Psylux]{examples/assets/psylux-logo.pdf}{Psylux logo}
-\begin{document}\INSRBeginDocument\INSRMakeTitle\INSRAbstract{Consortium metadata demo.}\INSRSection{Consortium}Multiple institutions and logos are declared in configuration-compatible commands.\end{document}
+\documentclass[document/type=paper,metadata/title={Multi-Institution Consortium Paper}]{insr}
+\INSRAddInstitution{id=charite,name={Charité -- Universitätsmedizin Berlin}}
+\INSRAddInstitution{id=psylux,name={Psylux}}
+\INSRAddAuthor{id=a-researcher,name={A. Researcher},affiliations={charite},roles={methodology}}
+\INSRAddAuthor{id=b-clinician,name={B. Clinician},affiliations={psylux},roles={investigation}}
+\begin{document}
+\INSRMakeTitle
+\INSRSection{Consortium}
+Multiple institutions are registered through the v4 metadata API.
+\end{document}

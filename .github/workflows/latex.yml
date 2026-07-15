@@ -69,32 +69,3 @@ jobs:
             doc/latex/insr/insr-latex-manual.tex
           latexmk_use_lualatex: true
           extra_system_packages: py3-pygments
-
-  focused-examples:
-    name: Focused example — ${{ matrix.document }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        document:
-          - examples/minimal-paper/main.tex
-          - examples/minimal-slides/main.tex
-          - examples/position-paper/main.tex
-          - examples/clinical-manual/main.tex
-          - examples/clinical-protocol/main.tex
-          - examples/rct-protocol/main.tex
-          - examples/systematic-review/main.tex
-          - examples/thesis/main.tex
-          - examples/conference-poster/main.tex
-          - examples/grant-proposal/main.tex
-          - examples/technical-documentation/main.tex
-          - examples/custom-theme/main.tex
-          - examples/custom-palette/main.tex
-          - examples/theme-gallery/main.tex
-    steps:
-      - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          extra_system_packages: py3-pygments

@@ -8,6 +8,7 @@ required = [
     'docs/PALETTE_DEVELOPER_GUIDE.md', 'docs/TEMPLATE_DEVELOPER_GUIDE.md',
     'docs/TESTING_GUIDE.md', 'docs/OVERLEAF_GUIDE.md',
     'docs/IMPLEMENTATION_REPORT_v4_FOUNDATION.md', 'tex/latex/insr/insr-base.sty',
+    'tools/overleaf_doctor.py', 'tests/test_overleaf_doctor.py',
 ]
 insr_class_copies = [str(p) for p in Path('.').rglob('insr.cls') if '.git' not in p.parts]
 if insr_class_copies != ['insr.cls']:
@@ -30,7 +31,15 @@ for token in ['\\INSRConfigure', 'document/type', 'design/theme', 'design/palett
         raise SystemExit(f'Missing configuration token: {token}')
 
 cls = Path('insr.cls').read_text(encoding='utf-8')
-order = ['\\RequirePackage{expl3}', '\\InputIfFileExists{config/project-config.tex}', '\\ProcessOptions', '\\insr_resolve_document_type:', '\\LoadClass', 'framework/adapters/']
+required_packages = ['insr-core','insr-config','insr-metadata','insr-content','insr-adapters','insr-bibliography','insr-localization','insr-typography','insr-colors','insr-layout','insr-boxes','insr-accessibility','insr-neuro','insr-utils']
+for package in required_packages:
+    path = Path(f'tex/latex/insr/{package}.sty')
+    if not path.is_file():
+        raise SystemExit(f'Missing modular package: {path}')
+    if f'\\ProvidesPackage{{{package}}}' not in path.read_text(encoding='utf-8'):
+        raise SystemExit(f'Missing ProvidesPackage declaration in {path}')
+
+order = ['\\RequirePackage{expl3}', 'insr-core.sty', 'insr-config.sty', 'insr-metadata.sty', 'config/project-config.tex', '\\ProcessOptions', '\\insr_resolve_document_type:', '\\LoadClass', 'insr-adapters.sty']
 pos = []
 for token in order:
     i = cls.find(token)
@@ -38,37 +47,32 @@ for token in order:
         raise SystemExit(f'Missing bootstrap token: {token}')
     pos.append(i)
 if pos != sorted(pos):
-    raise SystemExit('insr.cls bootstrap order does not match v4 two-phase requirements')
+    raise SystemExit('insr.cls bootstrap order does not match v4 package bootstrap requirements')
+if len(cls.splitlines()) > 250:
+    raise SystemExit('insr.cls must remain a thin bootstrap class')
+for implementation_token in ['NewDocumentEnvironment { INSRContentUnit }', 'RequirePackage[backend=biber', 'tcbuselibrary', 'newacronym']:
+    if implementation_token in cls:
+        raise SystemExit(f'Implementation detail remains in insr.cls: {implementation_token}')
 
-# Runtime hardening checks for LuaLaTeX/ExplSyntax boundaries and expanded bridges.
-class_text = cls.splitlines()
-expl_on = False
-for lineno, line in enumerate(class_text, start=1):
-    if '\\ExplSyntaxOn' in line:
-        expl_on = True
-    if any(cmd in line for cmd in ['\\file_if_exist_input:n', '\\file_if_exist_input:nF']):
-        raise SystemExit(f'Unsafe unexpanded dynamic loader remains in insr.cls:{lineno}')
-    if any(cmd in line for cmd in ['\\file_if_exist:nTF', '\\file_input:n', '\\tl_use:N', '\\tl_if_blank:VF', '\\bool_if:NT', '\\str_case:VnF', '\\msg_warning:nnx']) and not expl_on:
-        raise SystemExit(f'Expl3 command appears outside ExplSyntaxOn in insr.cls:{lineno}')
-    if '\\ExplSyntaxOff' in line:
-        expl_on = False
-if '\\__insr_load_adapter:' not in cls or 'INSR~#2:' not in cls:
+package_text = '\n'.join(Path(f'tex/latex/insr/{package}.sty').read_text(encoding='utf-8') for package in required_packages)
+if '\\__insr_load_adapter:' not in package_text or 'INSR #2:' not in package_text:
     raise SystemExit('Dedicated adapter loader or runtime file banner is missing')
-if '\\exp_args:NV \\selectlanguage' not in cls:
+if '\\exp_args:NV \\selectlanguage' not in package_text:
     raise SystemExit('Language selection must expand the configured token list')
-if 'pdftitle={\\g_insr_' in cls or 'pdfauthor={\\g_insr_' in cls:
+if 'pdftitle={\\g_insr_' in package_text or 'pdfauthor={\\g_insr_' in package_text:
     raise SystemExit('PDF metadata must not receive internal token-list variables directly')
 for forbidden in ['fancyhdr', 'inputenc', 'beginR', 'endR', 'beginL', 'endL', 'rlbabel.def', 'ivritex']:
-    if forbidden in cls:
-        raise SystemExit(f'Forbidden runtime package/primitive found in insr.cls: {forbidden}')
+    if forbidden in cls or forbidden in package_text:
+        raise SystemExit(f'Forbidden runtime package/primitive found: {forbidden}')
 for legacy_token in ['INSRContentUnit', 'INSRAltFigure', 'INSRLoadPlugin']:
-    if legacy_token not in cls:
-        raise SystemExit(f'Missing legacy compatibility token in insr.cls: {legacy_token}')
+    if legacy_token not in package_text:
+        raise SystemExit(f'Missing legacy compatibility/public token in modular packages: {legacy_token}')
 
+config_pkg = Path('tex/latex/insr/insr-config.sty').read_text(encoding='utf-8')
 required_types = ['article','paper','position-paper','whitepaper','report','book','monograph','thesis','slides','handout','poster','letter','grant','protocol','clinical-trial-protocol','rct','systematic-review','narrative-review','technical-documentation','developer-documentation','manual']
 for doc_type in required_types:
-    if f'{{ {doc_type} }}' not in cls and f'{{{doc_type}}}' not in cls:
-        raise SystemExit(f'Document type is not resolved in insr.cls: {doc_type}')
+    if f'{{ {doc_type} }}' not in config_pkg and f'{{{doc_type}}}' not in config_pkg:
+        raise SystemExit(f'Document type is not resolved in insr-config.sty: {doc_type}')
     profile = Path(f'profiles/documents/{doc_type}.profile.tex')
     if not profile.is_file():
         raise SystemExit(f'Missing document profile: {profile}')
@@ -78,20 +82,22 @@ for adapter in ['article','paper','report','book','slides','poster','letter','ma
     if not path.is_file():
         raise SystemExit(f'Missing adapter: {path}')
     text = path.read_text(encoding='utf-8')
-    for command in ['insr_adapter_make_title', 'insr_adapter_chapter', 'insr_adapter_bibliography']:
+    for command in ['__insr_adapter_make_title', '__insr_adapter_chapter', '__insr_adapter_bibliography']:
         if command not in text:
             raise SystemExit(f'Missing adapter command {command} in {path}')
 
-early_api_pos = cls.find('\\DeclareRobustCommand{\\INSRMakeTitle}')
-loadclass_pos = cls.find('\\LoadClass')
-if early_api_pos < 0 or early_api_pos > loadclass_pos:
-    raise SystemExit('INSRMakeTitle must be exported before LoadClass')
-if '\\DeclareRobustCommand{\\INSRRenderDocument}' not in cls or 'INSR v4 public API exports' not in cls:
-    raise SystemExit('INSR public API banner or early render command is missing')
-
+early_api_pos = Path('tex/latex/insr/insr-core.sty').read_text(encoding='utf-8').find('\\DeclareRobustCommand{\\INSRMakeTitle}')
+if early_api_pos < 0:
+    raise SystemExit('INSRMakeTitle must be exported by insr-core.sty')
 for command in ['INSRMakeTitle','INSRRenderDocument','INSRShowResolvedConfiguration','ResearchQuestion','KeyFinding','SafetyStatement']:
-    if command not in cls:
-        raise SystemExit(f'Missing public/semantic command in insr.cls: {command}')
+    if command not in package_text:
+        raise SystemExit(f'Missing public/semantic command in modular packages: {command}')
+
+definition_count = 0
+for package in required_packages:
+    definition_count += len(re.findall(r'\\(?:NewDocumentCommand|DeclareRobustCommand)\s*\{?\\INSRMakeTitle\}?', Path(f'tex/latex/insr/{package}.sty').read_text(encoding='utf-8')))
+if definition_count != 1:
+    raise SystemExit(f'INSRMakeTitle must have exactly one authoritative definition, found {definition_count}')
 
 base = Path('tex/latex/insr/insr-base.sty').read_text(encoding='utf-8')
 for option in ['python', 'externalize', 'minted', 'review']:
@@ -128,8 +134,8 @@ for content_path in ['content/manifest.tex', 'content/shared/core-question.tex',
 if 'How can INSR maintain one source' in cls or 'Changing \\texttt{config/project-config.tex}' in cls:
     raise SystemExit('insr.cls must not contain hard-coded demonstrator prose')
 for api in ['INSRContentUnit', 'INSRFullText', 'INSRSummary', 'INSRKeyMessage', 'INSROnlyFor', 'INSRExceptFor']:
-    if api not in cls:
-        raise SystemExit(f'Missing content API in insr.cls: {api}')
+    if api not in package_text:
+        raise SystemExit(f'Missing content API in modular packages: {api}')
 
 workflow = Path('.github/workflows/latex.yml').read_text(encoding='utf-8')
 for job in ['static-validation:', 'root-smoke:', 'paper:', 'beamer:', 'manual:']:

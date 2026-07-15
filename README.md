@@ -87,3 +87,9 @@ latexmk examples/manual-demo.tex
 2. Sync the repository to Overleaf Premium through Overleaf's Git integration.
 3. Compile with LuaLaTeX using the included `latexmkrc`.
 4. Use CI to compile static checks, the root smoke document, paper examples, Beamer examples and manual/documentation examples as separate jobs.
+
+## Modular package architecture
+
+`insr.cls` is the only public class. It now acts as a bootstrap layer: it loads early configuration and metadata support, resolves the base class, and then delegates implementation to modular packages under `tex/latex/insr/` (`insr-core`, `insr-config`, `insr-metadata`, `insr-content`, `insr-adapters`, `insr-bibliography`, `insr-localization`, `insr-typography`, `insr-colors`, `insr-layout`, `insr-boxes`, `insr-accessibility`, `insr-neuro`, and `insr-utils`). Runtime document adapters remain in `framework/adapters/` and are finalized through `insr-adapters.sty`.
+
+For Overleaf diagnostics, run `python3 tools/overleaf_doctor.py check`. This helper is optional and never required for normal LuaLaTeX compilation.
