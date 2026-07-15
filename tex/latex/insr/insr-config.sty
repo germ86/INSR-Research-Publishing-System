@@ -1,0 +1,74 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-config}[2026/07/15 INSR configuration]
+\ExplSyntaxOn
+\tl_gset:Nn \g_insr_document_type_tl { paper }
+\tl_gset:Nn \g_insr_density_tl { standard }
+\tl_gset:Nn \g_insr_build_profile_tl { development }
+\tl_gset:Nn \g_insr_theme_tl { clinical }
+\tl_gset:Nn \g_insr_palette_tl { neuroclinical }
+\tl_gset:Nn \g_insr_font_tl { libertinus }
+\tl_gset:Nn \g_insr_mode_tl { light }
+\tl_gset:Nn \g_insr_language_tl { english }
+\tl_gset:Nn \g_insr_direction_tl { ltr }
+\tl_gset:Nn \g_insr_title_tl { INSR Scientific Publishing Platform }
+\tl_gset:Nn \g_insr_subtitle_tl { LuaLaTeX-first scientific publishing }
+\tl_gset:Nn \g_insr_short_title_tl { INSR }
+\tl_gset:Nn \g_insr_date_tl { \today }
+\tl_gset:Nn \g_insr_author_tl { INSR Research Consortium }
+\tl_gset:Nn \g_insr_institution_tl { Independent translational research program }
+\tl_gset:Nn \g_insr_bibresource_tl { references.bib }
+\tl_gset:Nn \g_insr_keywords_tl { INSR, scientific publishing, LuaLaTeX }
+\keys_define:nn { insr }
+  {
+    document/type .tl_gset:N = \g_insr_document_type_tl,
+    document/density .tl_gset:N = \g_insr_density_tl,
+    document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
+    design/theme .tl_gset:N = \g_insr_theme_tl,
+    design/palette .tl_gset:N = \g_insr_palette_tl,
+    design/font .tl_gset:N = \g_insr_font_tl,
+    design/mode .tl_gset:N = \g_insr_mode_tl,
+    accessibility/high-contrast .bool_gset:N = \g_insr_high_contrast_bool,
+    localization/language .tl_gset:N = \g_insr_language_tl,
+    localization/direction .tl_gset:N = \g_insr_direction_tl,
+    metadata/title .tl_gset:N = \g_insr_title_tl,
+    metadata/subtitle .tl_gset:N = \g_insr_subtitle_tl,
+    metadata/short-title .tl_gset:N = \g_insr_short_title_tl,
+    metadata/date .tl_gset:N = \g_insr_date_tl,
+    metadata/author .tl_gset:N = \g_insr_author_tl,
+    metadata/institution .tl_gset:N = \g_insr_institution_tl,
+    bibliography/resource .tl_gset:N = \g_insr_bibresource_tl,
+    metadata/keywords .tl_gset:N = \g_insr_keywords_tl,
+    content/template .tl_gset:N = \g_insr_template_tl,
+    unknown .code:n = { \msg_warning:nnx { insr } { unknown-key } { \l_keys_key_str } }
+  }
+\NewDocumentCommand \INSRConfigure { m } { \ExplSyntaxOn \keys_set:nn { insr } { #1 } \ExplSyntaxOff }
+\NewDocumentCommand \INSRSetup { m } { \msg_warning:nnn { insr } { deprecated-command } { \string\INSRSetup } \INSRConfigure{#1} }
+\cs_new_protected:Npn \insr_resolve_document_type: {
+  \str_case:VnF \g_insr_document_type_tl
+    {
+      { article } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { article } }
+      { paper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
+      { position-paper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
+      { whitepaper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
+      { report } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { grant } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { protocol } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { clinical-trial-protocol } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { rct } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { systematic-review } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { narrative-review } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { technical-documentation } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { developer-documentation } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { manual } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { manual } }
+      { book } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
+      { monograph } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
+      { thesis } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
+      { slides } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } }
+      { handout } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } \PassOptionsToClass{handout}{beamer} }
+      { poster } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { poster } }
+      { letter } { \tl_gset:Nn \g_insr_base_class_tl { scrlttr2 } \tl_gset:Nn \g_insr_adapter_tl { letter } }
+    }
+    { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
+}
+\ExplSyntaxOff
+\endinput

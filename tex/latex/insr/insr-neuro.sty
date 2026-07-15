@@ -1,0 +1,11 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-neuro}[2026/07/15 INSR neuro helpers]
+\ExplSyntaxOn
+\NewDocumentCommand \INSRLoadPlugin { m } { \InputIfFileExists{plugins/#1.tex}{}{\ClassWarning{insr}{Plugin '#1' not found; continuing}} }
+\NewDocumentCommand \INSRClinicalStop { m } { \SafetyStatement{Clinical hard-stop: #1} }
+\NewDocumentCommand \INSRSomaticHold { m } { \ClinicalImplication{Somatic hold: #1} }
+\NewDocumentCommand \INSRBiomarkerTable { m } { \begin{tabularx}{\linewidth}{lX}\toprule Biomarker & Interpretation\\\midrule #1 \\\bottomrule\end{tabularx} }
+\NewDocumentCommand \INSRStateDetectionNote { m } { \TechnicalImplication{State detection: #1} }
+\NewDocumentCommand \INSRNeurotechnologyNote { m } { \TechnicalImplication{Neurotechnology: #1} }
+\ExplSyntaxOff
+\endinput

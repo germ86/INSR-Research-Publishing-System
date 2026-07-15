@@ -2,6 +2,17 @@
 
 A modular LuaLaTeX framework for the Integrative Neuro-Somatic Recalibration (INSR) research program. It supports scientific papers, Beamer presentations and clinical manuals with a shared corporate design, multilingual LTR/RTL typesetting, multi-author affiliation handling and Overleaf/GitHub workflows.
 
+
+## INSR v4.0 public entry model
+
+The production entry architecture is:
+
+- one public class: `insr.cls`;
+- one public entry document: `main.tex`;
+- one authoritative configuration file: `config/project-config.tex`.
+
+Switch paper, slides, poster, book, manual or protocol output by changing `document/type` in `config/project-config.tex`, not by editing `main.tex`. Legacy classes under `tex/latex/insr/` are deprecated compatibility surfaces while the v4.0 `insr.cls` architecture becomes authoritative.
+
 ## Overleaf compatibility findings
 
 These implementation notes were checked against the current Overleaf documentation on 14 July 2026. See the Overleaf pages on [selecting a TeX Live version and compiler](https://docs.overleaf.com/getting-started/recompiling-your-project/selecting-a-tex-live-version-and-latex-compiler), [typesetting non-Latin languages](https://docs.overleaf.com/troubleshooting-and-support/typesetting-non-latin-languages), [TeX Live support](https://docs.overleaf.com/troubleshooting-and-support/tex-live) and [compile timeouts](https://docs.overleaf.com/troubleshooting-and-support/fixing-and-preventing-compile-timeouts).
@@ -25,14 +36,14 @@ These implementation notes were checked against the current Overleaf documentati
 ## Modules
 
 - `tex/latex/insr/insr-base.sty`: shared colors, typography, multilingual setup, acronyms, `biblatex`/APA, boxes and research macros.
-- `tex/latex/insr/insr-paper.cls`: journal-paper class with optional `blindreview`, `twocolumn`, `python` and `externalize` options.
-- `tex/latex/insr/insr-beamer.cls`: 16:9 presentation class with minimalist INSR navigation and speaker-ready design primitives.
-- `tex/latex/insr/insr-manual.cls`: clinical manual/protocol class with therapist notes and fidelity checklists.
+- `tex/latex/insr/insr-paper.cls`: journal-paper class with optional `blindreview`, `twocolumn`, `python`, `externalize`, `minted` and `review` options.
+- `tex/latex/insr/insr-beamer.cls`: 16:9 presentation class with minimalist INSR navigation, speaker-ready design primitives and the same shared optional feature flags.
+- `tex/latex/insr/insr-manual.cls`: clinical manual/protocol class with therapist notes, fidelity checklists and the same shared optional feature flags.
 - `latexmkrc`: shared LuaLaTeX build settings for local builds, GitHub Actions and Overleaf.
 
 ## Quick start
 
-Set the compiler to **LuaLaTeX** in Overleaf and keep `main.tex` in the project root.
+Set the compiler to **LuaLaTeX** in Overleaf. The repository root `main.tex` is a Beamer smoke test for CI; use the dedicated files under `examples/` as starting points for papers, presentations and manuals.
 
 ```tex
 \documentclass{insr-paper}
@@ -48,6 +59,19 @@ Set the compiler to **LuaLaTeX** in Overleaf and keep `main.tex` in the project 
 \end{document}
 ```
 
+
+## Class-adaptive metadata helpers
+
+The shared base package provides metadata commands that adapt to the active document class:
+
+- `\INSRAddAuthor[short]{name}{institution}` uses `authblk` affiliations in article/report-style classes and Beamer author/institute metadata in presentations.
+- `\INSRInstitute[short]{institution}` records an institution without forcing a document-class-specific command in user documents.
+- `\INSRORCID{id}` links an ORCID identifier.
+- `\INSRTitlePage` emits `\maketitle` for non-Beamer documents and a title frame for Beamer documents.
+- `\INSRKeywords{...}` and `\INSRAcknowledgements{...}` are available across classes with class-appropriate rendering.
+
+See `docs/repository-audit-report.md` for the latest architecture and CI audit.
+
 ## Build commands
 
 ```bash
@@ -62,4 +86,10 @@ latexmk examples/manual-demo.tex
 1. Develop and review the framework in GitHub.
 2. Sync the repository to Overleaf Premium through Overleaf's Git integration.
 3. Compile with LuaLaTeX using the included `latexmkrc`.
-4. Use CI to compile the root demonstrator PDF on each push.
+4. Use CI to compile static checks, the root smoke document, paper examples, Beamer examples and manual/documentation examples as separate jobs.
+
+## Modular package architecture
+
+`insr.cls` is the only public class. It now acts as a bootstrap layer: it loads early configuration and metadata support, resolves the base class, and then delegates implementation to modular packages under `tex/latex/insr/` (`insr-core`, `insr-config`, `insr-metadata`, `insr-content`, `insr-adapters`, `insr-bibliography`, `insr-localization`, `insr-typography`, `insr-colors`, `insr-layout`, `insr-boxes`, `insr-accessibility`, `insr-neuro`, and `insr-utils`). Runtime document adapters remain in `framework/adapters/` and are finalized through `insr-adapters.sty`.
+
+For Overleaf diagnostics, run `python3 tools/overleaf_doctor.py check`. This helper is optional and never required for normal LuaLaTeX compilation.

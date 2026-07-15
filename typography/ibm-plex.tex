@@ -1,0 +1,7 @@
+% INSR typography preset: ibm-plex
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\IfFontExistsTF{IBM Plex Serif}{\setmainfont{IBM Plex Serif}}{\setmainfont{TeX Gyre Pagella}}
+\IfFontExistsTF{IBM Plex Sans}{\setsansfont{IBM Plex Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{IBM Plex Mono}{\setmonofont{IBM Plex Mono}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}}
+\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}
