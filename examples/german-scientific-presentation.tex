@@ -1,3 +1,27 @@
-\documentclass{../insr}
-\INSRSetup{document-type=slides,language=ngerman,title={Deutsche wissenschaftliche Präsentation},short-title={INSR Folien}}
-\begin{document}\INSRBeginDocument\INSRMakeTitle\INSRContentUnit{Kernaussage}{slides}{Volltext}{Zusammenfassung für die Folie.}{Eine Quelle, viele Ausgaben.}{Notiz}\end{document}
+\documentclass[document/type=slides]{insr}
+
+\INSRConfigure{
+  localization/language = ngerman,
+  metadata/title = {Deutsche~wissenschaftliche~Präsentation},
+  metadata/subtitle = {INSR~v4~Beispiel},
+  metadata/short-title = {INSR~Folien},
+  metadata/author = {INSR~Research~Team},
+  metadata/institution = {INSR~Research~Consortium}
+}
+
+\begin{document}
+
+\INSRMakeTitle
+
+\begin{INSRContentUnit}[
+  id = key-message,
+  title = {Kernaussage},
+  outputs = {slides,handout}
+]
+\INSRFullText{Volltext für Langformate.}
+\INSRSummary{Zusammenfassung für die Folie.}
+\INSRKeyMessage{Eine Quelle, viele Ausgaben.}
+\INSRSpeakerNotes{Hinweis für den Vortrag.}
+\end{INSRContentUnit}
+
+\end{document}
