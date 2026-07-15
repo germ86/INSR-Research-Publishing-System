@@ -5,5 +5,14 @@
 \cs_set_protected:Npn \__insr_adapter_section:n #1 { \begin{frame}[plain]\centering\vfill{\Large\bfseries #1}\vfill\end{frame} }
 \cs_set_protected:Npn \__insr_adapter_subsection:n #1 { \subsection{#1} }
 \cs_set_protected:Npn \__insr_adapter_subsubsection:n #1 { \subsubsection{#1} }
+\cs_set_protected:Npn \__insr_adapter_render_content_unit:
+  {
+    \begin{frame}{\tl_use:N \l_insr_unit_title_tl}
+    \tl_if_blank:VTF \l_insr_unit_summary_tl
+      { \tl_if_blank:VF \l_insr_unit_key_tl { \textbf{Key~message:}~\tl_use:N \l_insr_unit_key_tl } }
+      { \tl_use:N \l_insr_unit_summary_tl }
+    \tl_if_blank:VF \l_insr_unit_key_tl { \par\medskip\alert{\tl_use:N \l_insr_unit_key_tl} }
+    \end{frame}
+  }
 \cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \begin{frame}[allowframebreaks]{References}\__insr_print_bibliography:n {#1}\end{frame} }
 \ExplSyntaxOff
