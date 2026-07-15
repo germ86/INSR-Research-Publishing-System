@@ -67,6 +67,24 @@ if 'pdftitle={\\g_insr_' in package_text or 'pdfauthor={\\g_insr_' in package_te
 for forbidden in ['fancyhdr', 'inputenc', 'beginR', 'endR', 'beginL', 'endL', 'rlbabel.def', 'ivritex']:
     if forbidden in cls or forbidden in package_text:
         raise SystemExit(f'Forbidden runtime package/primitive found: {forbidden}')
+
+# Guard against the Overleaf root-cause class of errors: raw LaTeX2e @ internals
+# in normal runtime modules are tokenized incorrectly unless protected by
+# makeatletter. Legacy compatibility code is exempted because it is wrapped.
+for runtime_path in list(Path('tex/latex/insr').glob('insr-*.sty')) + list(Path('themes').glob('*.tex')) + list(Path('framework/adapters').glob('*.tex')):
+    if runtime_path.name == 'insr-base.sty':
+        continue
+    text = runtime_path.read_text(encoding='utf-8')
+    if re.search(r'\\@(ifclassloaded|ifpackageloaded|ifundefined|ifnextchar)', text):
+        raise SystemExit(f'Unsafe raw LaTeX2e @ conditional in runtime file: {runtime_path}')
+if r'\\alert' in Path('tex/latex/insr/insr-content.sty').read_text(encoding='utf-8'):
+    raise SystemExit('insr-content.sty must not contain generic Beamer-only \\alert rendering')
+for theme_path in Path('themes').glob('*.tex'):
+    if theme_path.name == 'manifest.tex':
+        continue
+    text = theme_path.read_text(encoding='utf-8')
+    if any(token in text for token in [r'\usetheme', r'\setbeamercolor', r'\setbeamertemplate', 'beamercolorbox']) and r'\str_if_eq:VnTF \g_insr_base_class_tl { beamer }' not in text:
+        raise SystemExit(f'Theme contains unguarded Beamer commands: {theme_path}')
 for legacy_token in ['INSRContentUnit', 'INSRAltFigure', 'INSRLoadPlugin']:
     if legacy_token not in package_text:
         raise SystemExit(f'Missing legacy compatibility/public token in modular packages: {legacy_token}')
@@ -130,6 +148,10 @@ for example in ['minimal-paper','minimal-slides','position-paper','clinical-manu
     path = Path(f'examples/{example}/main.tex')
     if not path.is_file():
         raise SystemExit(f'Missing focused example: {example}')
+
+for fixture in ['tests/fixtures/position-paper-editorial-content-unit.tex', 'tests/fixtures/slides-editorial-content-unit.tex']:
+    if not Path(fixture).is_file():
+        raise SystemExit(f'Missing LuaLaTeX regression fixture: {fixture}')
 
 for entrypoint in __import__('subprocess').check_output(['python3', 'tools/overleaf_doctor.py', 'list-entrypoints', '--plain'], text=True).splitlines():
     if entrypoint != 'main.tex':

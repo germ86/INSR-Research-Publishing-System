@@ -5,6 +5,7 @@
 \cs_set_protected:Npn \__insr_adapter_section:n #1 { \par\textbf{#1}\par }
 \cs_set_protected:Npn \__insr_adapter_subsection:n #1 { \par\emph{#1}\par }
 \cs_set_protected:Npn \__insr_adapter_subsubsection:n #1 { \par\emph{#1}\par }
+\cs_set_protected:Npn \__insr_adapter_render_content_unit: { \__insr_render_content_unit_block: }
 \cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \par }
 \ExplSyntaxOff
 \AtEndDocument{\closing{Sincerely,} \end{letter}}
