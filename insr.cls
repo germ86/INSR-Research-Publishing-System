@@ -40,17 +40,17 @@
 \typeout{INSR v4 bootstrap: type=\tl_use:N\g_insr_document_type_tl, base=\tl_use:N\g_insr_base_class_tl, adapter=\tl_use:N\g_insr_adapter_tl, theme=\tl_use:N\g_insr_theme_tl, palette=\tl_use:N\g_insr_palette_tl, font=\tl_use:N\g_insr_font_tl, language=\tl_use:N\g_insr_language_tl, direction=\tl_use:N\g_insr_direction_tl, profile=\tl_use:N\g_insr_build_profile_tl}
 \exp_args:NV \LoadClass \g_insr_base_class_tl
 \ExplSyntaxOff
-\INSRInputPackageFile{insr-utils}{tex/latex/insr/insr-utils.sty}
-\INSRInputPackageFile{insr-localization}{tex/latex/insr/insr-localization.sty}
-\INSRInputPackageFile{insr-bibliography}{tex/latex/insr/insr-bibliography.sty}
-\INSRInputPackageFile{insr-typography}{tex/latex/insr/insr-typography.sty}
-\INSRInputPackageFile{insr-colors}{tex/latex/insr/insr-colors.sty}
-\INSRInputPackageFile{insr-layout}{tex/latex/insr/insr-layout.sty}
-\INSRInputPackageFile{insr-frontmatter}{tex/latex/insr/insr-frontmatter.sty}
-\INSRInputPackageFile{insr-page-style}{tex/latex/insr/insr-page-style.sty}
-\INSRInputPackageFile{insr-boxes}{tex/latex/insr/insr-boxes.sty}
-\INSRInputPackageFile{insr-accessibility}{tex/latex/insr/insr-accessibility.sty}
-\INSRInputPackageFile{insr-neuro}{tex/latex/insr/insr-neuro.sty}
-\INSRInputPackageFile{insr-content}{tex/latex/insr/insr-content.sty}
-\INSRInputPackageFile{insr-adapters}{tex/latex/insr/insr-adapters.sty}
+\input{tex/latex/insr/insr-utils.sty}
+\input{tex/latex/insr/insr-localization.sty}
+\input{tex/latex/insr/insr-bibliography.sty}
+\input{tex/latex/insr/insr-typography.sty}
+\input{tex/latex/insr/insr-colors.sty}
+\input{tex/latex/insr/insr-layout.sty}
+\input{tex/latex/insr/insr-frontmatter.sty}
+\input{tex/latex/insr/insr-page-style.sty}
+\input{tex/latex/insr/insr-boxes.sty}
+\input{tex/latex/insr/insr-accessibility.sty}
+\input{tex/latex/insr/insr-neuro.sty}
+\input{tex/latex/insr/insr-content.sty}
+\input{tex/latex/insr/insr-adapters.sty}
 \endinput
