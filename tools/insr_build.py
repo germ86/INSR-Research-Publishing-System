@@ -2,23 +2,32 @@
 """Optional local multi-target builder for INSR documents."""
 from __future__ import annotations
 import argparse
+import os
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from overleaf_doctor import TARGETS, ROOT, check_source, check_target
 
 ACTIVE = ROOT / "config" / "active-target.tex"
 
+def _atomic_write(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write(text)
+    os.replace(tmp_name, path)
+
 def write_active(target: str) -> str | None:
     old = ACTIVE.read_text(encoding="utf-8") if ACTIVE.exists() else None
-    ACTIVE.write_text(f"% Temporary target selected by tools/insr_build.py\n\\INSRSelectTarget{{{target}}}\n", encoding="utf-8")
+    _atomic_write(ACTIVE, f"% Temporary target selected by tools/insr_build.py\n\\INSRSelectTarget{{{target}}}\n")
     return old
 
 def restore_active(old: str | None) -> None:
     if old is None:
         ACTIVE.unlink(missing_ok=True)
     else:
-        ACTIVE.write_text(old, encoding="utf-8")
+        _atomic_write(ACTIVE, old)
 
 def run_latexmk(target: str) -> int:
     outdir = ROOT / "build" / target

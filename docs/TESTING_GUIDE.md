@@ -76,3 +76,8 @@ python3 tools/insr_build.py build-all
 ```
 
 The build tool writes temporary active-target configuration, restores the previous file on exit, and reports `latexmk` failures with nonzero exit codes.
+
+
+## Golden reference and release checks
+
+Run `python3 tools/insr_metadata.py validate`, `python3 tools/insr_metadata.py export-all --outdir build/metadata` and `python3 tools/insr_release.py prepare --version v1.0.0-alpha.1` as part of release-readiness checks. The golden-reference entry points under `examples/reference-publication/` are included in Overleaf doctor entrypoint discovery and CI matrices.

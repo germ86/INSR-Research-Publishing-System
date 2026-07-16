@@ -56,3 +56,8 @@ The canonical Overleaf entrypoint remains `main.tex`. Select the output in `conf
 Implemented targets are validated by `tools/overleaf_doctor.py check-target <target>` and share the single source tree under `content/insr-position-paper`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
 
 Automatic citation mode derives the suggested citation from the registered visible authors, title/subtitle, publication date, and publisher. Manual mode uses `publication/suggested-citation` exactly as configured. Pending DOI values are displayed as pending metadata, not fabricated DOI URLs.
+
+
+## Release metadata keys
+
+`publication/year` is an optional explicit year override used by metadata exports and automatic citation formatting. Prefer it when `publication/date` is localized or otherwise not safely machine-readable.
