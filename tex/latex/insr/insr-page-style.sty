@@ -38,27 +38,28 @@
       {#1}
   }
 \cs_new:Npn \__insr_page_style_rule_color:n #1 { #1!\tl_use:N\g_insr_layout_separator_opacity_tl!INSRBackground }
+
 \cs_new_protected:Npn \__insr_page_style_head_rule:
   {
     \str_case:VnF \g_insr_layout_header_separator_style_tl
       {
-        {minimal}{\setheadsepline{0pt}}
-        {single}{\setheadsepline{\tl_use:N\g_insr_layout_header_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}]}
-        {accent}{\setheadsepline{\tl_use:N\g_insr_layout_header_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRHeaderAccent}}]}
-        {double}{\setheadsepline{\dimexpr 2\tl_use:N\g_insr_layout_header_separator_thickness_tl\relax}[\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}]}
+        {minimal}{\KOMAoptions{headsepline=false}}
+        {single}{\KOMAoptions{headsepline=\tl_use:N\g_insr_layout_header_separator_thickness_tl}\setkomafont{headsepline}{\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}}}
+        {accent}{\KOMAoptions{headsepline=\tl_use:N\g_insr_layout_header_separator_thickness_tl}\setkomafont{headsepline}{\color{\__insr_page_style_rule_color:n {INSRHeaderAccent}}}}
+        {double}{\KOMAoptions{headsepline=\dimexpr 2\tl_use:N\g_insr_layout_header_separator_thickness_tl\relax}\setkomafont{headsepline}{\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}}}
       }
-      {\setheadsepline{\tl_use:N\g_insr_layout_header_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}]}
+      {\KOMAoptions{headsepline=\tl_use:N\g_insr_layout_header_separator_thickness_tl}\setkomafont{headsepline}{\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}}}
   }
 \cs_new_protected:Npn \__insr_page_style_foot_rule:
   {
     \str_case:VnF \g_insr_layout_footer_separator_style_tl
       {
-        {minimal}{\setfootsepline{0pt}}
-        {single}{\setfootsepline{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}]}
-        {accent}{\setfootsepline{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRFooterAccent}}]}
-        {double}{\setfootsepline{\dimexpr 2\tl_use:N\g_insr_layout_footer_separator_thickness_tl\relax}[\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}]}
+        {minimal}{\KOMAoptions{footsepline=false}}
+        {single}{\KOMAoptions{footsepline=\tl_use:N\g_insr_layout_footer_separator_thickness_tl}\setkomafont{footsepline}{\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}}}
+        {accent}{\KOMAoptions{footsepline=\tl_use:N\g_insr_layout_footer_separator_thickness_tl}\setkomafont{footsepline}{\color{\__insr_page_style_rule_color:n {INSRFooterAccent}}}}
+        {double}{\KOMAoptions{footsepline=\dimexpr 2\tl_use:N\g_insr_layout_footer_separator_thickness_tl\relax}\setkomafont{footsepline}{\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}}}
       }
-      {\setfootsepline{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}]}
+      {\KOMAoptions{footsepline=\tl_use:N\g_insr_layout_footer_separator_thickness_tl}\setkomafont{footsepline}{\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}}}
   }
 \cs_new_protected:Npn \__insr_page_style_apply_koma:
   {
