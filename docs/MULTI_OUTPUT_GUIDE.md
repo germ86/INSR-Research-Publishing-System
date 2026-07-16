@@ -1,7 +1,7 @@
 
 ## Implemented target system
 
-INSR now separates `content/source` from `output/target`. A single source tree can render as paper-like output, slides, handouts, posters, manuals, reports, briefs, books, or theses according to the authoritative registry used by both `insr-config.sty` and the Python validators.
+INSR now separates `document/type`, `output/target`, and `content/source`. Use `\INSRBootstrap{document/type=rct-protocol, output/target=slides}` to choose the semantic document type independently from the rendering format. `content/source = auto` resolves the default source from the document type, while output targets select the base class and adapter.
 
 Content units retain `\INSRFullText`, `\INSRSummary`, `\INSRKeyMessage`, and `\INSRSpeakerNotes`, and add author-controlled representations: `\INSRHandoutText`, `\INSRPosterText`, `\INSRExecutiveSummary`, `\INSRClinicalApplication`, `\INSRSafetyNote`, `\INSRMethodsSummary`, and `\INSRLimitationsSummary`. The LaTeX build never invents or automatically summarizes scientific content.
 

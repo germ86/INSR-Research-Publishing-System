@@ -23,7 +23,10 @@ class ConfigLifecycleStaticTests(unittest.TestCase):
         self.assertIn("design/theme = editorial", config)
         self.assertIn("design/palette = neuroclinical", config)
         resolver = self.read("tex/latex/insr/insr-config.sty")
-        self.assertRegex(resolver, r"\{ position-paper \}.*\{ scrartcl \}.*\{ paper \}")
+        self.assertIn("__insr_resolve_document_profile:", resolver)
+        self.assertIn("__insr_resolve_output_target:", resolver)
+        self.assertRegex(resolver, r"\{ position-paper \}.*\{ position-paper \}")
+        self.assertRegex(resolver, r"\{ paper \}.*\{ scrartcl \}.*\{ paper \}")
 
     def test_class_options_processed_after_project_config(self):
         cls = self.read("insr.cls")

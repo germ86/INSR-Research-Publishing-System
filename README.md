@@ -10,7 +10,7 @@ The production entry architecture is intentionally small:
 - one public root document: `main.tex`;
 - one authoritative project configuration file: `config/project-config.tex`.
 
-Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Switch paper, slides, poster, book, manual, protocol or review output by changing the `document/type` key in `config/project-config.tex`.
+Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Select the semantic document genre and rendering format in `config/active-target.tex` with `document/type` and `output/target`; keep project-wide defaults such as theme, palette, typography and metadata in `config/project-config.tex`.
 
 The canonical root document is always:
 
@@ -29,14 +29,18 @@ The canonical root document is always:
 
 1. Set the compiler to **LuaLaTeX**.
 2. Keep `main.tex` unchanged.
-3. Edit `config/project-config.tex` to select output type, theme, palette, typography and metadata.
+3. Edit `config/active-target.tex` to select `document/type` and `output/target`; edit `config/project-config.tex` for theme, palette, typography and metadata.
 4. Compile `main.tex`.
 
 A minimal configuration looks like this:
 
 ```tex
+\INSRBootstrap{
+  document/type = position-paper,
+  output/target = paper
+}
+
 \INSRConfigure{
-  document/type = paper,
   design/theme = clinical,
   design/palette = neuroclinical,
   design/font = libertinus,

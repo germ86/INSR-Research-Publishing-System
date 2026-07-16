@@ -41,7 +41,7 @@
   }
 \insr_log_resolution_diagnostics:
 \typeout{INSR v4 class: root insr.cls version 2026/07/16 v4.0; git commit unavailable without shell escape}
-\typeout{INSR v4 bootstrap: type=\tl_use:N\g_insr_document_type_tl, base=\tl_use:N\g_insr_base_class_tl, adapter=\tl_use:N\g_insr_adapter_tl, theme=\tl_use:N\g_insr_theme_tl, palette=\tl_use:N\g_insr_palette_tl, font=\tl_use:N\g_insr_font_tl, language=\tl_use:N\g_insr_language_tl, direction=\tl_use:N\g_insr_direction_tl, profile=\tl_use:N\g_insr_build_profile_tl}
+\typeout{INSR v4 bootstrap: type=\tl_use:N\g_insr_document_type_tl, target=\tl_use:N\g_insr_output_target_tl, base=\tl_use:N\g_insr_base_class_tl, adapter=\tl_use:N\g_insr_adapter_tl, theme=\tl_use:N\g_insr_theme_tl, palette=\tl_use:N\g_insr_palette_tl, font=\tl_use:N\g_insr_font_tl, language=\tl_use:N\g_insr_language_tl, direction=\tl_use:N\g_insr_direction_tl, profile=\tl_use:N\g_insr_build_profile_tl, content=\tl_use:N\g_insr_content_source_tl}
 \exp_args:NV \LoadClass \g_insr_base_class_tl
 \ExplSyntaxOff
 \RequirePackage{insr-utils}
