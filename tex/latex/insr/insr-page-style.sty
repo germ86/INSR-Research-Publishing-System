@@ -1,0 +1,68 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-page-style}[2026/07/16 INSR semantic publication page styles]
+\ExplSyntaxOn
+\str_if_eq:VnF \g_insr_base_class_tl { beamer }
+  { \RequirePackage[automark]{scrlayer-scrpage} \RequirePackage{lastpage} }
+\tl_new:N \l__insr_page_style_placeholder_tl
+\cs_new:Npn \__insr_page_style_placeholder:n #1
+  {
+    \tl_set:Nx \l__insr_page_style_placeholder_tl {#1}
+    \str_case:VnF \l__insr_page_style_placeholder_tl
+      {
+        {current-section}{\headmark}
+        {running-title}{\INSRRunningTitle}
+        {page-number}{\thepage}
+        {total-pages}{\pageref{LastPage}}
+        {version}{v\tl_use:N\g_insr_publication_version_tl}
+        {doi}{\INSRDOILabel}
+      }
+      {#1}
+  }
+\cs_new_protected:Npn \__insr_page_style_apply_koma:
+  {
+    \clearpairofpagestyles
+    \bool_if:NT \g_insr_layout_header_bool
+      {
+        \ihead{\textcolor{INSRHeaderText}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_header_left_tl}}}
+        \chead{\textcolor{INSRHeaderAccent}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_header_center_tl}}}
+        \ohead{\textcolor{INSRHeaderText}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_header_right_tl}}}
+        \setkomafont{pagehead}{\sffamily\small\color{INSRHeaderText}}
+      }
+    \bool_if:NT \g_insr_layout_footer_bool
+      {
+        \ifoot{\textcolor{INSRFooterText}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_footer_left_tl}}}
+        \cfoot{\textcolor{INSRFooterAccent}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_footer_center_tl}/\__insr_page_style_placeholder:n {total-pages}}}
+        \ofoot{\textcolor{INSRFooterText}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_footer_right_tl}}}
+        \setkomafont{pagefoot}{\sffamily\small\color{INSRFooterText}}
+      }
+    \setkomafont{disposition}{\color{INSRTOCHeading}\bfseries}
+    \hypersetup{linkcolor=INSRTOCLink,urlcolor=INSRLink,citecolor=INSRLink}
+    \pagestyle{scrheadings}
+  }
+\cs_new_protected:Npn \__insr_page_style_apply_beamer:
+  {
+    \setbeamercolor{section in toc}{fg=INSRTOCSection}
+    \setbeamercolor{subsection in toc}{fg=INSRTOCSubsection}
+    \setbeamercolor{section in toc shaded}{fg=INSRTOCCurrent}
+    \setbeamercolor{page number in head/foot}{fg=INSRFooterText,bg=INSRFooterBackground}
+  }
+\cs_new_protected:Npn \__insr_page_style_setup:
+  { \str_if_eq:VnTF \g_insr_base_class_tl { beamer } { \__insr_page_style_apply_beamer: } { \__insr_page_style_apply_koma: } }
+\cs_new_protected:Npn \__insr_page_style_title: { \thispagestyle{empty} }
+\cs_new_protected:Npn \__insr_page_style_frontmatter: { \str_if_eq:VnF \g_insr_base_class_tl { beamer } { \pagestyle{scrheadings} } }
+\cs_new_protected:Npn \__insr_page_style_toc: { \str_if_eq:VnF \g_insr_base_class_tl { beamer } { \pagestyle{scrheadings} } }
+\cs_new_protected:Npn \__insr_page_style_main: { \str_if_eq:VnF \g_insr_base_class_tl { beamer } { \pagestyle{scrheadings} } }
+\cs_new_protected:Npn \__insr_page_style_chapter: { \str_if_eq:VnF \g_insr_base_class_tl { beamer } { \thispagestyle{plain.scrheadings} } }
+\cs_new_protected:Npn \__insr_page_style_references: { \str_if_eq:VnF \g_insr_base_class_tl { beamer } { \pagestyle{scrheadings} } }
+\cs_new_protected:Npn \__insr_page_style_appendix: { \str_if_eq:VnF \g_insr_base_class_tl { beamer } { \pagestyle{scrheadings} } }
+\cs_new_protected:Npn \__insr_page_style_blind_review: { \tl_gset:Nn \g_insr_layout_header_left_tl { Anonymous~manuscript } \tl_gset:Nn \g_insr_layout_footer_right_tl { } \__insr_page_style_setup: }
+\NewDocumentCommand \INSRPageStyleTitle {} { \__insr_page_style_title: }
+\NewDocumentCommand \INSRPageStyleFrontMatter {} { \__insr_page_style_frontmatter: }
+\NewDocumentCommand \INSRPageStyleTOC {} { \__insr_page_style_toc: }
+\NewDocumentCommand \INSRPageStyleMain {} { \__insr_page_style_main: }
+\NewDocumentCommand \INSRPageStyleChapter {} { \__insr_page_style_chapter: }
+\NewDocumentCommand \INSRPageStyleReferences {} { \__insr_page_style_references: }
+\NewDocumentCommand \INSRPageStyleAppendix {} { \__insr_page_style_appendix: }
+\__insr_page_style_setup:
+\ExplSyntaxOff
+\endinput
