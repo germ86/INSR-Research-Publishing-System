@@ -16,7 +16,10 @@ class ConfigLifecycleStaticTests(unittest.TestCase):
 
     def test_project_config_position_paper_resolution_inputs(self):
         config = self.read("config/project-config.tex")
-        self.assertIn("document/type = position-paper", config)
+        active = self.read("config/active-target.tex")
+        self.assertIn("\\INSRBootstrap", active)
+        self.assertIn("document/target=position-paper", active)
+        self.assertNotIn("document/type = position-paper", config)
         self.assertIn("design/theme = editorial", config)
         self.assertIn("design/palette = neuroclinical", config)
         resolver = self.read("tex/latex/insr/insr-config.sty")

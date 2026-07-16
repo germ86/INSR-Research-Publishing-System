@@ -169,7 +169,7 @@ Native distribution-style classes are available for production documents: `insr-
 
 ### Active target workflow
 
-The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with `\INSRSelectTarget{position-paper}` or via `output/target` in project configuration. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with the bootstrap-only setting `\INSRBootstrap{document/target=position-paper}`. Broader project values remain in `config/project-config.tex` and no longer need to restate the target. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
 
 Frontmatter now suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.
 

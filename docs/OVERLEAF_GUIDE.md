@@ -31,7 +31,7 @@ Run `python3 tools/overleaf_doctor.py check` before upload. Keep generated LaTeX
 For Overleaf, keep `main.tex` unchanged and edit only `config/active-target.tex`:
 
 ```tex
-\INSRSelectTarget{position-paper}
+\INSRBootstrap{document/target=position-paper}
 ```
 
 Valid targets include `position-paper`, `paper`, `journal-paper`, `slides`, `handout`, `poster`, `clinical-manual`, `technical-report`, `executive-brief`, `book`, and `thesis`. The target is read during early project configuration before the base class is loaded.

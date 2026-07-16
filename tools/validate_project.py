@@ -26,9 +26,13 @@ if '\\begin{frame}' in main or '\\documentclass{insr-manual}' in main:
     raise SystemExit('main.tex must not contain class-incompatible Beamer/manual merge artefacts')
 
 config = Path('config/project-config.tex').read_text(encoding='utf-8')
-for token in ['\\INSRConfigure', 'document/type', 'design/theme', 'design/palette', 'design/font']:
+active_target = Path('config/active-target.tex').read_text(encoding='utf-8')
+for token in ['\\INSRConfigure', 'document/build-profile', 'design/theme', 'design/palette', 'design/font']:
     if token not in config:
         raise SystemExit(f'Missing configuration token: {token}')
+for token in ['\\INSRBootstrap', 'document/target']:
+    if token not in active_target:
+        raise SystemExit(f'Missing active target bootstrap token: {token}')
 
 cls = Path('insr.cls').read_text(encoding='utf-8')
 required_packages = ['insr-core','insr-config','insr-metadata','insr-content','insr-adapters','insr-bibliography','insr-localization','insr-typography','insr-colors','insr-layout','insr-page-style','insr-boxes','insr-accessibility','insr-neuro','insr-utils']
