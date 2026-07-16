@@ -51,7 +51,7 @@ Publication-specific project values are split across `config/metadata-config.tex
 
 ## Active target, frontmatter, and placeholders
 
-The canonical Overleaf entrypoint remains `main.tex`. Select the output in `config/active-target.tex` with `\INSRSelectTarget{position-paper}` or with the `output/target` key in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+The canonical Overleaf entrypoint remains `main.tex`. Select the output in `config/active-target.tex` with `\INSRBootstrap{document/target=position-paper}`. Keep target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
 
 Implemented targets are validated by `tools/overleaf_doctor.py check-target <target>` and share the single source tree under `content/insr-position-paper`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
 
@@ -61,3 +61,15 @@ Automatic citation mode derives the suggested citation from the registered visib
 ## Release metadata keys
 
 `publication/year` is an optional explicit year override used by metadata exports and automatic citation formatting. Prefer it when `publication/date` is localized or otherwise not safely machine-readable.
+
+## Placeholder, role, and citation semantics
+
+Content units support semantic keys `role`, `numbered`, `toc`, `required`, and `placeholder`. The default is `required=true`; production builds or `content/placeholders=error` raise a precise content-unit error for required empty/placeholder units, while optional units (`required=false`) may be omitted. Use `\INSRPlaceholder` or `placeholder=true` for controlled placeholders; legacy placeholder prose is accepted temporarily with a migration warning.
+
+`\INSRTableOfContents` is the single public global TOC API. Paper-like targets use the class-native `\tableofcontents` heading with one stable bookmark destination; Beamer targets render one Agenda frame. Repeated global calls are ignored and diagnosed in development builds.
+
+Automatic suggested citations are assembled from semantic author, year, title, subtitle, version, and publisher components. `publication/year` is used for the year; full publication dates remain title-page metadata. Pending DOI values are displayed as pending metadata rather than linked identifiers.
+
+CRediT role lists are parsed as comma lists and mapped to publication-facing labels, including Writing -- Original Draft, Writing -- Review and Editing, Formal Analysis, Data Curation, Funding Acquisition, and Resources. Unknown role slugs warn in development and are not printed as raw technical identifiers.
+
+Review builds render neutral placeholder text. Production builds fail required placeholder units, while optional units marked `required=false` may remain silent. The repository's official position-paper content uses explicit `\INSRPlaceholder` markers rather than legacy placeholder prose.
