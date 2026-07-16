@@ -20,14 +20,7 @@ def _atomic_write(path: Path, text: str) -> None:
 
 def write_active(target: str) -> str | None:
     old = ACTIVE.read_text(encoding="utf-8") if ACTIVE.exists() else None
-    info = TARGETS[target]
-    document_type = info.get("type", target)
-    output_target = info.get("target", "paper")
-    _atomic_write(
-        ACTIVE,
-        "% Temporary target selected by tools/insr_build.py\n"
-        f"\\INSRBootstrap{{document/type={document_type}, output/target={output_target}}}\n",
-    )
+    _atomic_write(ACTIVE, f"% Temporary target selected by tools/insr_build.py\n\\INSRBootstrap{{document/target={target}}}\n")
     return old
 
 def restore_active(old: str | None) -> None:

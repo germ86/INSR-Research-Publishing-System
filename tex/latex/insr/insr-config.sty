@@ -81,8 +81,8 @@
 \keys_define:nn { insr }
   {
     config/load-project .bool_gset:N = \g_insr_load_project_config_bool,
-    document/type .code:n = { \tl_gset:Nn \g_insr_document_type_tl { #1 } \bool_gset_true:N \g__insr_document_type_explicit_bool },
-    document/target .code:n = { \tl_gset:Nn \g_insr_output_target_tl { #1 } \bool_gset_true:N \g__insr_output_target_explicit_bool },
+    document/type .tl_gset:N = \g_insr_document_type_tl,
+    document/target .tl_gset:N = \g_insr_output_target_tl,
     document/density .tl_gset:N = \g_insr_density_tl,
     document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
     design/theme .tl_gset:N = \g_insr_theme_tl,
