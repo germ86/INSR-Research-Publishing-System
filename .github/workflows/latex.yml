@@ -23,7 +23,10 @@ jobs:
           python3 tools/validate_project.py
           python3 tools/validate_bibliography.py references.bib
           python3 tools/validate_palette.py
-          python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
+          python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py tests/test_publication_layer_static.py tests/test_release_metadata_static.py
+          python3 tools/insr_metadata.py validate
+          python3 tools/insr_metadata.py export-all --outdir build/metadata
+          python3 tools/insr_release.py prepare --version ci-alpha
           ./tests/run-tests.sh --static-only
 
   root-smoke:
@@ -58,6 +61,7 @@ jobs:
           - examples/publication-zenodo-preprint/main.tex
           - examples/publication-multi-author/main.tex
           - examples/publication-funded-research/main.tex
+          - examples/reference-publication/paper.tex
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
@@ -78,6 +82,8 @@ jobs:
           - examples/beamer-demo.tex
           - examples/german-scientific-presentation.tex
           - examples/hebrew-rtl-slides.tex
+          - examples/reference-publication/slides.tex
+          - examples/reference-publication/handout.tex
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
@@ -118,6 +124,7 @@ jobs:
           - examples/clinical-trial-protocol.tex
           - examples/systematic-review/main.tex
           - examples/conference-poster/main.tex
+          - examples/reference-publication/poster.tex
           - examples/technical-documentation/main.tex
           - examples/theme-gallery/main.tex
           - examples/custom-theme/main.tex

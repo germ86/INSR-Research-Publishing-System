@@ -27,3 +27,8 @@ Headers, footers and table-of-contents links use semantic colors derived from th
 ## Professional separators
 
 Header and footer separators are controlled through `layout/header-separator-style`, `layout/footer-separator-style`, `layout/header-separator-thickness`, `layout/footer-separator-thickness`, `layout/header-separator-spacing`, `layout/footer-separator-spacing` and `layout/separator-opacity`. Supported styles are `single`, `double`, `accent` and `minimal`. Separator colors come from theme-level `INSRHeaderSeparator` and `INSRFooterSeparator`, which derive from the active palette.
+
+
+## Release page-style checks
+
+Release candidates should inspect the root document and the reference-publication paper for title page, table of contents, normal content page, bibliography and appendix page styles. `body-only`, `physical` and `frontmatter-roman` numbering modes must be checked in a TeX-enabled environment.

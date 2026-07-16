@@ -22,12 +22,15 @@ ENTRYPOINTS = {
         "examples/publication-zenodo-preprint/main.tex",
         "examples/publication-multi-author/main.tex",
         "examples/publication-funded-research/main.tex",
+        "examples/reference-publication/paper.tex",
     ],
     "slides": [
         "examples/minimal-slides/main.tex",
         "examples/beamer-demo.tex",
         "examples/german-scientific-presentation.tex",
         "examples/hebrew-rtl-slides.tex",
+        "examples/reference-publication/slides.tex",
+        "examples/reference-publication/handout.tex",
     ],
     "manual": [
         "examples/clinical-manual/main.tex",
@@ -40,7 +43,7 @@ ENTRYPOINTS = {
         "examples/clinical-trial-protocol.tex",
     ],
     "review": ["examples/systematic-review/main.tex"],
-    "poster": ["examples/conference-poster/main.tex"],
+    "poster": ["examples/conference-poster/main.tex", "examples/reference-publication/poster.tex"],
     "documentation": [
         "examples/technical-documentation/main.tex",
         "examples/theme-gallery/main.tex",

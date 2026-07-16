@@ -1,0 +1,35 @@
+\documentclass[config/load-project=false,document/type=paper,metadata/title={Reference Publication Demo},metadata/author={Reference Authors},metadata/institution={Example Publishing Lab}]{insr}
+\INSRConfigure{
+  metadata/title={Reference Publication Demo},
+  metadata/subtitle={Neutral Golden Reference for Layout and Metadata},
+  metadata/short-title={Reference Publication},
+  metadata/author={Reference Authors},
+  metadata/institution={Example Publishing Lab},
+  metadata/keywords={reference, metadata, accessibility, publishing},
+  bibliography/resource={examples/reference-publication/references.bib},
+  publication/type={Reference paper},
+  publication/status={alpha reference},
+  publication/version={1.0.0-alpha.1},
+  publication/date={16 July 2026},
+  publication/year={2026},
+  publication/doi={pending},
+  publication/url={https://example.org/insr/reference-publication/very/long/url/that/exercises/line/breaking/in/the/metadata/panel},
+  publication/repository={https://github.com/germ86/INSR-Research-Publishing-System/tree/main/examples/reference-publication},
+  publication/license={CC BY 4.0},
+  publication/publisher={Example Publishing Lab},
+  metadata/funding={No external funding was used for this neutral demonstration.},
+  metadata/conflict-of-interest={The demo authors declare no competing interests.},
+  metadata/ethics={No human or animal participant data are included.},
+  metadata/data-availability={No research dataset is associated with this demonstration.},
+  metadata/code-availability={Demo source files are included in the repository.},
+  metadata/highlights={Neutral reference title page; Structured metadata; Multi-output source},
+  metadata/key-messages={This document validates layout behavior without scientific claims.}
+}
+\INSRAddInstitution{id=example-lab,name={Example Publishing Lab},city={Example City},country={Exampleland}}
+\INSRAddInstitution{id=demo-archive,name={Demonstration Archive},city={Archive City},country={Exampleland}}
+\INSRAddAuthor{id=author-one,name={Jane Doe},short-name={Doe, J.},orcid={0000-0002-1825-0097},affiliations={example-lab},roles={conceptualization,methodology,writing-original-draft}}
+\INSRAddAuthor{id=author-two,name={John Q. Public},short-name={Public, J. Q.},orcid={0000-0003-1415-9265},affiliations={example-lab,demo-archive},roles={software,validation,writing-review-editing}}
+\begin{document}
+\INSRMakeTitle
+\input{examples/reference-publication/content/reference-body.tex}
+\end{document}

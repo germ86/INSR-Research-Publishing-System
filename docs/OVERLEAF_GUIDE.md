@@ -35,3 +35,8 @@ For Overleaf, keep `main.tex` unchanged and edit only `config/active-target.tex`
 ```
 
 Valid targets include `position-paper`, `paper`, `journal-paper`, `slides`, `handout`, `poster`, `clinical-manual`, `technical-report`, `executive-brief`, `book`, and `thesis`. The target is read during early project configuration before the base class is loaded.
+
+
+## Reference publication workflow
+
+Overleaf builds continue to use `main.tex` plus optional `config/active-target.tex` for target switching. The reference publication example under `examples/reference-publication/` uses `config/load-project=false` entry points so it can be compiled independently without changing the productive root document.
