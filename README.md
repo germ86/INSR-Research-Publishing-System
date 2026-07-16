@@ -169,7 +169,7 @@ Native distribution-style classes are available for production documents: `insr-
 
 ### Active target workflow
 
-The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with `\INSRSelectTarget{position-paper}` or via `output/target` in project configuration. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with the bootstrap-only setting `\INSRBootstrap{document/target=position-paper}`. Broader project values remain in `config/project-config.tex` and no longer need to restate the target. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
 
 Frontmatter now suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.
 
@@ -177,3 +177,7 @@ Frontmatter now suppresses empty optional fields, resolves author affiliation ID
 ### Release readiness and golden reference
 
 The neutral golden-reference project lives in `examples/reference-publication/` and exercises paper, slides, handout and poster entry points without scientific or clinical claims. Metadata exports are prepared with `python3 tools/insr_metadata.py export-all --outdir build/metadata`; release bundles are prepared locally with `python3 tools/insr_release.py prepare --version <version>`. See `docs/RELEASE_GUIDE.md`.
+
+### Root build placeholder and TOC policy
+
+INSR v4 keeps placeholder rendering central in `tex/latex/insr/insr-content.sty`. Authors should mark intentional empty content with `\INSRPlaceholder` or `placeholder=true`; legacy prose placeholders are accepted only with a migration warning. Production builds and `content/placeholders=error` fail required empty units with unit ID, visible title, source, and target. `\INSRTableOfContents` is the only global TOC API and is guarded against duplicate visible contents pages.
