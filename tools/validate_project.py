@@ -230,4 +230,31 @@ for token in ['INSRHeaderText', 'INSRHeaderSeparator', 'INSRFooterText', 'INSRFo
     if token not in Path('tex/latex/insr/insr-colors.sty').read_text(encoding='utf-8'):
         raise SystemExit(f'Missing semantic publication color: {token}')
 
+
+# Ensure central internal renderers called by content/adapters are defined or intentionally supplied by adapters.
+module_texts = {str(path): path.read_text(encoding='utf-8') for path in Path('tex/latex/insr').glob('insr-*.sty')}
+combined_modules = '\n'.join(module_texts.values())
+defined = set(re.findall(r'\\(?:cs_new(?:_protected)?|cs_set(?:_protected)?|cs_gset(?:_protected)?|prg_new_conditional):[^\s]*\s+(\\__[A-Za-z0-9_:]+)', combined_modules))
+called = set(re.findall(r'(\\__insr_[A-Za-z0-9_]+(?::[A-Za-z]+)?:)', combined_modules))
+allowed_imports = {'\\__insr_adapter_make_title:', '\\__insr_adapter_render_content_unit:', '\\__insr_adapter_part:', '\\__insr_adapter_chapter:', '\\__insr_adapter_section:', '\\__insr_adapter_subsection:', '\\__insr_adapter_subsubsection:', '\\__insr_adapter_bibliography:'}
+missing_internal = sorted(name for name in called if name not in defined and name not in allowed_imports and not any(d.startswith(name) for d in defined))
+if missing_internal:
+    raise SystemExit(f'Undefined internal renderer/helper calls: {missing_internal}')
+content_module = Path('tex/latex/insr/insr-content.sty').read_text(encoding='utf-8')
+for token in ['\\__insr_render_placeholder:', '\\INSRPlaceholder', 'placeholder .bool_set:N', 'required .tl_set:N', 'role .tl_set:N']:
+    if token not in content_module:
+        raise SystemExit(f'Missing central placeholder/content-unit semantic token: {token}')
+if r'\tl_if_in:VnTF \l_insr_unit_full_tl {placeholder}' in content_module:
+    raise SystemExit('Placeholder detection must not use arbitrary substring matching')
+if r'\section*{Contents}' in content_module:
+    raise SystemExit('INSRTableOfContents must not add a second manual Contents heading before native tableofcontents')
+metadata_module = Path('tex/latex/insr/insr-metadata.sty').read_text(encoding='utf-8')
+for slug in ['writing-original-draft', 'writing-review-editing', 'formal-analysis', 'data-curation', 'funding-acquisition']:
+    if slug not in metadata_module:
+        raise SystemExit(f'Missing CRediT mapping for {slug}')
+if 'publication/year' not in config_pkg or 'g_insr_publication_year_tl' not in metadata_module:
+    raise SystemExit('Automatic citation must use publication/year support')
+if r'\RequirePackage{bookmark}' not in Path('tex/latex/insr/insr-layout.sty').read_text(encoding='utf-8'):
+    raise SystemExit('bookmark must be loaded explicitly after hyperref')
+
 print('project validation passed')

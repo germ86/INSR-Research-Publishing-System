@@ -48,3 +48,7 @@ Optional fields are rendered only when their trimmed value is nonblank. This app
 ## Optional field semantics
 
 Optional frontmatter labels are emitted only when their underlying token-list or author-role data is non-empty. Renderer macros alone do not make Funding, Conflict of interest, Ethics, Highlights, Key messages, Data availability, Code availability or Author contributions visible.
+
+## Content-unit roles and numbering
+
+Position-paper frontmatter should use semantic roles instead of title comparisons: `frontmatter-status`, `abstract`, `main`, `declarations`, and `references`. The standard profile renders Document status, Abstract, Keywords, Highlights, Key messages, and Contents as unnumbered frontmatter; Introduction is the first numbered main section.
