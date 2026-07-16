@@ -30,6 +30,7 @@
   }
 \cs_new_protected:Npn \__insr_frontmatter_render_scientific:n #1
   {
+    \hypersetup{pageanchor=false}
     \begin{titlepage}
       \INSRPageStyleTitle
       \centering
@@ -50,6 +51,7 @@
       \end{minipage}
     \end{titlepage}
     \str_case:Vn \g_insr_layout_page_numbering_tl { {body-only}{\setcounter{page}{1}} {frontmatter-roman}{\pagenumbering{roman}\setcounter{page}{1}} }
+    \hypersetup{pageanchor=true}
     \INSRPageStyleMain
     \__insr_frontmatter_optional:nn {Highlights} {\tl_use:N\g_insr_highlights_tl}
     \__insr_frontmatter_optional:nn {Key~messages} {\tl_use:N\g_insr_key_messages_tl}
