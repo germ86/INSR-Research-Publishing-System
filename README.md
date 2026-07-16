@@ -177,3 +177,7 @@ Frontmatter now suppresses empty optional fields, resolves author affiliation ID
 ### Release readiness and golden reference
 
 The neutral golden-reference project lives in `examples/reference-publication/` and exercises paper, slides, handout and poster entry points without scientific or clinical claims. Metadata exports are prepared with `python3 tools/insr_metadata.py export-all --outdir build/metadata`; release bundles are prepared locally with `python3 tools/insr_release.py prepare --version <version>`. See `docs/RELEASE_GUIDE.md`.
+
+### Root build placeholder and TOC policy
+
+INSR v4 keeps placeholder rendering central in `tex/latex/insr/insr-content.sty`. Authors should mark intentional empty content with `\INSRPlaceholder` or `placeholder=true`; legacy prose placeholders are accepted only with a migration warning. Production builds and `content/placeholders=error` fail required empty units with unit ID, visible title, source, and target. `\INSRTableOfContents` is the only global TOC API and is guarded against duplicate visible contents pages.

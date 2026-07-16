@@ -40,3 +40,7 @@ Valid targets include `position-paper`, `paper`, `journal-paper`, `slides`, `han
 ## Reference publication workflow
 
 Overleaf builds continue to use `main.tex` plus optional `config/active-target.tex` for target switching. The reference publication example under `examples/reference-publication/` uses `config/load-project=false` entry points so it can be compiled independently without changing the productive root document.
+
+## Root build guardrails
+
+Before validating the root document, remove stale TeX auxiliaries and require a zero `latexmk` exit code; an emitted PDF after a failing TeX run is not considered successful. The root content currently contains controlled development placeholders, rendered centrally by `tex/latex/insr/insr-content.sty` according to `document/build-profile` and `content/placeholders`.

@@ -81,3 +81,7 @@ The build tool writes temporary active-target configuration, restores the previo
 ## Golden reference and release checks
 
 Run `python3 tools/insr_metadata.py validate`, `python3 tools/insr_metadata.py export-all --outdir build/metadata` and `python3 tools/insr_release.py prepare --version v1.0.0-alpha.1` as part of release-readiness checks. The golden-reference entry points under `examples/reference-publication/` are included in Overleaf doctor entrypoint discovery and CI matrices.
+
+## Renderer regression checks
+
+`tools/validate_project.py` statically validates that internal `\__insr_...:` renderer/helper calls in the modular package layer are defined or explicitly supplied by adapters. This catches missing central renderers such as `\__insr_render_placeholder:` before merge.
