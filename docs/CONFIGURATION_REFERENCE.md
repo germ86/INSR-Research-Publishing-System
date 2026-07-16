@@ -48,3 +48,11 @@ The alias `localization/language = german` is normalized to `ngerman`; `english`
 ## Publication configuration hierarchy
 
 Publication-specific project values are split across `config/metadata-config.tex`, `config/publication-config.tex`, `config/layout-config.tex` and `config/authors-config.tex`; the implementation layer remains `tex/latex/insr/insr-config.sty`.
+
+## Active target, frontmatter, and placeholders
+
+The canonical Overleaf entrypoint remains `main.tex`. Select the output in `config/active-target.tex` with `\INSRSelectTarget{position-paper}` or with the `output/target` key in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+
+Implemented targets are validated by `tools/overleaf_doctor.py check-target <target>` and share the single source tree under `content/insr-position-paper`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
+
+Automatic citation mode derives the suggested citation from the registered visible authors, title/subtitle, publication date, and publisher. Manual mode uses `publication/suggested-citation` exactly as configured. Pending DOI values are displayed as pending metadata, not fabricated DOI URLs.

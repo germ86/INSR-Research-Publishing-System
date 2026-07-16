@@ -37,3 +37,9 @@ Use `publication/profile` for document intent: `generic-preprint`, `journal`, `b
 ## Stabilization notes
 
 The frontmatter renderer now delegates page-state changes to `insr-page-style.sty`, keeping title/frontmatter metadata rendering separate from page-style implementation. DOI values are displayed only when configured and are also forwarded to PDF metadata.
+
+## Publication-quality title-page rules
+
+The title page renders the publication type once, then the title and subtitle. Author output is built from the author/institution registries: internal affiliation IDs are resolved to institution names, ORCID values are shown separately, and CRediT roles are moved into an author-contributions block using human-readable labels.
+
+Optional fields are rendered only when their trimmed value is nonblank. This applies to funding, conflicts of interest, ethics, highlights, key messages, author contributions, data availability, code availability, repository, license, and suggested citation.

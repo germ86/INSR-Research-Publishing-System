@@ -166,3 +166,9 @@ INSR includes a dedicated publication layer for journal manuscripts, position pa
 Page styles are centralized in `tex/latex/insr/insr-page-style.sty`; see `PAGESTYLE_GUIDE.md` for semantic title/frontmatter/main/references/appendix styles and palette-integrated header, footer and TOC colors.
 
 Native distribution-style classes are available for production documents: `insr-paper`, `insr-book`, `insr-beamer`, `insr-poster`, `insr-handout` and `insr-manual`. They all inherit the shared `insr` architecture and remain compatible with the v4 public API.
+
+### Active target workflow
+
+The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with `\INSRSelectTarget{position-paper}` or via `output/target` in project configuration. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+
+Frontmatter now suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.

@@ -3,6 +3,8 @@
 \ExplSyntaxOn
 \bool_gset_true:N \g_insr_load_project_config_bool
 \tl_gset:Nn \g_insr_document_type_tl { paper }
+\tl_gset:Nn \g_insr_output_target_tl { }
+\tl_gset:Nn \g_insr_content_source_tl { insr-position-paper }
 \tl_gset:Nn \g_insr_density_tl { standard }
 \tl_gset:Nn \g_insr_build_profile_tl { development }
 \tl_gset:Nn \g_insr_theme_tl { clinical }
@@ -45,6 +47,8 @@
 \tl_gset:Nn \g_insr_layout_logo_tl { }
 \tl_gset:Nn \g_insr_publication_review_tl { }
 \tl_gset:Nn \g_insr_citation_tl { }
+\tl_gset:Nn \g_insr_citation_mode_tl { automatic }
+\tl_gset:Nn \g_insr_suggested_citation_tl { }
 \tl_gset:Nn \g_insr_abstract_word_count_tl { }
 \tl_gset:Nn \g_insr_document_word_count_tl { }
 \tl_gset:Nn \g_insr_funding_statement_tl { }
@@ -66,6 +70,11 @@
 \tl_gset:Nn \g_insr_layout_footer_left_tl { version }
 \tl_gset:Nn \g_insr_layout_footer_center_tl { page-number }
 \tl_gset:Nn \g_insr_layout_footer_right_tl { doi }
+\tl_gset:Nn \g_insr_layout_page_numbering_tl { body-only }
+\tl_gset:Nn \g_insr_content_placeholders_tl { compact }
+\bool_gset_true:N \g_insr_frontmatter_toc_bool
+\bool_gset_false:N \g_insr_frontmatter_abstract_numbered_bool
+\bool_gset_true:N \g_insr_frontmatter_keywords_bool
 \keys_define:nn { insr }
   {
     config/load-project .bool_gset:N = \g_insr_load_project_config_bool,
@@ -101,6 +110,8 @@
     publication/copyright .tl_gset:N = \g_insr_publication_copyright_tl,
     publication/profile .tl_gset:N = \g_insr_publication_profile_tl,
     publication/review .tl_gset:N = \g_insr_publication_review_tl,
+    publication/citation-mode .tl_gset:N = \g_insr_citation_mode_tl,
+    publication/suggested-citation .tl_gset:N = \g_insr_suggested_citation_tl,
 
     publication/publisher .tl_gset:N = \g_insr_publication_publisher_tl,
     publication/git-revision .tl_gset:N = \g_insr_publication_git_revision_tl,
@@ -135,11 +146,19 @@
     layout/footer-center .tl_gset:N = \g_insr_layout_footer_center_tl,
     layout/footer-right .tl_gset:N = \g_insr_layout_footer_right_tl,
     content/template .tl_gset:N = \g_insr_template_tl,
+    content/source .tl_gset:N = \g_insr_content_source_tl,
+    content/placeholders .tl_gset:N = \g_insr_content_placeholders_tl,
+    output/target .tl_gset:N = \g_insr_output_target_tl,
+    layout/page-numbering .tl_gset:N = \g_insr_layout_page_numbering_tl,
+    frontmatter/toc .bool_gset:N = \g_insr_frontmatter_toc_bool,
+    frontmatter/abstract-numbered .bool_gset:N = \g_insr_frontmatter_abstract_numbered_bool,
+    frontmatter/keywords .bool_gset:N = \g_insr_frontmatter_keywords_bool,
     unknown .code:n = { \msg_warning:nnx { insr } { unknown-key } { \l_keys_key_str } }
   }
 \NewDocumentCommand \INSRConfigure { m } { \ExplSyntaxOn \keys_set:nn { insr } { #1 } \ExplSyntaxOff }
 \NewDocumentCommand \INSRSetup { m } { \msg_warning:nnn { insr } { deprecated-command } { \string\INSRSetup } \INSRConfigure{#1} }
 \cs_new_protected:Npn \insr_resolve_document_type: {
+  \tl_if_blank:VF \g_insr_output_target_tl { \tl_gset_eq:NN \g_insr_document_type_tl \g_insr_output_target_tl }
   \str_case:VnF \g_insr_document_type_tl
     {
       { article } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { article } }
@@ -161,10 +180,14 @@
       { thesis } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { thesis } }
       { slides } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } }
       { handout } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } \PassOptionsToClass{handout}{beamer} }
+      { journal-paper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
+      { clinical-manual } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { manual } }
+      { technical-report } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
+      { executive-brief } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
       { poster } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { poster } }
       { letter } { \tl_gset:Nn \g_insr_base_class_tl { scrlttr2 } \tl_gset:Nn \g_insr_adapter_tl { letter } }
     }
-    { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
+    { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \tl_gset:Nn \g_insr_output_target_tl { } \tl_gset:Nn \g_insr_content_source_tl { insr-position-paper } \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
 }
 \ExplSyntaxOff
 \endinput

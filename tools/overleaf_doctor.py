@@ -63,12 +63,26 @@ GENERATED_SUFFIXES = {
     ".glg", ".acn", ".acr", ".alg",
 }
 
+TARGETS = {
+    "position-paper": {"base": "scrartcl", "adapter": "paper", "profile": "position-paper", "source": "insr-position-paper"},
+    "paper": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
+    "journal-paper": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
+    "slides": {"base": "beamer", "adapter": "slides", "profile": "slides", "source": "insr-position-paper"},
+    "handout": {"base": "beamer", "adapter": "slides", "profile": "handout", "source": "insr-position-paper"},
+    "poster": {"base": "beamer", "adapter": "poster", "profile": "poster", "source": "insr-position-paper"},
+    "clinical-manual": {"base": "scrreprt", "adapter": "manual", "profile": "manual", "source": "insr-position-paper"},
+    "technical-report": {"base": "scrreprt", "adapter": "report", "profile": "report", "source": "insr-position-paper"},
+    "executive-brief": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
+    "book": {"base": "scrbook", "adapter": "book", "profile": "book", "source": "insr-position-paper"},
+    "thesis": {"base": "scrbook", "adapter": "thesis", "profile": "thesis", "source": "insr-position-paper"},
+}
+
 SUPPORTED_DOCUMENT_TYPES = {
     "article", "paper", "position-paper", "whitepaper", "report", "book", "monograph",
     "thesis", "slides", "handout", "poster", "letter", "grant", "protocol",
     "clinical-trial-protocol", "rct", "systematic-review", "narrative-review",
     "technical-documentation", "developer-documentation", "manual",
-}
+} | set(TARGETS)
 VALID_THEMES = {p.stem for p in (ROOT / "themes").glob("*.tex")}
 VALID_PALETTES = {p.stem for p in (ROOT / "palettes").glob("*.tex") if p.parent.name == "palettes"}
 VALID_FONTS = {p.stem for p in (ROOT / "typography").glob("*.tex")}
@@ -242,6 +256,53 @@ def check_entrypoint(args: argparse.Namespace) -> int:
     return 0
 
 
+
+def check_target(args: argparse.Namespace) -> int:
+    target = args.target
+    if target not in TARGETS:
+        print(f"unknown target: {target}")
+        return 1
+    info = TARGETS[target]
+    problems: list[str] = []
+    if not (ROOT / f"framework/adapters/{info['adapter']}.tex").is_file():
+        problems.append(f"missing adapter: {info['adapter']}")
+    if not (ROOT / f"profiles/documents/{info['profile']}.profile.tex").is_file():
+        problems.append(f"missing profile: {info['profile']}")
+    if not (ROOT / f"content/{info['source']}").is_dir():
+        problems.append(f"missing content source: {info['source']}")
+    config_pkg = read(ROOT / "tex/latex/insr/insr-config.sty")
+    if f"{{ {target} }}" not in config_pkg and f"{{{target}}}" not in config_pkg:
+        problems.append("target not mapped in insr-config.sty")
+    if problems:
+        print(f"target {target}: invalid")
+        for problem in problems:
+            print(f"- {problem}")
+        return 1
+    print(f"target {target}: base={info['base']} adapter={info['adapter']} profile={info['profile']} source={info['source']}")
+    return 0
+
+
+def check_source(args: argparse.Namespace) -> int:
+    source = args.source
+    directory = ROOT / "content" / source
+    manifest = ROOT / "content/manifest.tex"
+    problems: list[str] = []
+    if not directory.is_dir():
+        problems.append(f"missing content source: {source}")
+    if not manifest.is_file():
+        problems.append("missing content/manifest.tex")
+    else:
+        text = read(manifest)
+        if f"content/{source}/" not in text:
+            problems.append(f"manifest does not reference content/{source}/")
+    if problems:
+        print(f"source {source}: invalid")
+        for problem in problems:
+            print(f"- {problem}")
+        return 1
+    print(f"source {source}: ok")
+    return 0
+
 def check(_: argparse.Namespace) -> int:
     problems = collect_problems()
     if problems:
@@ -290,6 +351,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check").set_defaults(func=check)
+    ct = sub.add_parser("check-target"); ct.add_argument("target"); ct.set_defaults(func=check_target)
+    cs = sub.add_parser("check-source"); cs.add_argument("source"); cs.set_defaults(func=check_source)
     le = sub.add_parser("list-entrypoints"); le.add_argument("--plain", action="store_true", help="print only paths for scripts"); le.set_defaults(func=list_entrypoints)
     ce = sub.add_parser("check-entrypoint"); ce.add_argument("path"); ce.set_defaults(func=check_entrypoint)
     sub.add_parser("generate-overleaf-report").set_defaults(func=report)

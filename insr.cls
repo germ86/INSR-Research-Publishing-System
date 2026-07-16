@@ -3,20 +3,9 @@
 \ProvidesClass{insr}[2026/07/15 v4.0 INSR Scientific Publishing Platform]
 \RequirePackage{expl3}
 \RequirePackage{xparse}
-\makeatletter
-\newcommand\INSRInputPackageFile[2]{%
-  \let\insr@saved@currname\@currname
-  \let\insr@saved@currext\@currext
-  \def\@currname{#1}%
-  \def\@currext{sty}%
-  \input{#2}%
-  \let\@currname\insr@saved@currname
-  \let\@currext\insr@saved@currext
-}
-\makeatother
-\INSRInputPackageFile{insr-core}{tex/latex/insr/insr-core.sty}
-\INSRInputPackageFile{insr-config}{tex/latex/insr/insr-config.sty}
-\INSRInputPackageFile{insr-metadata}{tex/latex/insr/insr-metadata.sty}
+\RequirePackage{insr-core}
+\RequirePackage{insr-config}
+\RequirePackage{insr-metadata}
 \ExplSyntaxOff
 \makeatletter
 \def\insr@loadproject{true}%

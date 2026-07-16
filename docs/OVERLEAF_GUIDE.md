@@ -25,3 +25,13 @@ Official examples use `config/load-project=false` and provide local metadata in 
 ## Publication-layer Overleaf checks
 
 Run `python3 tools/overleaf_doctor.py check` before upload. Keep generated LaTeX files out of the upload, and use `config/load-project=false` in official examples so they do not inherit production publication metadata.
+
+## Switching output targets
+
+For Overleaf, keep `main.tex` unchanged and edit only `config/active-target.tex`:
+
+```tex
+\INSRSelectTarget{position-paper}
+```
+
+Valid targets include `position-paper`, `paper`, `journal-paper`, `slides`, `handout`, `poster`, `clinical-manual`, `technical-report`, `executive-brief`, `book`, and `thesis`. The target is read during early project configuration before the base class is loaded.
