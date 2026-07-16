@@ -60,3 +60,19 @@ Warnings from external TeX packages should be fixed when caused by INSR configur
 ## v1.0.0-alpha readiness gates
 
 A release candidate must verify native classes (`insr-paper`, `insr-book`, `insr-beamer`, `insr-poster`, `insr-handout`, `insr-manual`), bibliography, localization examples, themes, headers/footers and Overleaf diagnostics. Treat avoidable warnings as defects.
+
+## Target validation and local builds
+
+Use the standard-library tools for target validation and optional local builds:
+
+```bash
+python3 tools/overleaf_doctor.py check-target position-paper
+python3 tools/overleaf_doctor.py check-target slides
+python3 tools/overleaf_doctor.py check-source insr-position-paper
+python3 tools/insr_build.py list-targets
+python3 tools/insr_build.py validate
+python3 tools/insr_build.py build position-paper
+python3 tools/insr_build.py build-all
+```
+
+The build tool writes temporary active-target configuration, restores the previous file on exit, and reports `latexmk` failures with nonzero exit codes.

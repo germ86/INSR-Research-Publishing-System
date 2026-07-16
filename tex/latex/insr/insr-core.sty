@@ -75,6 +75,15 @@
 \tl_new:N \g_insr_layout_footer_left_tl
 \tl_new:N \g_insr_layout_footer_center_tl
 \tl_new:N \g_insr_layout_footer_right_tl
+\tl_new:N \g_insr_citation_mode_tl
+\tl_new:N \g_insr_suggested_citation_tl
+\tl_new:N \g_insr_output_target_tl
+\tl_new:N \g_insr_content_source_tl
+\tl_new:N \g_insr_content_placeholders_tl
+\tl_new:N \g_insr_layout_page_numbering_tl
+\bool_new:N \g_insr_frontmatter_toc_bool
+\bool_new:N \g_insr_frontmatter_abstract_numbered_bool
+\bool_new:N \g_insr_frontmatter_keywords_bool
 \bool_new:N \g_insr_layout_header_bool
 \bool_new:N \g_insr_layout_footer_bool
 \bool_new:N \g_insr_high_contrast_bool
@@ -91,6 +100,7 @@
 \cs_generate_variant:Nn \clist_if_in:nnTF { VV }
 \DeclareRobustCommand{\INSRMakeTitle}{\ifcsname __insr_adapter_make_title:\endcsname\csname __insr_adapter_make_title:\endcsname\else\ClassError{insr}{Mandatory adapter title renderer missing}{The selected adapter did not define \string\__insr_adapter_make_title:.}\fi}
 \DeclareRobustCommand{\INSRRenderDocument}{\ifcsname __insr_template_render:\endcsname\csname __insr_template_render:\endcsname\else\ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}\par\noindent INSR template renderer unavailable.\par\fi}
+\DeclareRobustCommand{\INSRSelectTarget}[1]{\ExplSyntaxOn\tl_gset:Nn \g_insr_output_target_tl {#1}\tl_gset:Nn \g_insr_document_type_tl {#1}\ExplSyntaxOff}
 \DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
 \ExplSyntaxOff
 \endinput

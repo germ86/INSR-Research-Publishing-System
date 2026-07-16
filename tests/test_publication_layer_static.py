@@ -47,7 +47,7 @@ class PublicationLayerStaticTests(unittest.TestCase):
             self.assertIn(f"document/type={doc_type}", text)
             self.assertNotIn("ClassWarning", text)
         page_style = self.read("tex/latex/insr/insr-page-style.sty")
-        for token in ["setheadsepline", "setfootsepline", "header-separator", "footer-separator", "logo", "git-revision"]:
+        for token in ["KOMAoptions", "headsepline", "footsepline", "header-separator", "footer-separator", "logo", "git-revision"]:
             self.assertIn(token, page_style)
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 % INSR Scientific Publishing Platform v4.0 project configuration.
-% Switch output here; do not edit main.tex for document-type changes.
+% Switch output in config/active-target.tex; do not edit main.tex for document-type changes.
+\InputIfFileExists{config/active-target.tex}{}{}
 \INSRConfigure{
+  output/target = position-paper,
   document/type = position-paper,
   document/density = standard,
   document/build-profile = development,
@@ -12,7 +14,9 @@
   localization/language = english,
   localization/direction = ltr,
   bibliography/resource = {},
-  content/template = auto
+  content/template = auto,
+  content/source = insr-position-paper,
+  content/placeholders = compact
 }
 \InputIfFileExists{config/metadata-config.tex}{}{}
 \InputIfFileExists{config/publication-config.tex}{}{}

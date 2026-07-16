@@ -16,3 +16,7 @@ python3 tools/overleaf_doctor.py list-entrypoints --plain
 ```
 
 The root `main.tex` remains the canonical Overleaf entrypoint. Focused examples may use class options such as `document/type=slides` to demonstrate a specific adapter without changing productive configuration.
+
+## Multi-output examples
+
+Examples still use `config/load-project=false` for isolation. The productive root uses `config/active-target.tex` for target switching; local multi-target validation is available with `python3 tools/insr_build.py validate`.
