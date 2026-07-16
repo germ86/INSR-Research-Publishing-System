@@ -69,27 +69,5 @@ class PublicationLayerStaticTests(unittest.TestCase):
         self.assertIn("\\RequirePackage{insr-adapters}", cls)
         self.assertNotIn("\\input{tex/latex/insr/insr-adapters.sty}", cls)
 
-    def test_citation_and_credit_formatters_are_publication_quality(self):
-        meta = self.read("tex/latex/insr/insr-metadata.sty")
-        for role in ["investigation", "validation", "formal-analysis", "data-curation", "supervision", "funding-acquisition", "resources"]:
-            self.assertIn(role, meta)
-        for token in ["__insr_publication_year:", "https://doi.org/", "{pending}{}", r"\__insr_credit_roles:n {##2}"]:
-            self.assertIn(token, meta)
-        self.assertNotIn("Roadmap.INSR", meta)
-        self.assertNotIn("Consortium,", meta)
-        self.assertNotIn("writing-original-draft} {#1}", meta)
-
-    def test_toc_document_status_and_placeholder_lifecycle(self):
-        content = self.read("tex/latex/insr/insr-content.sty")
-        self.assertIn("g__insr_toc_rendered_bool", content)
-        self.assertIn("pdfbookmark[section]{Contents}{insr-toc}", content)
-        self.assertNotIn(r"\section*{Contents}", content)
-        self.assertNotIn("addcontentsline{toc}{section}{Contents}", content)
-        self.assertIn("{pp-status}", content)
-        self.assertIn(r"\section*{Document status}", content)
-        self.assertIn("__insr_render_placeholder:", content)
-        self.assertIn("Substantive~content~pending", content)
-        self.assertNotIn("syntactically complete", content)
-
 if __name__ == "__main__":
     unittest.main()

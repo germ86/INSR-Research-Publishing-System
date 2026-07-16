@@ -41,8 +41,6 @@
   { \tl_if_blank:VTF \l_insr_unit_title_tl { \msg_warning:nnn { insr } { missing-slot } { content-unit/title } } { \tl_if_blank:VTF \l_insr_unit_outputs_tl { \insr_content_unit_render_selected: } { \clist_if_in:VVTF \l_insr_unit_outputs_tl \g_insr_document_type_tl { \insr_content_unit_render_selected: } { } } } }
 \cs_new_protected:Npn \insr_content_unit_render_selected: { \__insr_adapter_render_content_unit: }
 \cs_new:Npn \__insr_placeholder_text: { Substantive~content~pending. }
-\cs_new_protected:Npn \__insr_render_placeholder:
-  { \str_case:VnF \g_insr_content_placeholders_tl { {hide}{} {error}{\msg_error:nnn { insr } { missing-slot } { \tl_use:N\l_insr_unit_id_tl }} {show}{\begin{quote}\small\itshape \__insr_placeholder_text: \end{quote}} {compact}{\begin{quote}\small\itshape \__insr_placeholder_text: \end{quote}} } { \begin{quote}\small\itshape \__insr_placeholder_text: \end{quote} } }
 \cs_new_protected:Npn \__insr_render_unit_body:
   {
     \tl_if_in:VnTF \l_insr_unit_full_tl {placeholder}
@@ -50,7 +48,7 @@
       { \tl_if_blank:VTF \l_insr_unit_full_tl { \tl_if_blank:VTF \l_insr_unit_summary_tl { \__insr_render_placeholder: } { \tl_use:N \l_insr_unit_summary_tl } } { \tl_use:N \l_insr_unit_full_tl } }
   }
 \cs_new_protected:Npn \__insr_render_content_unit_block:
-  { \str_case:VnF \l_insr_unit_id_tl { {pp-status}{\section*{Document status}\addcontentsline{toc}{section}{Document status}} } { \str_case:VnF \l_insr_unit_title_tl { {Abstract}{\section*{Abstract}\addcontentsline{toc}{section}{Abstract}} {Document status}{\section*{Document status}\addcontentsline{toc}{section}{Document status}} {Declarations}{\section*{Declarations}\addcontentsline{toc}{section}{Declarations}} } { \INSRSection{\tl_use:N \l_insr_unit_title_tl} } } \__insr_render_unit_body: }
+  { \str_case:VnF \l_insr_unit_title_tl { {Abstract}{\section*{Abstract}\addcontentsline{toc}{section}{Abstract}} {Document status}{\section*{Document status}\addcontentsline{toc}{section}{Document status}} {Declarations}{\section*{Declarations}\addcontentsline{toc}{section}{Declarations}} } { \INSRSection{\tl_use:N \l_insr_unit_title_tl} } \__insr_render_unit_body: }
 \NewDocumentCommand \INSRAbstract { m } { \str_if_eq:VnTF \g_insr_base_class_tl { beamer } { \begin{frame}{Abstract}#1\end{frame} } { \section*{Abstract}\addcontentsline{toc}{section}{Abstract}#1 } }
 \NewDocumentCommand \INSRKeywords { o } { \bool_if:NT \g_insr_frontmatter_keywords_bool { \par\noindent\textbf{Keywords:~}\tl_use:N\g_insr_keywords_tl\par } }
 \NewDocumentCommand \INSRDeclarations {} { \section*{Declarations}\addcontentsline{toc}{section}{Declarations} }
@@ -61,7 +59,7 @@
         \bool_gset_true:N \g__insr_toc_rendered_bool
         \str_if_eq:VnTF \g_insr_base_class_tl { beamer }
           { \begin{frame}{Agenda}\tableofcontents\end{frame} }
-          { \pdfbookmark[section]{Contents}{insr-toc}\begingroup\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup\clearpage }
+          { \section*{Contents}\pdfbookmark[section]{Contents}{insr-toc}\begingroup\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup\clearpage }
       }
   }
 \ExplSyntaxOff
