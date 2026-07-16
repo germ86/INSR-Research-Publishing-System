@@ -74,7 +74,7 @@
             \seq_map_indexed_inline:Nn \g_insr_author_credit_seq
               {
                 \tl_set:Nx \l_tmpa_tl { \seq_item:Nn \g_insr_author_name_seq {##1} }
-                \tl_if_blank:VF \l_tmpa_tl { \textbf{\tl_use:N\l_tmpa_tl:}~ }
+                \tl_if_blank:VF \l_tmpa_tl { \textbf{\tl_use:N \l_tmpa_tl}:~ }
                 ##2
                 \int_compare:nNnT {##1} < {\seq_count:N \g_insr_author_credit_seq} {;~}
               }
