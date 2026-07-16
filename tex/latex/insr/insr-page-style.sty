@@ -1,22 +1,64 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-page-style}[2026/07/16 INSR semantic publication page styles]
+\ProvidesPackage{insr-page-style}[2026/07/16 INSR scientific publisher page styles]
 \ExplSyntaxOn
+% User keys: header-separator, footer-separator, logo, git-revision.
 \str_if_eq:VnF \g_insr_base_class_tl { beamer }
   { \RequirePackage[automark]{scrlayer-scrpage} \RequirePackage{lastpage} }
 \tl_new:N \l__insr_page_style_placeholder_tl
+\cs_new:Npn \__insr_page_style_logo:
+  { \tl_if_blank:VTF \g_insr_layout_logo_tl { } { \includegraphics[height=1.8ex]{\tl_use:N \g_insr_layout_logo_tl} } }
 \cs_new:Npn \__insr_page_style_placeholder:n #1
   {
     \tl_set:Nx \l__insr_page_style_placeholder_tl {#1}
     \str_case:VnF \l__insr_page_style_placeholder_tl
       {
+        {document-title}{\tl_use:N\g_insr_title_tl}
+        {title}{\tl_use:N\g_insr_title_tl}
+        {chapter-title}{\headmark}
+        {section-title}{\headmark}
         {current-section}{\headmark}
         {running-title}{\INSRRunningTitle}
+        {authors}{\insr_author_block:}
+        {author}{\insr_author_block:}
+        {institution}{\insr_institution_block:}
+        {logo}{\__insr_page_style_logo:}
         {page-number}{\thepage}
         {total-pages}{\pageref{LastPage}}
         {version}{v\tl_use:N\g_insr_publication_version_tl}
         {doi}{\INSRDOILabel}
+        {copyright}{\tl_use:N\g_insr_publication_copyright_tl}
+        {license}{\tl_use:N\g_insr_publication_license_tl}
+        {date}{\tl_use:N\g_insr_publication_date_tl}
+        {url}{\tl_use:N\g_insr_publication_url_tl}
+        {repository}{\tl_use:N\g_insr_publication_repository_tl}
+        {orcid}{\tl_use:N\g_insr_author_tl}
+        {publisher}{\tl_use:N\g_insr_publication_publisher_tl}
+        {git-revision}{\tl_use:N\g_insr_publication_git_revision_tl}
       }
       {#1}
+  }
+\cs_new:Npn \__insr_page_style_rule_color:n #1 { #1!\tl_use:N\g_insr_layout_separator_opacity_tl!INSRBackground }
+\cs_new_protected:Npn \__insr_page_style_head_rule:
+  {
+    \str_case:VnF \g_insr_layout_header_separator_style_tl
+      {
+        {minimal}{\setheadsepline{0pt}}
+        {single}{\setheadsepline{\tl_use:N\g_insr_layout_header_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}]}
+        {accent}{\setheadsepline{\tl_use:N\g_insr_layout_header_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRHeaderAccent}}]}
+        {double}{\setheadsepline{\dimexpr 2\tl_use:N\g_insr_layout_header_separator_thickness_tl\relax}[\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}]}
+      }
+      {\setheadsepline{\tl_use:N\g_insr_layout_header_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRHeaderSeparator}}]}
+  }
+\cs_new_protected:Npn \__insr_page_style_foot_rule:
+  {
+    \str_case:VnF \g_insr_layout_footer_separator_style_tl
+      {
+        {minimal}{\setfootsepline{0pt}}
+        {single}{\setfootsepline{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}]}
+        {accent}{\setfootsepline{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRFooterAccent}}]}
+        {double}{\setfootsepline{\dimexpr 2\tl_use:N\g_insr_layout_footer_separator_thickness_tl\relax}[\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}]}
+      }
+      {\setfootsepline{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}[\color{\__insr_page_style_rule_color:n {INSRFooterSeparator}}]}
   }
 \cs_new_protected:Npn \__insr_page_style_apply_koma:
   {
@@ -27,6 +69,7 @@
         \chead{\textcolor{INSRHeaderAccent}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_header_center_tl}}}
         \ohead{\textcolor{INSRHeaderText}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_header_right_tl}}}
         \setkomafont{pagehead}{\sffamily\small\color{INSRHeaderText}}
+        \__insr_page_style_head_rule:
       }
     \bool_if:NT \g_insr_layout_footer_bool
       {
@@ -34,6 +77,7 @@
         \cfoot{\textcolor{INSRFooterAccent}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_footer_center_tl}/\__insr_page_style_placeholder:n {total-pages}}}
         \ofoot{\textcolor{INSRFooterText}{\__insr_page_style_placeholder:n {\tl_use:N\g_insr_layout_footer_right_tl}}}
         \setkomafont{pagefoot}{\sffamily\small\color{INSRFooterText}}
+        \__insr_page_style_foot_rule:
       }
     \setkomafont{disposition}{\color{INSRTOCHeading}\bfseries}
     \hypersetup{linkcolor=INSRTOCLink,urlcolor=INSRLink,citecolor=INSRLink}
@@ -45,6 +89,8 @@
     \setbeamercolor{subsection in toc}{fg=INSRTOCSubsection}
     \setbeamercolor{section in toc shaded}{fg=INSRTOCCurrent}
     \setbeamercolor{page number in head/foot}{fg=INSRFooterText,bg=INSRFooterBackground}
+    \setbeamertemplate{headline}{\vskip1pt{\color{INSRHeaderSeparator}\rule{\paperwidth}{\tl_use:N\g_insr_layout_header_separator_thickness_tl}}}
+    \setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1ex,leftskip=1em]{author in head/foot}\textcolor{INSRFooterText}{\insertshorttitle}\end{beamercolorbox}\begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1ex,center]{date in head/foot}\textcolor{INSRFooterAccent}{\insertframenumber/\inserttotalframenumber}\end{beamercolorbox}}{\color{INSRFooterSeparator}\rule{\paperwidth}{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}}}
   }
 \cs_new_protected:Npn \__insr_page_style_setup:
   { \str_if_eq:VnTF \g_insr_base_class_tl { beamer } { \__insr_page_style_apply_beamer: } { \__insr_page_style_apply_koma: } }

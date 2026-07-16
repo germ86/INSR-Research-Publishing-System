@@ -162,3 +162,7 @@ The default neuroclinical design uses restrained navy/teal/cyan accents and sema
 ## Publication-ready front matter
 
 INSR includes a dedicated publication layer for journal manuscripts, position papers, white papers, reports, manuals, books, theses and grant proposals. Configure it with `publication/*`, `metadata/*` and `layout/*` keys, then call the stable public API `\INSRMakeTitle`. See `FRONTMATTER_GUIDE.md` for DOI handling, blind-review suppression, running headers/footers and examples.
+
+Page styles are centralized in `tex/latex/insr/insr-page-style.sty`; see `PAGESTYLE_GUIDE.md` for semantic title/frontmatter/main/references/appendix styles and palette-integrated header, footer and TOC colors.
+
+Native distribution-style classes are available for production documents: `insr-paper`, `insr-book`, `insr-beamer`, `insr-poster`, `insr-handout` and `insr-manual`. They all inherit the shared `insr` architecture and remain compatible with the v4 public API.

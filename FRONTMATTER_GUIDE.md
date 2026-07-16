@@ -33,3 +33,7 @@ Use `publication/profile` for document intent: `generic-preprint`, `journal`, `b
 * White paper: set `document/type=whitepaper` and `publication/profile=white-paper`.
 * Technical report: set `document/type=report` and `publication/profile=technical-report`.
 * Blind review: `examples/publication-blind-review/main.tex`
+
+## Stabilization notes
+
+The frontmatter renderer now delegates page-state changes to `insr-page-style.sty`, keeping title/frontmatter metadata rendering separate from page-style implementation. DOI values are displayed only when configured and are also forwarded to PDF metadata.

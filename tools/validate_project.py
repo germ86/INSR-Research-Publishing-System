@@ -127,10 +127,17 @@ for option in ['python', 'externalize', 'minted', 'review']:
 for command in ['INSRTodoClinical', 'INSRTodoBiostats', 'INSRTodoTech']:
     if command not in base:
         raise SystemExit(f'Missing review helper command in insr-base.sty: {command}')
-for class_file in ['tex/latex/insr/insr-paper.cls', 'tex/latex/insr/insr-beamer.cls', 'tex/latex/insr/insr-manual.cls']:
-    text = Path(class_file).read_text(encoding='utf-8')
-    if 'deprecated wrapper' not in text or '\\LoadClass{insr}' not in text:
-        raise SystemExit(f'{class_file} must be a thin deprecated wrapper delegating to insr.cls')
+for class_name, doc_type in [('insr-core',''),('insr-paper','paper'),('insr-book','book'),('insr-beamer','slides'),('insr-poster','poster'),('insr-handout','handout'),('insr-manual','manual')]:
+    for class_file in [Path(f'{class_name}.cls'), Path(f'tex/latex/insr/{class_name}.cls')]:
+        if not class_file.is_file():
+            raise SystemExit(f'Missing native class: {class_file}')
+        text = class_file.read_text(encoding='utf-8')
+        if r'\LoadClass{insr}' not in text:
+            raise SystemExit(f'{class_file} must delegate to insr.cls')
+        if doc_type and f'document/type={doc_type}' not in text:
+            raise SystemExit(f'{class_file} must set document/type={doc_type}')
+        if 'deprecated' in text or 'ClassWarning' in text:
+            raise SystemExit(f'{class_file} must not emit avoidable deprecation warnings')
 
 for palette in ['neuroclinical','clinical','research','editorial','ocean','forest','slate','graphite','monochrome','high-contrast','colourblind-safe','print','warm-clinical','calm-trauma','neurodiversity','academic-blue','biomedical','public-health','digital-health','midnight','light-minimal']:
     if not Path(f'palettes/{palette}.tex').is_file():
@@ -219,7 +226,7 @@ for theme_path in Path('themes').glob('*.tex'):
 page_style = Path('tex/latex/insr/insr-page-style.sty')
 if not page_style.is_file():
     raise SystemExit('Missing centralized page-style module')
-for token in ['INSRHeaderText', 'INSRFooterText', 'INSRTOCSection', 'INSRTOCLink']:
+for token in ['INSRHeaderText', 'INSRHeaderSeparator', 'INSRFooterText', 'INSRFooterSeparator', 'INSRTOCSection', 'INSRTOCLink']:
     if token not in Path('tex/latex/insr/insr-colors.sty').read_text(encoding='utf-8'):
         raise SystemExit(f'Missing semantic publication color: {token}')
 

@@ -45,3 +45,7 @@ If LuaLaTeX/latexmk are available, run `./tests/run-tests.sh` to compile all off
 ## External-package warning policy
 
 Warnings from external TeX packages should be fixed when caused by INSR configuration. If a warning is unavoidable and originates solely from an external package or a missing local toolchain, document the package/tool, command, and reason in the release notes instead of suppressing it.
+
+## v1.0.0-alpha readiness gates
+
+A release candidate must verify native classes (`insr-paper`, `insr-book`, `insr-beamer`, `insr-poster`, `insr-handout`, `insr-manual`), bibliography, localization examples, themes, headers/footers and Overleaf diagnostics. Treat avoidable warnings as defects.

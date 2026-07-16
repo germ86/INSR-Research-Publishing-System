@@ -36,6 +36,7 @@
 \input{tex/latex/insr/insr-colors.sty}
 \input{tex/latex/insr/insr-layout.sty}
 \input{tex/latex/insr/insr-frontmatter.sty}
+\input{tex/latex/insr/insr-page-style.sty}
 \input{tex/latex/insr/insr-boxes.sty}
 \input{tex/latex/insr/insr-accessibility.sty}
 \input{tex/latex/insr/insr-neuro.sty}

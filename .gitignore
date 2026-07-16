@@ -18,3 +18,5 @@
 *.xdy
 _minted-*/
 build/tikz/
+__pycache__/
+*.py[cod]

@@ -23,3 +23,7 @@ Header and footer configuration accepts `running-title`, `current-section`, `pag
 ## Palette integration
 
 Headers, footers and table-of-contents links use semantic colors derived from the active palette: `INSRHeaderText`, `INSRHeaderAccent`, `INSRFooterText`, `INSRFooterAccent`, `INSRTOCHeading`, `INSRTOCSection`, `INSRTOCSubsection`, `INSRTOCCurrent`, `INSRTOCPageNumber`, `INSRTOCLink` and `INSRTOCLeader`.
+
+## Professional separators
+
+Header and footer separators are controlled through `layout/header-separator-style`, `layout/footer-separator-style`, `layout/header-separator-thickness`, `layout/footer-separator-thickness`, `layout/header-separator-spacing`, `layout/footer-separator-spacing` and `layout/separator-opacity`. Supported styles are `single`, `double`, `accent` and `minimal`. Separator colors come from theme-level `INSRHeaderSeparator` and `INSRFooterSeparator`, which derive from the active palette.

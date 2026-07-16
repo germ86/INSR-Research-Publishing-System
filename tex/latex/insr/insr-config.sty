@@ -32,6 +32,17 @@
 \tl_gset:Nn \g_insr_publication_license_tl { }
 \tl_gset:Nn \g_insr_publication_copyright_tl { }
 \tl_gset:Nn \g_insr_publication_profile_tl { generic-preprint }
+
+\tl_gset:Nn \g_insr_publication_publisher_tl { }
+\tl_gset:Nn \g_insr_publication_git_revision_tl { }
+\tl_gset:Nn \g_insr_layout_header_separator_style_tl { single }
+\tl_gset:Nn \g_insr_layout_footer_separator_style_tl { single }
+\tl_gset:Nn \g_insr_layout_header_separator_thickness_tl { 0.4pt }
+\tl_gset:Nn \g_insr_layout_footer_separator_thickness_tl { 0.4pt }
+\tl_gset:Nn \g_insr_layout_header_separator_spacing_tl { 2.0pt }
+\tl_gset:Nn \g_insr_layout_footer_separator_spacing_tl { 2.0pt }
+\tl_gset:Nn \g_insr_layout_separator_opacity_tl { 70 }
+\tl_gset:Nn \g_insr_layout_logo_tl { }
 \tl_gset:Nn \g_insr_publication_review_tl { }
 \tl_gset:Nn \g_insr_citation_tl { }
 \tl_gset:Nn \g_insr_abstract_word_count_tl { }
@@ -90,6 +101,17 @@
     publication/copyright .tl_gset:N = \g_insr_publication_copyright_tl,
     publication/profile .tl_gset:N = \g_insr_publication_profile_tl,
     publication/review .tl_gset:N = \g_insr_publication_review_tl,
+
+    publication/publisher .tl_gset:N = \g_insr_publication_publisher_tl,
+    publication/git-revision .tl_gset:N = \g_insr_publication_git_revision_tl,
+    layout/logo .tl_gset:N = \g_insr_layout_logo_tl,
+    layout/header-separator-style .tl_gset:N = \g_insr_layout_header_separator_style_tl,
+    layout/footer-separator-style .tl_gset:N = \g_insr_layout_footer_separator_style_tl,
+    layout/header-separator-thickness .tl_gset:N = \g_insr_layout_header_separator_thickness_tl,
+    layout/footer-separator-thickness .tl_gset:N = \g_insr_layout_footer_separator_thickness_tl,
+    layout/header-separator-spacing .tl_gset:N = \g_insr_layout_header_separator_spacing_tl,
+    layout/footer-separator-spacing .tl_gset:N = \g_insr_layout_footer_separator_spacing_tl,
+    layout/separator-opacity .tl_gset:N = \g_insr_layout_separator_opacity_tl,
     metadata/citation .tl_gset:N = \g_insr_citation_tl,
     metadata/abstract-word-count .tl_gset:N = \g_insr_abstract_word_count_tl,
     metadata/document-word-count .tl_gset:N = \g_insr_document_word_count_tl,
