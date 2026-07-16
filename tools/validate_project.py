@@ -39,7 +39,7 @@ for package in required_packages:
     if f'\\ProvidesPackage{{{package}}}' not in path.read_text(encoding='utf-8'):
         raise SystemExit(f'Missing ProvidesPackage declaration in {path}')
 
-order = ['\\RequirePackage{expl3}', '\\RequirePackage{insr-core}', '\\RequirePackage{insr-config}', '\\RequirePackage{insr-metadata}', 'config/project-config.tex', '\\ProcessOptions', '\\insr_resolve_document_type:', '\\LoadClass', 'insr-adapters.sty']
+order = ['\\RequirePackage{expl3}', '\\RequirePackage{insr-core}', '\\RequirePackage{insr-config}', '\\RequirePackage{insr-metadata}', 'config/project-config.tex', '\\ProcessOptions', '\\insr_resolve_document_type:', '\\LoadClass', '\\RequirePackage{insr-adapters}']
 pos = []
 for token in order:
     i = cls.find(token)

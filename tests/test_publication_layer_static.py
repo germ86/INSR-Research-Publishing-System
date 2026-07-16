@@ -50,5 +50,61 @@ class PublicationLayerStaticTests(unittest.TestCase):
         for token in ["KOMAoptions", "headsepline", "footsepline", "header-separator", "footer-separator", "logo", "git-revision"]:
             self.assertIn(token, page_style)
 
+    def test_frontmatter_metadata_helpers_cover_reviewed_cases(self):
+        meta = self.read("tex/latex/insr/insr-metadata.sty")
+        frontmatter = self.read("tex/latex/insr/insr-frontmatter.sty")
+        for token in ["\\insr_author_title_block:", "\\insr_affiliation_title_block:", "\\insr_suggested_citation:", "\\insr_credit_block:"]:
+            self.assertIn(token, meta)
+            self.assertIn(token, frontmatter)
+        for token in ["ORCID", "orcid.org", "seq_remove_duplicates", "manual", "g_insr_publication_publisher_tl", "g_insr_author_contributions_tl"]:
+            self.assertIn(token, meta)
+        self.assertIn("Anonymous~manuscript", frontmatter)
+        self.assertIn("pageanchor=false", frontmatter)
+        self.assertIn("pageanchor=true", frontmatter)
+
+    def test_requirepackage_bootstrap_has_local_package_path(self):
+        cls = self.read("insr.cls")
+        self.assertIn("\\def\\input@path", cls)
+        self.assertIn("tex/latex/insr/", cls)
+        self.assertIn("\\RequirePackage{insr-adapters}", cls)
+        self.assertNotIn("\\input{tex/latex/insr/insr-adapters.sty}", cls)
+
+    def test_optional_frontmatter_uses_data_state_not_renderer_tokens(self):
+        frontmatter = self.read("tex/latex/insr/insr-frontmatter.sty")
+        for token in [
+            "__insr_frontmatter_line_if_tl:Nn",
+            "__insr_frontmatter_optional_if_tl:Nn",
+            "__insr_frontmatter_author_contributions:",
+            r"seq_if_empty:NF \g_insr_author_credit_seq",
+        ]:
+            self.assertIn(token, frontmatter)
+        self.assertNotIn(r"__insr_frontmatter_line:nn {Funding} {\tl_use:N\g_insr_funding_statement_tl}", frontmatter)
+
+    def test_citation_and_credit_formatters_are_structured(self):
+        meta = self.read("tex/latex/insr/insr-metadata.sty")
+        for role in [
+            "investigation", "validation", "formal-analysis", "data-curation",
+            "supervision", "funding-acquisition", "resources",
+        ]:
+            self.assertIn(role, meta)
+        for token in [
+            "__insr_publication_year:",
+            "publication_year_tl",
+            "https://doi.org/",
+            "{pending}{}",
+            r"\url{\tl_use:N \g_insr_publication_url_tl}",
+        ]:
+            self.assertIn(token, meta)
+        self.assertNotIn("Roadmap.INSR", meta)
+        self.assertNotIn("Consortium,", meta)
+
+    def test_toc_lifecycle_and_visible_title_spacing(self):
+        content = self.read("tex/latex/insr/insr-content.sty")
+        self.assertIn("g__insr_toc_rendered_bool", content)
+        self.assertIn("pdfbookmark[section]{Contents}{insr-toc}", content)
+        self.assertNotIn("addcontentsline{toc}{section}{Contents}", content)
+        self.assertIn(r"{Document status}{\section*{Document status}", content)
+        self.assertNotIn("Document~status", content)
+
 if __name__ == "__main__":
     unittest.main()
