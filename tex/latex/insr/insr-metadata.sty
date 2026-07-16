@@ -36,6 +36,7 @@
 \keys_define:nn { insr/institution }
   { id .tl_set:N=\l_insr_institution_id_tl, name .tl_set:N=\l_insr_institution_name_tl, short-name .tl_set:N=\l_insr_institution_short_name_tl, department .tl_set:N=\l_insr_institution_department_tl, city .tl_set:N=\l_insr_institution_city_tl, country .tl_set:N=\l_insr_institution_country_tl, type .code:n={}, logo .tl_set:N=\l_insr_institution_logo_tl, logo-dark .code:n={}, url .tl_set:N=\l_insr_institution_website_tl, website .tl_set:N=\l_insr_institution_website_tl, ror .tl_set:N=\l_insr_institution_ror_tl, unknown .code:n={\msg_warning:nnn { insr } { unknown-key } { institution/#1 }} }
 \keys_define:nn { insr/funding } { grant-number .tl_set:N=\l_insr_funding_grant_tl, agency .tl_set:N=\l_insr_funding_agency_tl, project-acronym .tl_set:N=\l_insr_funding_project_tl, unknown .code:n={\msg_warning:nnn { insr } { unknown-key } { funding/#1 }} }
+
 \cs_new:Npn \__insr_role_label:n #1
   { \str_case:nnF {#1} { {conceptualization}{Conceptualization} {methodology}{Methodology} {software}{Software} {writing-original-draft}{Writing~--~Original~Draft} {writing-review-editing}{Writing~--~Review~and~Editing} {project-administration}{Project~Administration} {visualization}{Visualization} } {#1} }
 \cs_new:Npn \__insr_affiliation_label:n #1 { \prop_item:Nn \g_insr_institution_name_prop {#1} }
