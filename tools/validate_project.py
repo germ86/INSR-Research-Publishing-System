@@ -61,6 +61,29 @@ for implementation_token in ['NewDocumentEnvironment { INSRContentUnit }', 'Requ
 if 'config/load-project=false' not in cls or cls.find('config/load-project=false') > cls.find('config/project-config.tex'):
     raise SystemExit('insr.cls must detect config/load-project=false before reading project config')
 
+
+if '\\def\\input@path{{tex/latex/insr/}{./tex/latex/insr/}}' not in cls:
+    raise SystemExit('insr.cls must centrally register the local INSR package search path')
+for token in ['INSR v4 class path:', 'INSR v4 class version:', 'INSR v4 package path:', 'INSR v4 local package path:']:
+    if token not in cls:
+        raise SystemExit(f'Missing class/package resolution diagnostic: {token}')
+for path in Path('.').rglob('*'):
+    if '.git' in path.parts or not path.is_file():
+        continue
+    try:
+        text = path.read_text(encoding='utf-8')
+    except UnicodeDecodeError:
+        continue
+    stale_patterns = [
+        '\\RequirePackage{' + 'tex/latex/insr/',
+        '\\usepackage{' + 'tex/latex/insr/',
+        'RequirePackage{' + 'tex/latex/insr/',
+        'usepackage{' + 'tex/latex/insr/',
+    ]
+    for stale in stale_patterns:
+        if stale in text:
+            raise SystemExit(f'Stale full-path package request in {path}: {stale}')
+
 package_text = '\n'.join(Path(f'tex/latex/insr/{package}.sty').read_text(encoding='utf-8') for package in required_packages)
 if '\\__insr_load_adapter:' not in package_text or 'INSR #2:' not in package_text:
     raise SystemExit('Dedicated adapter loader or runtime file banner is missing')
@@ -111,7 +134,7 @@ for adapter in ['article','paper','report','book','slides','poster','letter','ma
         if command not in text:
             raise SystemExit(f'Missing adapter command {command} in {path}')
 
-early_api_pos = Path('tex/latex/insr/insr-core.sty').read_text(encoding='utf-8').find('\\DeclareRobustCommand{\\INSRMakeTitle}')
+early_api_pos = (Path('tex/latex/insr') / 'insr-core.sty').read_text(encoding='utf-8').find('\\DeclareRobustCommand{\\INSRMakeTitle}')
 if early_api_pos < 0:
     raise SystemExit('INSRMakeTitle must be exported by insr-core.sty')
 for command in ['INSRMakeTitle','INSRRenderDocument','INSRShowResolvedConfiguration','ResearchQuestion','KeyFinding','SafetyStatement']:
