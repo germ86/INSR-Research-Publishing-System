@@ -14,6 +14,17 @@ python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
 ./tests/run-tests.sh --static-only
 ```
 
+## Local TeX toolchain
+
+For Debian/Ubuntu-based development containers, install the same LuaLaTeX-first toolchain used by the local compile runner before running full builds:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y latexmk texlive-luatex biber texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended fonts-freefont-otf fonts-hosny-amiri fonts-noto-core fonts-noto-cjk
+```
+
+`latexmk`, `lualatex`, and `biber` must all be on `PATH`. The font packages provide the Arabic, Hebrew, and broad Unicode fallback fonts used by the multilingual typography presets, avoiding local-only fontspec failures during smoke builds.
+
 When TeX Live is installed, run:
 
 ```bash
@@ -25,3 +36,27 @@ When TeX Live is installed, run:
 The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0.
 
 Static-only mode does not require TeX Live and is suitable for lightweight containers.
+
+## Publication stabilization checks
+
+Run the full static suite before a release:
+
+```bash
+git diff --check
+python3 tools/overleaf_doctor.py check
+python3 tools/validate_project.py
+python3 tools/validate_bibliography.py references.bib
+python3 tools/validate_palette.py
+python3 -m unittest
+./tests/run-tests.sh --static-only
+```
+
+If LuaLaTeX/latexmk are available, run `./tests/run-tests.sh` to compile all official entrypoints listed by the Overleaf doctor.
+
+## External-package warning policy
+
+Warnings from external TeX packages should be fixed when caused by INSR configuration. If a warning is unavoidable and originates solely from an external package or a missing local toolchain, document the package/tool, command, and reason in the release notes instead of suppressing it.
+
+## v1.0.0-alpha readiness gates
+
+A release candidate must verify native classes (`insr-paper`, `insr-book`, `insr-beamer`, `insr-poster`, `insr-handout`, `insr-manual`), bibliography, localization examples, themes, headers/footers and Overleaf diagnostics. Treat avoidable warnings as defects.

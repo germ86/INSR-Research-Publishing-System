@@ -3,7 +3,7 @@ import re
 
 required = [
     '.github/workflows/latex.yml', 'insr.cls', 'main.tex', 'config/project-config.tex',
-    'references.bib', 'content/manifest.tex', 'themes/manifest.tex', 'plugins/README.md',
+    'config/metadata-config.tex', 'config/publication-config.tex', 'config/layout-config.tex', 'config/authors-config.tex', 'references.bib', 'content/manifest.tex', 'themes/manifest.tex', 'plugins/README.md',
     'i18n/english.tex', 'docs/CONFIGURATION_REFERENCE.md', 'docs/THEME_DEVELOPER_GUIDE.md',
     'docs/PALETTE_DEVELOPER_GUIDE.md', 'docs/TEMPLATE_DEVELOPER_GUIDE.md',
     'docs/TESTING_GUIDE.md', 'docs/OVERLEAF_GUIDE.md',
@@ -31,7 +31,7 @@ for token in ['\\INSRConfigure', 'document/type', 'design/theme', 'design/palett
         raise SystemExit(f'Missing configuration token: {token}')
 
 cls = Path('insr.cls').read_text(encoding='utf-8')
-required_packages = ['insr-core','insr-config','insr-metadata','insr-content','insr-adapters','insr-bibliography','insr-localization','insr-typography','insr-colors','insr-layout','insr-boxes','insr-accessibility','insr-neuro','insr-utils']
+required_packages = ['insr-core','insr-config','insr-metadata','insr-content','insr-adapters','insr-bibliography','insr-localization','insr-typography','insr-colors','insr-layout','insr-page-style','insr-boxes','insr-accessibility','insr-neuro','insr-utils']
 for package in required_packages:
     path = Path(f'tex/latex/insr/{package}.sty')
     if not path.is_file():
@@ -98,7 +98,7 @@ for doc_type in required_types:
     if not profile.is_file():
         raise SystemExit(f'Missing document profile: {profile}')
 
-for adapter in ['article','paper','report','book','slides','poster','letter','manual']:
+for adapter in ['article','paper','report','book','slides','poster','letter','manual','thesis']:
     path = Path(f'framework/adapters/{adapter}.tex')
     if not path.is_file():
         raise SystemExit(f'Missing adapter: {path}')
@@ -127,10 +127,17 @@ for option in ['python', 'externalize', 'minted', 'review']:
 for command in ['INSRTodoClinical', 'INSRTodoBiostats', 'INSRTodoTech']:
     if command not in base:
         raise SystemExit(f'Missing review helper command in insr-base.sty: {command}')
-for class_file in ['tex/latex/insr/insr-paper.cls', 'tex/latex/insr/insr-beamer.cls', 'tex/latex/insr/insr-manual.cls']:
-    text = Path(class_file).read_text(encoding='utf-8')
-    if 'deprecated wrapper' not in text or '\\LoadClass{insr}' not in text:
-        raise SystemExit(f'{class_file} must be a thin deprecated wrapper delegating to insr.cls')
+for class_name, doc_type in [('insr-core',''),('insr-paper','paper'),('insr-book','book'),('insr-beamer','slides'),('insr-poster','poster'),('insr-handout','handout'),('insr-manual','manual')]:
+    for class_file in [Path(f'{class_name}.cls'), Path(f'tex/latex/insr/{class_name}.cls')]:
+        if not class_file.is_file():
+            raise SystemExit(f'Missing native class: {class_file}')
+        text = class_file.read_text(encoding='utf-8')
+        if r'\LoadClass{insr}' not in text:
+            raise SystemExit(f'{class_file} must delegate to insr.cls')
+        if doc_type and f'document/type={doc_type}' not in text:
+            raise SystemExit(f'{class_file} must set document/type={doc_type}')
+        if 'deprecated' in text or 'ClassWarning' in text:
+            raise SystemExit(f'{class_file} must not emit avoidable deprecation warnings')
 
 for palette in ['neuroclinical','clinical','research','editorial','ocean','forest','slate','graphite','monochrome','high-contrast','colourblind-safe','print','warm-clinical','calm-trauma','neurodiversity','academic-blue','biomedical','public-health','digital-health','midnight','light-minimal']:
     if not Path(f'palettes/{palette}.tex').is_file():
@@ -188,5 +195,39 @@ for stale in ['Beamer smoke test for CI', '\\documentclass{insr-paper}', 'The re
         raise SystemExit(f'Stale README architecture guidance remains: {stale}')
 if readme.count('\\documentclass{insr}') < 1:
     raise SystemExit('README must show the canonical v4 documentclass')
+
+
+
+# Publication-stabilization validator extensions.
+def _balanced_key_block_keys(text, family):
+    start = text.find(f"\\keys_define:nn {{ {family} }}")
+    if start < 0:
+        return []
+    keys = re.findall(r'([A-Za-z0-9_./-]+)\s+\.(?:tl|bool|code)', text[start:start+5000])
+    return keys
+for package in required_packages:
+    text = Path(f'tex/latex/insr/{package}.sty').read_text(encoding='utf-8')
+    names = re.findall(r'\\(?:tl|bool|seq|clist|int)_new:N\s+(\\[A-Za-z_:]+)', text)
+    dup = sorted({name for name in names if names.count(name) > 1})
+    if dup:
+        raise SystemExit(f'Duplicate internal state in tex/latex/insr/{package}.sty: {dup}')
+config_keys = _balanced_key_block_keys(config_pkg, 'insr')
+for key in sorted({key for key in config_keys if config_keys.count(key) > 1}):
+    raise SystemExit(f'Duplicate configuration key in insr-config.sty: {key}')
+for path in Path('framework/adapters').glob('*.tex'):
+    if path.stem in {'slides', 'poster'}:
+        continue
+    text = path.read_text(encoding='utf-8')
+    if any(token in text for token in ['\\maketitle', '\\title{', '\\author{', '\\date{']):
+        raise SystemExit(f'Adapter contains title/frontmatter layout logic: {path}')
+for theme_path in Path('themes').glob('*.tex'):
+    if theme_path.name != 'manifest.tex' and any(token in theme_path.read_text(encoding='utf-8') for token in ['scrlayer-scrpage', '\\ihead', '\\ohead', '\\cfoot']):
+        raise SystemExit(f'Theme contains page-style implementation: {theme_path}')
+page_style = Path('tex/latex/insr/insr-page-style.sty')
+if not page_style.is_file():
+    raise SystemExit('Missing centralized page-style module')
+for token in ['INSRHeaderText', 'INSRHeaderSeparator', 'INSRFooterText', 'INSRFooterSeparator', 'INSRTOCSection', 'INSRTOCLink']:
+    if token not in Path('tex/latex/insr/insr-colors.sty').read_text(encoding='utf-8'):
+        raise SystemExit(f'Missing semantic publication color: {token}')
 
 print('project validation passed')
