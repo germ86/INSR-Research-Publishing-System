@@ -50,7 +50,8 @@
   {
     \bool_set_false:N \l__insr_credit_role_valid_bool
     \tl_clear:N \l__insr_credit_role_label_tl
-    \tl_set:Nx \l__insr_credit_role_key_tl { \str_lowercase:n { \tl_trim_spaces:n {#1} } }
+    \tl_set:Nn \l__insr_credit_role_key_tl {#1}
+    \tl_trim_spaces:N \l__insr_credit_role_key_tl
     \str_case:VnTF \l__insr_credit_role_key_tl
       {
         {conceptualization}{\tl_set:Nn \l__insr_credit_role_label_tl {Conceptualization}}
@@ -165,7 +166,8 @@
     \bool_set_false:N \l__insr_citation_doi_valid_bool
     \tl_if_blank:VF \g_insr_publication_doi_tl
       {
-        \tl_set:Nx \l_tmpa_tl { \str_lowercase:n { \tl_trim_spaces:n { \tl_use:N \g_insr_publication_doi_tl } } }
+        \tl_set_eq:NN \l_tmpa_tl \g_insr_publication_doi_tl
+        \tl_trim_spaces:N \l_tmpa_tl
         \str_if_eq:VnF \l_tmpa_tl { pending }
           { \str_if_eq:VnF \l_tmpa_tl { to~be~assigned } { \bool_set_true:N \l__insr_citation_doi_valid_bool } }
       }
@@ -176,12 +178,12 @@
     \str_if_eq:VnTF \g_insr_citation_mode_tl { manual }
       { \tl_if_blank:VTF \g_insr_suggested_citation_tl { \tl_use:N \g_insr_citation_tl } { \tl_use:N \g_insr_suggested_citation_tl } }
       {
-        \seq_if_empty:NTF \g_insr_author_short_seq { \tl_use:N \g_insr_author_tl } { \seq_use:Nn \g_insr_author_short_seq {;~} }
-        ~(\tl_if_blank:VTF \g_insr_publication_year_tl {2026} {\tl_use:N \g_insr_publication_year_tl}).~
+        \seq_if_empty:NTF \g_insr_author_short_seq { \tl_use:N \g_insr_author_tl } { \seq_use:Nn \g_insr_author_short_seq {;~} }\space
+        (\tl_if_blank:VTF \g_insr_publication_year_tl {2026} {\tl_use:N \g_insr_publication_year_tl}).\space
         \tl_use:N \g_insr_title_tl
         \tl_if_blank:VF \g_insr_subtitle_tl {:~\tl_use:N \g_insr_subtitle_tl}
-        \tl_if_blank:VF \g_insr_publication_version_tl {~(Version~\tl_use:N \g_insr_publication_version_tl)}.
-        ~\tl_if_blank:VTF \g_insr_publication_publisher_tl { \tl_use:N \g_insr_institution_tl } { \tl_use:N \g_insr_publication_publisher_tl }.
+        \tl_if_blank:VF \g_insr_publication_version_tl {~(Version~\tl_use:N \g_insr_publication_version_tl)}.\space
+        \tl_if_blank:VTF \g_insr_publication_publisher_tl { \tl_use:N \g_insr_institution_tl } { \tl_use:N \g_insr_publication_publisher_tl }.
         \__insr_citation_doi_valid_set:
         \bool_if:NT \l__insr_citation_doi_valid_bool {~\href{https://doi.org/\tl_use:N\g_insr_publication_doi_tl}{https://doi.org/\tl_use:N\g_insr_publication_doi_tl}.}
       }

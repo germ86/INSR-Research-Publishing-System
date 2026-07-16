@@ -94,7 +94,7 @@
         \bool_gset_true:N \g__insr_toc_rendered_bool
         \str_if_eq:VnTF \g_insr_base_class_tl { beamer }
           { \begin{frame}{Agenda}\tableofcontents\end{frame} }
-          { \phantomsection\pdfbookmark[section]{Contents}{insr-global-toc}\begingroup\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup }
+          { \begingroup\thispagestyle{plain}\phantomsection\pdfbookmark[section]{Contents}{insr-global-toc}\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup }
       }
   }
 \ExplSyntaxOff

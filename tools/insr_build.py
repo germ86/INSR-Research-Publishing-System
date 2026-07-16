@@ -36,7 +36,7 @@ def run_latexmk(target: str) -> int:
         (outdir / "build.log").write_text("latexmk not found; build not executed\n", encoding="utf-8")
         print("latexmk not found")
         return 127
-    cmd = ["latexmk", "-lualatex", "-interaction=nonstopmode", "-halt-on-error", f"-outdir={outdir}", "main.tex"]
+    cmd = ["latexmk", "-lualatex", "-bibtex-", "-interaction=nonstopmode", "-halt-on-error", f"-outdir={outdir}", "main.tex"]
     proc = subprocess.run(cmd, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (outdir / "build.log").write_text(proc.stdout, encoding="utf-8")
     return proc.returncode
