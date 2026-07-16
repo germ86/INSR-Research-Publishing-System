@@ -9,3 +9,7 @@ Content units retain `\INSRFullText`, `\INSRSummary`, `\INSRKeyMessage`, and `\I
 ## Golden reference outputs
 
 The reference publication project provides paper, slides, handout and poster entry points generated from neutral, author-controlled content. Use these entry points for release smoke tests and visual review.
+
+## Shared TOC and placeholder lifecycle
+
+All targets use the same public `\INSRTableOfContents` entry point. Paper, report, manual, book, and thesis outputs receive one localized contents heading from the base class; slides receive one Agenda frame. Content-unit placeholders are resolved centrally and work across paper, slides, handout, poster, manual, and executive brief renderers without automatic AI summarization.
