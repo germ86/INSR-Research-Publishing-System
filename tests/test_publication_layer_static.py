@@ -50,5 +50,24 @@ class PublicationLayerStaticTests(unittest.TestCase):
         for token in ["KOMAoptions", "headsepline", "footsepline", "header-separator", "footer-separator", "logo", "git-revision"]:
             self.assertIn(token, page_style)
 
+    def test_frontmatter_metadata_helpers_cover_reviewed_cases(self):
+        meta = self.read("tex/latex/insr/insr-metadata.sty")
+        frontmatter = self.read("tex/latex/insr/insr-frontmatter.sty")
+        for token in ["\\insr_author_title_block:", "\\insr_affiliation_title_block:", "\\insr_suggested_citation:", "\\insr_credit_block:"]:
+            self.assertIn(token, meta)
+            self.assertIn(token, frontmatter)
+        for token in ["ORCID", "orcid.org", "seq_remove_duplicates", "manual", "g_insr_publication_publisher_tl", "g_insr_author_contributions_tl"]:
+            self.assertIn(token, meta)
+        self.assertIn("Anonymous~manuscript", frontmatter)
+        self.assertIn("pageanchor=false", frontmatter)
+        self.assertIn("pageanchor=true", frontmatter)
+
+    def test_requirepackage_bootstrap_has_local_package_path(self):
+        cls = self.read("insr.cls")
+        self.assertIn("\\def\\input@path", cls)
+        self.assertIn("tex/latex/insr/", cls)
+        self.assertIn("\\RequirePackage{insr-adapters}", cls)
+        self.assertNotIn("\\input{tex/latex/insr/insr-adapters.sty}", cls)
+
 if __name__ == "__main__":
     unittest.main()

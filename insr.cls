@@ -3,6 +3,9 @@
 \ProvidesClass{insr}[2026/07/16 v4.0 INSR Scientific Publishing Platform]
 \RequirePackage{expl3}
 \RequirePackage{xparse}
+\makeatletter
+\def\input@path{{tex/latex/insr/}{./tex/latex/insr/}}
+\makeatother
 \RequirePackage{insr-core}
 \RequirePackage{insr-config}
 \RequirePackage{insr-metadata}

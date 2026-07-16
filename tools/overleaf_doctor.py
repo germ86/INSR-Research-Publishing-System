@@ -186,7 +186,7 @@ def collect_problems() -> list[str]:
     conflict_markers = ("<" * 7, "=" * 7, ">" * 7)
     for pattern in conflict_markers:
         for path in ROOT.rglob("*"):
-            if path.is_file() and ".git" not in path.parts and path.suffix not in {".pdf", ".png", ".jpg"}:
+            if path.is_file() and ".git" not in path.parts and "__pycache__" not in path.parts and path.suffix not in {".pdf", ".png", ".jpg", ".pyc"}:
                 if pattern in read(path):
                     problems.append(f"conflict marker {pattern} in {rel(path)}")
     for path in ROOT.rglob("*"):
