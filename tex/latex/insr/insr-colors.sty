@@ -4,6 +4,23 @@
 \ExplSyntaxOn
 \cs_new_protected:Npn \__insr_load_palette: { \__insr_load_file_with_fallback:nnn { palettes/\tl_use:N\g_insr_palette_tl.tex } { palette } { \msg_warning:nnx { insr } { unknown-palette } { \tl_use:N\g_insr_palette_tl } \file_input:n { palettes/neuroclinical.tex } } }
 \__insr_load_palette:
+
+\colorlet{INSRHeaderBackground}{INSRSurfaceAlt}
+\colorlet{INSRHeaderText}{INSRPrimary}
+\colorlet{INSRHeaderAccent}{INSRSecondary}
+\colorlet{INSRHeaderSeparator}{INSRRule}
+\colorlet{INSRFooterBackground}{INSRSurfaceAlt}
+\colorlet{INSRFooterText}{INSRTextMuted}
+\colorlet{INSRFooterAccent}{INSRSecondary}
+\colorlet{INSRFooterSeparator}{INSRRule}
+\colorlet{INSRTOCHeading}{INSRPrimary}
+\colorlet{INSRTOCSection}{INSRPrimary}
+\colorlet{INSRTOCSubsection}{INSRSecondary}
+\colorlet{INSRTOCCurrent}{INSRAccent}
+\colorlet{INSRTOCNumber}{INSRSecondary}
+\colorlet{INSRTOCPageNumber}{INSRTextMuted}
+\colorlet{INSRTOCLink}{INSRLink}
+\colorlet{INSRTOCLeader}{INSRRule}
 \bool_if:NT \g_insr_high_contrast_bool { \file_input:n { palettes/high-contrast.tex } }
 \ExplSyntaxOff
 \endinput

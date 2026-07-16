@@ -1,0 +1,57 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-frontmatter}[2026/07/15 INSR publication front matter]
+\RequirePackage{xparse}
+\ExplSyntaxOn
+\bool_new:N \l__insr_blind_bool
+\cs_new:Npn \__insr_review_blind_p:
+  { \bool_lazy_or_p:nn { \str_if_eq_p:Vn \g_insr_publication_review_tl { blind } } { \str_if_eq_p:Vn \g_insr_publication_review_tl { double-blind } } }
+\cs_new:Npn \__insr_doi_label:
+  { \tl_if_blank:VTF \g_insr_publication_doi_tl { } { DOI:~\str_case:VnF \g_insr_publication_doi_tl { {pending}{Pending} {to~be~assigned}{Pending} } { \tl_use:N \g_insr_publication_doi_tl } } }
+\cs_new:Npn \__insr_running_title:
+  { \tl_if_blank:VTF \g_insr_short_title_tl { \tl_range:Nnn \g_insr_title_tl {1} {70} } { \tl_use:N \g_insr_short_title_tl } }
+\NewDocumentCommand \INSRRunningTitle {} { \__insr_running_title: }
+\NewDocumentCommand \INSRDOILabel {} { \__insr_doi_label: }
+\cs_new_protected:Npn \__insr_frontmatter_line:nn #1#2 { \tl_if_blank:oF {#2} { \par\small\textbf{#1:}~#2 } }
+\cs_new_protected:Npn \__insr_frontmatter_optional:nn #1#2 { \tl_if_blank:oF {#2} { \par\medskip\noindent\textbf{#1}\par #2\par } }
+\cs_new_protected:Npn \__insr_frontmatter_render_scientific:n #1
+  {
+    \INSRPageStyleTitle
+    \pagenumbering{Alph}
+    \begin{titlepage}\centering
+      {\sffamily\bfseries\large \tl_if_blank:VTF \g_insr_publication_type_tl {#1} {\tl_use:N\g_insr_publication_type_tl}\par}
+      \vspace{1.5cm}{\huge\bfseries \tl_use:N\g_insr_title_tl\par}
+      \tl_if_blank:VF \g_insr_subtitle_tl {\vspace{.5cm}{\Large \tl_use:N\g_insr_subtitle_tl\par}}
+      \vspace{1cm}
+      \bool_if:nTF { \__insr_review_blind_p: }
+        {{\large Anonymous~manuscript\par}\vspace{.5cm}{\small Author, affiliation, funding and competing-interest metadata suppressed for review.\par}}
+        {{\large \insr_author_block:\par}\vspace{.35cm}{\small \insr_institution_block:\par}}
+      \vfill
+      \begin{minipage}{.86\textwidth}\raggedright
+      \__insr_frontmatter_line:nn {Version} {\tl_use:N\g_insr_publication_version_tl}
+      \__insr_frontmatter_line:nn {Status} {\tl_use:N\g_insr_publication_status_tl}
+      \__insr_frontmatter_line:nn {Date} {\tl_use:N\g_insr_publication_date_tl}
+      \tl_if_blank:VF \g_insr_publication_doi_tl {\par\small\textbf{\__insr_doi_label:}}
+      \__insr_frontmatter_line:nn {Repository} {\tl_use:N\g_insr_publication_repository_tl}
+      \__insr_frontmatter_line:nn {License} {\tl_use:N\g_insr_publication_license_tl}
+      \__insr_frontmatter_line:nn {Suggested~citation} {\tl_use:N\g_insr_citation_tl}
+      \bool_if:nF { \__insr_review_blind_p: } {
+        \__insr_frontmatter_line:nn {Funding} {\tl_use:N\g_insr_funding_statement_tl}
+        \__insr_frontmatter_line:nn {Conflict~of~interest} {\tl_use:N\g_insr_conflict_statement_tl}
+      }
+      \__insr_frontmatter_line:nn {Ethics} {\tl_use:N\g_insr_ethics_statement_tl}
+      \end{minipage}
+    \end{titlepage}
+    \pagenumbering{arabic}\INSRPageStyleMain
+    \__insr_frontmatter_optional:nn {Highlights} {\tl_use:N\g_insr_highlights_tl}
+    \__insr_frontmatter_optional:nn {Key~messages} {\tl_use:N\g_insr_key_messages_tl}
+    \bool_if:nF { \__insr_review_blind_p: } { \__insr_frontmatter_optional:nn {Author~contributions} {\tl_use:N\g_insr_author_contributions_tl} }
+    \__insr_frontmatter_optional:nn {Data~availability} {\tl_use:N\g_insr_data_availability_tl}
+    \__insr_frontmatter_optional:nn {Code~availability} {\tl_use:N\g_insr_code_availability_tl}
+  }
+\cs_new_protected:Npn \__insr_frontmatter_render_paper: { \__insr_frontmatter_render_scientific:n {Paper} }
+\cs_new_protected:Npn \__insr_frontmatter_render_report: { \__insr_frontmatter_render_scientific:n {Report} }
+\cs_new_protected:Npn \__insr_frontmatter_render_book: { \frontmatter \__insr_frontmatter_render_scientific:n {Book} \mainmatter }
+\cs_new_protected:Npn \__insr_frontmatter_render_manual: { \__insr_frontmatter_render_scientific:n {Manual} }
+\cs_new_protected:Npn \__insr_frontmatter_render_thesis: { \frontmatter \__insr_frontmatter_render_scientific:n {Thesis} \mainmatter }
+\ExplSyntaxOff
+\endinput

@@ -5,7 +5,7 @@
 \RequirePackage{amsmath,amssymb,mathtools}
 \RequirePackage{microtype}
 \RequirePackage{hyperref}
-\RequirePackage[acronym,shortcuts]{glossaries-extra}
+\RequirePackage[acronym,shortcuts,translate=false]{glossaries-extra}
 \RequirePackage{tikz}
 \ExplSyntaxOn
 \str_if_eq:VnF \g_insr_base_class_tl { beamer }
@@ -22,6 +22,7 @@
   }
 \__insr_load_theme:
 \__insr_select_language:
+
 \__insr_setup_pdf_metadata:
 \ExplSyntaxOff
 \newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}

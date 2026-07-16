@@ -19,6 +19,53 @@
 \tl_gset:Nn \g_insr_institution_tl { Independent translational research program }
 \tl_gset:Nn \g_insr_bibresource_tl { references.bib }
 \tl_gset:Nn \g_insr_keywords_tl { INSR, scientific publishing, LuaLaTeX }
+
+\tl_gset:Nn \g_insr_publication_type_tl { preprint }
+\tl_gset:Nn \g_insr_publication_status_tl { draft }
+\tl_gset:Nn \g_insr_publication_version_tl { 1.0 }
+\tl_gset:Nn \g_insr_publication_revision_tl { }
+\tl_gset:Nn \g_insr_publication_date_tl { \today }
+\tl_gset:Nn \g_insr_publication_revision_date_tl { }
+\tl_gset:Nn \g_insr_publication_doi_tl { }
+\tl_gset:Nn \g_insr_publication_url_tl { }
+\tl_gset:Nn \g_insr_publication_repository_tl { }
+\tl_gset:Nn \g_insr_publication_license_tl { }
+\tl_gset:Nn \g_insr_publication_copyright_tl { }
+\tl_gset:Nn \g_insr_publication_profile_tl { generic-preprint }
+
+\tl_gset:Nn \g_insr_publication_publisher_tl { }
+\tl_gset:Nn \g_insr_publication_git_revision_tl { }
+\tl_gset:Nn \g_insr_layout_header_separator_style_tl { single }
+\tl_gset:Nn \g_insr_layout_footer_separator_style_tl { single }
+\tl_gset:Nn \g_insr_layout_header_separator_thickness_tl { 0.4pt }
+\tl_gset:Nn \g_insr_layout_footer_separator_thickness_tl { 0.4pt }
+\tl_gset:Nn \g_insr_layout_header_separator_spacing_tl { 2.0pt }
+\tl_gset:Nn \g_insr_layout_footer_separator_spacing_tl { 2.0pt }
+\tl_gset:Nn \g_insr_layout_separator_opacity_tl { 70 }
+\tl_gset:Nn \g_insr_layout_logo_tl { }
+\tl_gset:Nn \g_insr_publication_review_tl { }
+\tl_gset:Nn \g_insr_citation_tl { }
+\tl_gset:Nn \g_insr_abstract_word_count_tl { }
+\tl_gset:Nn \g_insr_document_word_count_tl { }
+\tl_gset:Nn \g_insr_funding_statement_tl { }
+\tl_gset:Nn \g_insr_conflict_statement_tl { }
+\tl_gset:Nn \g_insr_ethics_statement_tl { }
+\tl_gset:Nn \g_insr_graphical_abstract_tl { }
+\tl_gset:Nn \g_insr_highlights_tl { }
+\tl_gset:Nn \g_insr_key_messages_tl { }
+\tl_gset:Nn \g_insr_clinical_significance_tl { }
+\tl_gset:Nn \g_insr_abbreviations_tl { }
+\tl_gset:Nn \g_insr_author_contributions_tl { }
+\tl_gset:Nn \g_insr_data_availability_tl { }
+\tl_gset:Nn \g_insr_code_availability_tl { }
+\bool_gset_true:N \g_insr_layout_header_bool
+\bool_gset_true:N \g_insr_layout_footer_bool
+\tl_gset:Nn \g_insr_layout_header_left_tl { running-title }
+\tl_gset:Nn \g_insr_layout_header_center_tl { }
+\tl_gset:Nn \g_insr_layout_header_right_tl { current-section }
+\tl_gset:Nn \g_insr_layout_footer_left_tl { version }
+\tl_gset:Nn \g_insr_layout_footer_center_tl { page-number }
+\tl_gset:Nn \g_insr_layout_footer_right_tl { doi }
 \keys_define:nn { insr }
   {
     config/load-project .bool_gset:N = \g_insr_load_project_config_bool,
@@ -40,6 +87,53 @@
     metadata/institution .tl_gset:N = \g_insr_institution_tl,
     bibliography/resource .tl_gset:N = \g_insr_bibresource_tl,
     metadata/keywords .tl_gset:N = \g_insr_keywords_tl,
+
+    publication/type .tl_gset:N = \g_insr_publication_type_tl,
+    publication/status .tl_gset:N = \g_insr_publication_status_tl,
+    publication/version .tl_gset:N = \g_insr_publication_version_tl,
+    publication/revision .tl_gset:N = \g_insr_publication_revision_tl,
+    publication/date .tl_gset:N = \g_insr_publication_date_tl,
+    publication/revision-date .tl_gset:N = \g_insr_publication_revision_date_tl,
+    publication/doi .tl_gset:N = \g_insr_publication_doi_tl,
+    publication/url .tl_gset:N = \g_insr_publication_url_tl,
+    publication/repository .tl_gset:N = \g_insr_publication_repository_tl,
+    publication/license .tl_gset:N = \g_insr_publication_license_tl,
+    publication/copyright .tl_gset:N = \g_insr_publication_copyright_tl,
+    publication/profile .tl_gset:N = \g_insr_publication_profile_tl,
+    publication/review .tl_gset:N = \g_insr_publication_review_tl,
+
+    publication/publisher .tl_gset:N = \g_insr_publication_publisher_tl,
+    publication/git-revision .tl_gset:N = \g_insr_publication_git_revision_tl,
+    layout/logo .tl_gset:N = \g_insr_layout_logo_tl,
+    layout/header-separator-style .tl_gset:N = \g_insr_layout_header_separator_style_tl,
+    layout/footer-separator-style .tl_gset:N = \g_insr_layout_footer_separator_style_tl,
+    layout/header-separator-thickness .tl_gset:N = \g_insr_layout_header_separator_thickness_tl,
+    layout/footer-separator-thickness .tl_gset:N = \g_insr_layout_footer_separator_thickness_tl,
+    layout/header-separator-spacing .tl_gset:N = \g_insr_layout_header_separator_spacing_tl,
+    layout/footer-separator-spacing .tl_gset:N = \g_insr_layout_footer_separator_spacing_tl,
+    layout/separator-opacity .tl_gset:N = \g_insr_layout_separator_opacity_tl,
+    metadata/citation .tl_gset:N = \g_insr_citation_tl,
+    metadata/abstract-word-count .tl_gset:N = \g_insr_abstract_word_count_tl,
+    metadata/document-word-count .tl_gset:N = \g_insr_document_word_count_tl,
+    metadata/funding .tl_gset:N = \g_insr_funding_statement_tl,
+    metadata/conflict-of-interest .tl_gset:N = \g_insr_conflict_statement_tl,
+    metadata/ethics .tl_gset:N = \g_insr_ethics_statement_tl,
+    metadata/graphical-abstract .tl_gset:N = \g_insr_graphical_abstract_tl,
+    metadata/highlights .tl_gset:N = \g_insr_highlights_tl,
+    metadata/key-messages .tl_gset:N = \g_insr_key_messages_tl,
+    metadata/clinical-significance .tl_gset:N = \g_insr_clinical_significance_tl,
+    metadata/abbreviations .tl_gset:N = \g_insr_abbreviations_tl,
+    metadata/author-contributions .tl_gset:N = \g_insr_author_contributions_tl,
+    metadata/data-availability .tl_gset:N = \g_insr_data_availability_tl,
+    metadata/code-availability .tl_gset:N = \g_insr_code_availability_tl,
+    layout/header .bool_gset:N = \g_insr_layout_header_bool,
+    layout/footer .bool_gset:N = \g_insr_layout_footer_bool,
+    layout/header-left .tl_gset:N = \g_insr_layout_header_left_tl,
+    layout/header-center .tl_gset:N = \g_insr_layout_header_center_tl,
+    layout/header-right .tl_gset:N = \g_insr_layout_header_right_tl,
+    layout/footer-left .tl_gset:N = \g_insr_layout_footer_left_tl,
+    layout/footer-center .tl_gset:N = \g_insr_layout_footer_center_tl,
+    layout/footer-right .tl_gset:N = \g_insr_layout_footer_right_tl,
     content/template .tl_gset:N = \g_insr_template_tl,
     unknown .code:n = { \msg_warning:nnx { insr } { unknown-key } { \l_keys_key_str } }
   }
@@ -64,7 +158,7 @@
       { manual } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { manual } }
       { book } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
       { monograph } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
-      { thesis } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
+      { thesis } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { thesis } }
       { slides } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } }
       { handout } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } \PassOptionsToClass{handout}{beamer} }
       { poster } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { poster } }
