@@ -20,8 +20,8 @@ class ConfigLifecycleStaticTests(unittest.TestCase):
         self.assertIn("\\INSRBootstrap", active)
         self.assertIn("document/target=position-paper", active)
         self.assertNotIn("document/type = position-paper", config)
-        self.assertIn("design/theme =", config)
-        self.assertIn("design/palette =", config)
+        self.assertIn("design/theme = editorial", config)
+        self.assertIn("design/palette = neuroclinical", config)
         resolver = self.read("tex/latex/insr/insr-config.sty")
         self.assertRegex(resolver, r"\{ position-paper \}.*\{ scrartcl \}.*\{ paper \}")
 
