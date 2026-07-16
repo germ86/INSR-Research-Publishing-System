@@ -51,6 +51,13 @@ jobs:
           - examples/position-paper/main.tex
           - examples/arabic-rtl-paper.tex
           - examples/multi-institution-consortium-paper.tex
+          - examples/publication-minimal/main.tex
+          - examples/publication-journal-article/main.tex
+          - examples/publication-position-paper/main.tex
+          - examples/publication-blind-review/main.tex
+          - examples/publication-zenodo-preprint/main.tex
+          - examples/publication-multi-author/main.tex
+          - examples/publication-funded-research/main.tex
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3

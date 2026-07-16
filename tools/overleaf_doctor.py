@@ -15,6 +15,13 @@ ENTRYPOINTS = {
         "examples/position-paper/main.tex",
         "examples/arabic-rtl-paper.tex",
         "examples/multi-institution-consortium-paper.tex",
+        "examples/publication-minimal/main.tex",
+        "examples/publication-journal-article/main.tex",
+        "examples/publication-position-paper/main.tex",
+        "examples/publication-blind-review/main.tex",
+        "examples/publication-zenodo-preprint/main.tex",
+        "examples/publication-multi-author/main.tex",
+        "examples/publication-funded-research/main.tex",
     ],
     "slides": [
         "examples/minimal-slides/main.tex",
@@ -48,7 +55,7 @@ ENTRYPOINTS = {
 REQUIRED_STY = [
     "insr-core", "insr-config", "insr-metadata", "insr-content", "insr-adapters",
     "insr-bibliography", "insr-localization", "insr-typography", "insr-colors",
-    "insr-layout", "insr-boxes", "insr-accessibility", "insr-neuro", "insr-utils",
+    "insr-layout", "insr-page-style", "insr-boxes", "insr-accessibility", "insr-neuro", "insr-utils",
 ]
 GENERATED_SUFFIXES = {
     ".aux", ".bcf", ".bbl", ".blg", ".fdb_latexmk", ".fls", ".log", ".out",
@@ -196,7 +203,7 @@ def collect_problems() -> list[str]:
     for doc_type in SUPPORTED_DOCUMENT_TYPES:
         if not (ROOT / f"profiles/documents/{doc_type}.profile.tex").is_file():
             problems.append(f"missing profile: {doc_type}")
-    for adapter in ["article", "paper", "report", "book", "slides", "poster", "letter", "manual"]:
+    for adapter in ["article", "paper", "report", "book", "slides", "poster", "letter", "manual", "thesis"]:
         if not (ROOT / f"framework/adapters/{adapter}.tex").is_file():
             problems.append(f"missing adapter: {adapter}")
     return sorted(set(problems))
