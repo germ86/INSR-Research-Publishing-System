@@ -26,19 +26,10 @@ class PublicationLayerStaticTests(unittest.TestCase):
             self.assertIn(key, src)
 
     def test_header_footer_and_pdf_metadata(self):
-        self.assertIn("scrlayer-scrpage", self.read("tex/latex/insr/insr-page-style.sty"))
-        self.assertNotIn("scrlayer-scrpage", self.read("tex/latex/insr/insr-layout.sty"))
+        self.assertIn("scrlayer-scrpage", self.read("tex/latex/insr/insr-layout.sty"))
         meta = self.read("tex/latex/insr/insr-metadata.sty")
         for field in ["pdfsubject", "pdfkeywords", "pdflang", "doi", "License", "Repository", "PublicationStatus"]:
             self.assertIn(field, meta)
-
-    def test_project_config_split_and_semantic_colors(self):
-        project = self.read("config/project-config.tex")
-        for cfg in ["metadata-config.tex", "publication-config.tex", "layout-config.tex", "authors-config.tex"]:
-            self.assertIn(cfg, project)
-        colors = self.read("tex/latex/insr/insr-colors.sty")
-        for color in ["INSRHeaderText", "INSRFooterText", "INSRTOCSection", "INSRTOCLink"]:
-            self.assertIn(color, colors)
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,3 @@ Existing configuration keys remain supported. Publication-quality output adds th
 * `layout/header`, `layout/footer`, `layout/header-left`, `layout/header-center`, `layout/header-right`, `layout/footer-left`, `layout/footer-center`, `layout/footer-right`
 
 Header/footer placeholders: `current-section`, `running-title`, `page-number`, `total-pages`, `version`, `doi`.
-
-## Project configuration hierarchy
-
-The configuration engine remains implemented in `tex/latex/insr/insr-config.sty`. Project-specific values are split across `config/project-config.tex`, `config/metadata-config.tex`, `config/publication-config.tex`, `config/layout-config.tex` and `config/authors-config.tex`. Optional overlays may live in `config/profiles/`.

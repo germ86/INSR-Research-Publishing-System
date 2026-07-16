@@ -15,7 +15,7 @@
 \cs_new_protected:Npn \__insr_frontmatter_optional:nn #1#2 { \tl_if_blank:oF {#2} { \par\medskip\noindent\textbf{#1}\par #2\par } }
 \cs_new_protected:Npn \__insr_frontmatter_render_scientific:n #1
   {
-    \INSRPageStyleTitle
+    \thispagestyle{empty}
     \begin{titlepage}\centering
       {\sffamily\bfseries\large \tl_if_blank:VTF \g_insr_publication_type_tl {#1} {\tl_use:N\g_insr_publication_type_tl}\par}
       \vspace{1.5cm}{\huge\bfseries \tl_use:N\g_insr_title_tl\par}
@@ -40,7 +40,7 @@
       \__insr_frontmatter_line:nn {Ethics} {\tl_use:N\g_insr_ethics_statement_tl}
       \end{minipage}
     \end{titlepage}
-    \setcounter{page}{1}\INSRPageStyleMain
+    \setcounter{page}{1}\pagestyle{scrheadings}
     \__insr_frontmatter_optional:nn {Highlights} {\tl_use:N\g_insr_highlights_tl}
     \__insr_frontmatter_optional:nn {Key~messages} {\tl_use:N\g_insr_key_messages_tl}
     \bool_if:nF { \__insr_review_blind_p: } { \__insr_frontmatter_optional:nn {Author~contributions} {\tl_use:N\g_insr_author_contributions_tl} }
