@@ -37,7 +37,7 @@
   { id .tl_set:N=\l_insr_institution_id_tl, name .tl_set:N=\l_insr_institution_name_tl, short-name .tl_set:N=\l_insr_institution_short_name_tl, department .tl_set:N=\l_insr_institution_department_tl, city .tl_set:N=\l_insr_institution_city_tl, country .tl_set:N=\l_insr_institution_country_tl, type .code:n={}, logo .tl_set:N=\l_insr_institution_logo_tl, logo-dark .code:n={}, url .tl_set:N=\l_insr_institution_website_tl, website .tl_set:N=\l_insr_institution_website_tl, ror .tl_set:N=\l_insr_institution_ror_tl, unknown .code:n={\msg_warning:nnn { insr } { unknown-key } { institution/#1 }} }
 \keys_define:nn { insr/funding } { grant-number .tl_set:N=\l_insr_funding_grant_tl, agency .tl_set:N=\l_insr_funding_agency_tl, project-acronym .tl_set:N=\l_insr_funding_project_tl, unknown .code:n={\msg_warning:nnn { insr } { unknown-key } { funding/#1 }} }
 \cs_new:Npn \__insr_role_label:n #1
-  { \str_case:nnF {#1} { {conceptualization}{Conceptualization} {methodology}{Methodology} {software}{Software} {writing-original-draft}{Writing~--~Original~Draft} {writing-review-editing}{Writing~--~Review~and~Editing} } {#1} }
+  { \str_case:nnF {#1} { {conceptualization}{Conceptualization} {methodology}{Methodology} {software}{Software} {writing-original-draft}{Writing~--~Original~Draft} {writing-review-editing}{Writing~--~Review~and~Editing} {project-administration}{Project~Administration} {visualization}{Visualization} } {#1} }
 \cs_new:Npn \__insr_affiliation_label:n #1 { \prop_item:Nn \g_insr_institution_name_prop {#1} }
 \NewDocumentCommand \INSRAddInstitution { m }
   { \tl_clear:N\l_insr_institution_id_tl \tl_clear:N\l_insr_institution_name_tl \tl_clear:N\l_insr_institution_department_tl \tl_clear:N\l_insr_institution_city_tl \tl_clear:N\l_insr_institution_country_tl \tl_clear:N\l_insr_institution_ror_tl \keys_set:nn { insr/institution } { #1 } \prop_gput:Nxx \g_insr_institution_name_prop { \tl_use:N \l_insr_institution_id_tl } { \tl_use:N \l_insr_institution_name_tl } \seq_gput_right:Nx \g_insr_institution_seq { \tl_use:N\l_insr_institution_name_tl } }
@@ -49,6 +49,59 @@
 \NewDocumentCommand \INSRLogo { O{} m m } { }
 \cs_new:Npn \insr_author_block: { \seq_if_empty:NTF \g_insr_author_name_seq { \tl_use:N \g_insr_author_tl } { \seq_use:Nn \g_insr_author_name_seq {,~} } }
 \cs_new:Npn \insr_institution_block: { \seq_if_empty:NTF \g_insr_institution_seq { \tl_use:N \g_insr_institution_tl } { \seq_use:Nn \g_insr_institution_seq {;~} } }
+\cs_new_protected:Npn \insr_author_title_block:
+  {
+    \seq_if_empty:NTF \g_insr_author_name_seq
+      { \tl_use:N \g_insr_author_tl }
+      {
+        \seq_map_indexed_inline:Nn \g_insr_author_name_seq
+          {
+            ##2
+            \tl_set:Nx \l_tmpa_tl { \seq_item:Nn \g_insr_author_orcid_seq {##1} }
+            \tl_if_blank:VF \l_tmpa_tl {~(ORCID:~\href{https://orcid.org/\tl_use:N\l_tmpa_tl}{\tl_use:N\l_tmpa_tl})}
+            \int_compare:nNnT {##1} < {\seq_count:N \g_insr_author_name_seq} {;~}
+          }
+      }
+  }
+\cs_new_protected:Npn \insr_affiliation_title_block:
+  {
+    \seq_if_empty:NTF \g_insr_author_affiliation_seq
+      { \insr_institution_block: }
+      {
+        \seq_set_eq:NN \l_tmpa_seq \g_insr_author_affiliation_seq
+        \seq_remove_duplicates:N \l_tmpa_seq
+        \seq_use:Nn \l_tmpa_seq {;~}
+      }
+  }
+\cs_new_protected:Npn \insr_credit_block:
+  {
+    \tl_if_blank:VTF \g_insr_author_contributions_tl
+      {
+        \seq_if_empty:NF \g_insr_author_credit_seq
+          {
+            \seq_map_indexed_inline:Nn \g_insr_author_credit_seq
+              {
+                \tl_set:Nx \l_tmpa_tl { \seq_item:Nn \g_insr_author_name_seq {##1} }
+                \tl_if_blank:VF \l_tmpa_tl { \textbf{\tl_use:N \l_tmpa_tl}:~ }
+                ##2
+                \int_compare:nNnT {##1} < {\seq_count:N \g_insr_author_credit_seq} {;~}
+              }
+          }
+      }
+      { \tl_use:N \g_insr_author_contributions_tl }
+  }
+\cs_new_protected:Npn \insr_suggested_citation:
+  {
+    \str_if_eq:VnTF \g_insr_citation_mode_tl { manual }
+      { \tl_if_blank:VTF \g_insr_suggested_citation_tl { \tl_use:N \g_insr_citation_tl } { \tl_use:N \g_insr_suggested_citation_tl } }
+      {
+        \seq_if_empty:NTF \g_insr_author_short_seq { \tl_use:N \g_insr_author_tl } { \seq_use:Nn \g_insr_author_short_seq {,~} }.
+        ~\tl_use:N \g_insr_title_tl
+        \tl_if_blank:VF \g_insr_subtitle_tl {:~\tl_use:N \g_insr_subtitle_tl}.
+        ~\tl_if_blank:VTF \g_insr_publication_publisher_tl { \tl_use:N \g_insr_institution_tl } { \tl_use:N \g_insr_publication_publisher_tl },
+        ~\tl_use:N \g_insr_publication_date_tl.
+      }
+  }
 \cs_new_protected:Npn \__insr_setup_pdf_metadata: { \tl_set_eq:NN \l__insr_pdf_title_tl \g_insr_title_tl \tl_set:Nx \l__insr_pdf_author_tl { \insr_author_block: } \tl_set_eq:NN \l__insr_pdf_keywords_tl \g_insr_keywords_tl \exp_args:Nx \hypersetup { unicode=true,colorlinks=true,linkcolor=INSRLink,citecolor=INSRLink,urlcolor=INSRLink,pdftitle={\tl_use:N\l__insr_pdf_title_tl},pdfauthor={\tl_use:N\l__insr_pdf_author_tl},pdfsubject={\tl_use:N\g_insr_publication_type_tl;~\tl_use:N\g_insr_publication_status_tl},pdfkeywords={\tl_use:N\l__insr_pdf_keywords_tl},pdflang={\tl_use:N\g_insr_language_tl},pdfcreator={INSR Scientific Publishing Platform},pdfproducer={LuaLaTeX with INSR},pdfinfo={doi={\tl_use:N\g_insr_publication_doi_tl},License={\tl_use:N\g_insr_publication_license_tl},Repository={\tl_use:N\g_insr_publication_repository_tl},Version={\tl_use:N\g_insr_publication_version_tl},PublicationStatus={\tl_use:N\g_insr_publication_status_tl}} } }
 \ExplSyntaxOff
 \endinput
