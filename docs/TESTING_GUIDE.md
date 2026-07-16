@@ -14,6 +14,17 @@ python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
 ./tests/run-tests.sh --static-only
 ```
 
+## Local TeX toolchain
+
+For Debian/Ubuntu-based development containers, install the same LuaLaTeX-first toolchain used by the local compile runner before running full builds:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y latexmk texlive-luatex biber texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended fonts-freefont-otf fonts-hosny-amiri fonts-noto-core fonts-noto-cjk
+```
+
+`latexmk`, `lualatex`, and `biber` must all be on `PATH`. The font packages provide the Arabic, Hebrew, and broad Unicode fallback fonts used by the multilingual typography presets, avoiding local-only fontspec failures during smoke builds.
+
 When TeX Live is installed, run:
 
 ```bash
