@@ -67,25 +67,28 @@ GENERATED_SUFFIXES = {
 }
 
 TARGETS = {
-    "position-paper": {"base": "scrartcl", "adapter": "paper", "profile": "position-paper", "source": "insr-position-paper"},
-    "paper": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
-    "journal-paper": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
-    "slides": {"base": "beamer", "adapter": "slides", "profile": "slides", "source": "insr-position-paper"},
-    "handout": {"base": "beamer", "adapter": "slides", "profile": "handout", "source": "insr-position-paper"},
-    "poster": {"base": "beamer", "adapter": "poster", "profile": "poster", "source": "insr-position-paper"},
-    "clinical-manual": {"base": "scrreprt", "adapter": "manual", "profile": "manual", "source": "insr-position-paper"},
-    "technical-report": {"base": "scrreprt", "adapter": "report", "profile": "report", "source": "insr-position-paper"},
-    "executive-brief": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
-    "book": {"base": "scrbook", "adapter": "book", "profile": "book", "source": "insr-position-paper"},
-    "thesis": {"base": "scrbook", "adapter": "thesis", "profile": "thesis", "source": "insr-position-paper"},
+    "position-paper": {"type": "position-paper", "target": "paper", "base": "scrartcl", "adapter": "paper", "profile": "position-paper", "source": "insr-position-paper"},
+    "paper": {"type": "paper", "target": "paper", "base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
+    "journal-paper": {"type": "journal-article", "target": "paper", "base": "scrartcl", "adapter": "paper", "profile": "journal-paper", "source": "insr-position-paper"},
+    "slides": {"type": "position-paper", "target": "slides", "base": "beamer", "adapter": "slides", "profile": "position-paper", "source": "insr-position-paper"},
+    "handout": {"type": "position-paper", "target": "handout", "base": "beamer", "adapter": "slides", "profile": "position-paper", "source": "insr-position-paper"},
+    "poster": {"type": "position-paper", "target": "poster", "base": "beamer", "adapter": "poster", "profile": "position-paper", "source": "insr-position-paper"},
+    "rct-protocol": {"type": "rct-protocol", "target": "paper", "base": "scrartcl", "adapter": "paper", "profile": "rct-protocol", "source": "rct-protocol"},
+    "clinical-protocol": {"type": "clinical-protocol", "target": "paper", "base": "scrartcl", "adapter": "paper", "profile": "clinical-protocol", "source": "clinical-protocol"},
+    "rct-protocol-slides": {"type": "rct-protocol", "target": "slides", "base": "beamer", "adapter": "slides", "profile": "rct-protocol", "source": "rct-protocol"},
+    "clinical-protocol-handout": {"type": "clinical-protocol", "target": "handout", "base": "beamer", "adapter": "slides", "profile": "clinical-protocol", "source": "clinical-protocol"},
+    "clinical-manual": {"type": "clinical-manual", "target": "manual", "base": "scrreprt", "adapter": "manual", "profile": "clinical-manual", "source": "insr-position-paper"},
+    "technical-report": {"type": "technical-report", "target": "report", "base": "scrreprt", "adapter": "report", "profile": "technical-report", "source": "insr-position-paper"},
+    "executive-brief": {"type": "position-paper", "target": "executive-brief", "base": "scrartcl", "adapter": "paper", "profile": "position-paper", "source": "insr-position-paper"},
+    "book": {"type": "position-paper", "target": "book", "base": "scrbook", "adapter": "book", "profile": "position-paper", "source": "insr-position-paper"},
+    "thesis": {"type": "position-paper", "target": "thesis", "base": "scrbook", "adapter": "thesis", "profile": "position-paper", "source": "insr-position-paper"},
 }
-
 SUPPORTED_DOCUMENT_TYPES = {
     "article", "paper", "position-paper", "whitepaper", "report", "book", "monograph",
     "thesis", "slides", "handout", "poster", "letter", "grant", "protocol",
-    "clinical-trial-protocol", "rct", "systematic-review", "narrative-review",
-    "technical-documentation", "developer-documentation", "manual",
-} | set(TARGETS)
+    "clinical-trial-protocol", "clinical-protocol", "rct", "rct-protocol", "journal-paper", "systematic-review", "narrative-review", "technical-report",
+    "clinical-manual", "technical-documentation", "developer-documentation", "manual",
+}
 VALID_THEMES = {p.stem for p in (ROOT / "themes").glob("*.tex")}
 VALID_PALETTES = {p.stem for p in (ROOT / "palettes").glob("*.tex") if p.parent.name == "palettes"}
 VALID_FONTS = {p.stem for p in (ROOT / "typography").glob("*.tex")}
@@ -274,8 +277,12 @@ def check_target(args: argparse.Namespace) -> int:
     if not (ROOT / f"content/{info['source']}").is_dir():
         problems.append(f"missing content source: {info['source']}")
     config_pkg = read(ROOT / "tex/latex/insr/insr-config.sty")
-    if f"{{ {target} }}" not in config_pkg and f"{{{target}}}" not in config_pkg:
-        problems.append("target not mapped in insr-config.sty")
+    mapped_type = info.get("type", target)
+    mapped_target = info.get("target", "paper")
+    if f"{{ {mapped_type} }}" not in config_pkg and f"{{{mapped_type}}}" not in config_pkg:
+        problems.append(f"document type not mapped in insr-config.sty: {mapped_type}")
+    if f"{{ {mapped_target} }}" not in config_pkg and f"{{{mapped_target}}}" not in config_pkg:
+        problems.append(f"output target not mapped in insr-config.sty: {mapped_target}")
     if problems:
         print(f"target {target}: invalid")
         for problem in problems:

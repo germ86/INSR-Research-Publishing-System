@@ -15,14 +15,25 @@
 \tl_new:N \l_insr_unit_safety_tl
 \tl_new:N \l_insr_unit_methods_tl
 \tl_new:N \l_insr_unit_limitations_tl
+\tl_new:N \l_insr_unit_role_tl
+\tl_new:N \l_insr_unit_numbered_tl
+\tl_new:N \l_insr_unit_toc_tl
+\tl_new:N \l_insr_unit_required_tl
+\bool_new:N \l__insr_unit_placeholder_bool
 \bool_new:N \g__insr_toc_rendered_bool
 \keys_define:nn { insr/content-unit }
-  { id .tl_set:N = \l_insr_unit_id_tl, title .tl_set:N = \l_insr_unit_title_tl, outputs .tl_set:N = \l_insr_unit_outputs_tl, unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { content-unit/#1 } } }
+  { id .tl_set:N = \l_insr_unit_id_tl, title .tl_set:N = \l_insr_unit_title_tl, outputs .tl_set:N = \l_insr_unit_outputs_tl, role .tl_set:N = \l_insr_unit_role_tl, numbered .tl_set:N = \l_insr_unit_numbered_tl, toc .tl_set:N = \l_insr_unit_toc_tl, required .tl_set:N = \l_insr_unit_required_tl, placeholder .bool_set:N = \l__insr_unit_placeholder_bool, unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { content-unit/#1 } } }
 \cs_new_protected:Npn \__insr_template_render:
-  { \file_if_exist:nTF { content/manifest.tex } { \file_input:n { content/manifest.tex } } { \msg_warning:nnn { insr } { missing-slot } { content/manifest.tex } } }
+  {
+    \tl_set:Nx \l__insr_runtime_file_tl { content/\tl_use:N \g_insr_content_source_tl/manifest.tex }
+    \file_if_exist:VTF \l__insr_runtime_file_tl
+      { \file_input:V \l__insr_runtime_file_tl }
+      { \file_if_exist:nTF { content/manifest.tex } { \file_input:n { content/manifest.tex } } { \msg_warning:nnx { insr } { missing-slot } { \tl_use:N \l__insr_runtime_file_tl } } }
+  }
 \cs_new_protected:Npn \__insr_unit_reset:
-  { \tl_clear:N \l_insr_unit_id_tl \tl_clear:N \l_insr_unit_title_tl \tl_clear:N \l_insr_unit_outputs_tl \tl_clear:N \l_insr_unit_full_tl \tl_clear:N \l_insr_unit_summary_tl \tl_clear:N \l_insr_unit_key_tl \tl_clear:N \l_insr_unit_notes_tl \tl_clear:N \l_insr_unit_handout_tl \tl_clear:N \l_insr_unit_poster_tl \tl_clear:N \l_insr_unit_executive_tl \tl_clear:N \l_insr_unit_clinical_tl \tl_clear:N \l_insr_unit_safety_tl \tl_clear:N \l_insr_unit_methods_tl \tl_clear:N \l_insr_unit_limitations_tl }
+  { \tl_clear:N \l_insr_unit_id_tl \tl_clear:N \l_insr_unit_title_tl \tl_clear:N \l_insr_unit_outputs_tl \tl_clear:N \l_insr_unit_full_tl \tl_clear:N \l_insr_unit_summary_tl \tl_clear:N \l_insr_unit_key_tl \tl_clear:N \l_insr_unit_notes_tl \tl_clear:N \l_insr_unit_handout_tl \tl_clear:N \l_insr_unit_poster_tl \tl_clear:N \l_insr_unit_executive_tl \tl_clear:N \l_insr_unit_clinical_tl \tl_clear:N \l_insr_unit_safety_tl \tl_clear:N \l_insr_unit_methods_tl \tl_clear:N \l_insr_unit_limitations_tl \tl_clear:N \l_insr_unit_role_tl \tl_clear:N \l_insr_unit_numbered_tl \tl_clear:N \l_insr_unit_toc_tl \tl_set:Nn \l_insr_unit_required_tl { true } \bool_set_false:N \l__insr_unit_placeholder_bool }
 \NewDocumentCommand \INSRFullText { +m } { \tl_set:Nn \l_insr_unit_full_tl {#1} }
+\NewDocumentCommand \INSRPlaceholder {} { \bool_set_true:N \l__insr_unit_placeholder_bool }
 \NewDocumentCommand \INSRSummary { +m } { \tl_set:Nn \l_insr_unit_summary_tl {#1} }
 \NewDocumentCommand \INSRKeyMessage { +m } { \tl_set:Nn \l_insr_unit_key_tl {#1} }
 \NewDocumentCommand \INSRSpeakerNotes { +m } { \tl_set:Nn \l_insr_unit_notes_tl {#1} }
@@ -38,28 +49,57 @@
 \NewDocumentCommand \INSRExceptFor { m +m } { \clist_if_in:nnF {#1} { \tl_use:N \g_insr_document_type_tl } {#2} }
 \NewDocumentEnvironment { INSRContentUnit } { O{} +b } { \group_begin: \__insr_unit_reset: \keys_set:nn { insr/content-unit } { #1 } #2 \insr_content_unit_render: \group_end: } { }
 \cs_new_protected:Npn \insr_content_unit_render:
-  { \tl_if_blank:VTF \l_insr_unit_title_tl { \msg_warning:nnn { insr } { missing-slot } { content-unit/title } } { \tl_if_blank:VTF \l_insr_unit_outputs_tl { \insr_content_unit_render_selected: } { \clist_if_in:VVTF \l_insr_unit_outputs_tl \g_insr_document_type_tl { \insr_content_unit_render_selected: } { } } } }
+  { \tl_if_blank:VTF \l_insr_unit_title_tl { \msg_warning:nnn { insr } { missing-slot } { content-unit/title } } { \tl_if_blank:VTF \l_insr_unit_outputs_tl { \insr_content_unit_render_selected: } { \clist_if_in:VVTF \l_insr_unit_outputs_tl \g_insr_output_target_tl { \insr_content_unit_render_selected: } { } } } }
 \cs_new_protected:Npn \insr_content_unit_render_selected: { \__insr_adapter_render_content_unit: }
+
+\msg_new:nnn { insr } { production-placeholder } { Required~content~unit~'#1'~('#2')~is~empty~or~placeholder~content;~source='#3',~target='#4'. }
+\msg_new:nnn { insr } { legacy-placeholder } { Content~unit~'#1'~uses~legacy~placeholder~prose.~Use~\INSRPlaceholder~or~placeholder=true. }
+\msg_new:nnn { insr } { duplicate-toc } { Global~table~of~contents~already~rendered;~second~call~ignored. }
 \cs_new:Npn \__insr_placeholder_text: { Substantive~content~pending. }
+\cs_new:Npn \__insr_placeholder_verbose_text: { Substantive~content~for~this~unit~is~pending. }
+\cs_new:Npn \__insr_placeholder_review_text: { Content~pending~for~review. }
+\prg_new_conditional:Npnn \__insr_unit_required: { T, F, TF }
+  { \str_if_eq:VnTF \l_insr_unit_required_tl { false } { \prg_return_false: } { \prg_return_true: } }
+\cs_new:Npn \__insr_unit_source: { content/\tl_use:N\g_insr_content_source_tl/\tl_use:N\l_insr_unit_id_tl }
+\prg_new_conditional:Npnn \__insr_legacy_placeholder_full: { T, F, TF }
+  {
+    \str_if_eq:VnTF \l_insr_unit_full_tl { Substantive~content~pending. } { \prg_return_true: }
+      { \tl_if_in:VnTF \l_insr_unit_full_tl { This~placeholder~exists~only~to~keep~the~INSR~position-paper~build~syntactically~complete. } { \prg_return_true: } { \prg_return_false: } }
+  }
+\cs_new_protected:Npn \__insr_render_placeholder:
+  {
+    \str_if_eq:VnTF \g_insr_build_profile_tl { production }
+      { \__insr_unit_required:TF { \msg_error:nnxxxx { insr } { production-placeholder } { \tl_use:N\l_insr_unit_id_tl } { \tl_use:N\l_insr_unit_title_tl } { \__insr_unit_source: } { \tl_use:N\g_insr_document_type_tl } } { } }
+      {
+        \str_if_eq:VnTF \g_insr_build_profile_tl { review }
+          { \par\noindent\emph{\__insr_placeholder_review_text:}\par }
+          {
+            \str_case:VnF \g_insr_content_placeholders_tl
+              { { hide } { } { error } { \msg_error:nnxxxx { insr } { production-placeholder } { \tl_use:N\l_insr_unit_id_tl } { \tl_use:N\l_insr_unit_title_tl } { \__insr_unit_source: } { \tl_use:N\g_insr_document_type_tl } } { show } { \par\noindent\emph{\__insr_placeholder_verbose_text:}\par } }
+              { \par\noindent\textcolor{INSRTextMuted}{\emph{\__insr_placeholder_text:}}\par }
+          }
+      }
+  }
 \cs_new_protected:Npn \__insr_render_unit_body:
   {
-    \tl_if_in:VnTF \l_insr_unit_full_tl {placeholder}
-      { \__insr_render_placeholder: }
-      { \tl_if_blank:VTF \l_insr_unit_full_tl { \tl_if_blank:VTF \l_insr_unit_summary_tl { \__insr_render_placeholder: } { \tl_use:N \l_insr_unit_summary_tl } } { \tl_use:N \l_insr_unit_full_tl } }
+    \bool_if:NTF \l__insr_unit_placeholder_bool { \__insr_render_placeholder: }
+      { \__insr_legacy_placeholder_full:TF { \msg_warning:nnx { insr } { legacy-placeholder } { \tl_use:N\l_insr_unit_id_tl } \__insr_render_placeholder: } { \tl_if_blank:VTF \l_insr_unit_full_tl { \tl_if_blank:VTF \l_insr_unit_summary_tl { \__insr_render_placeholder: } { \tl_use:N \l_insr_unit_summary_tl } } { \tl_use:N \l_insr_unit_full_tl } } }
   }
+\cs_new_protected:Npn \__insr_heading_star_toc:n #1 { \section*{#1}\addcontentsline{toc}{section}{#1} }
 \cs_new_protected:Npn \__insr_render_content_unit_block:
-  { \str_case:VnF \l_insr_unit_title_tl { {Abstract}{\section*{Abstract}\addcontentsline{toc}{section}{Abstract}} {Document status}{\section*{Document status}\addcontentsline{toc}{section}{Document status}} {Declarations}{\section*{Declarations}\addcontentsline{toc}{section}{Declarations}} } { \INSRSection{\tl_use:N \l_insr_unit_title_tl} } \__insr_render_unit_body: }
+  { \str_case:VnF \l_insr_unit_role_tl { {frontmatter-status}{\__insr_heading_star_toc:n{\tl_use:N\l_insr_unit_title_tl}} {abstract}{\__insr_heading_star_toc:n{\tl_use:N\l_insr_unit_title_tl}} {declarations}{\__insr_heading_star_toc:n{\tl_use:N\l_insr_unit_title_tl}} {references}{\__insr_heading_star_toc:n{\tl_use:N\l_insr_unit_title_tl}} } { \str_case:VnF \l_insr_unit_title_tl { {Abstract}{\__insr_heading_star_toc:n{Abstract}} {Document status}{\__insr_heading_star_toc:n{Document status}} {Declarations}{\__insr_heading_star_toc:n{Declarations}} } { \INSRSection{\tl_use:N \l_insr_unit_title_tl} } } \__insr_render_unit_body: }
 \NewDocumentCommand \INSRAbstract { m } { \str_if_eq:VnTF \g_insr_base_class_tl { beamer } { \begin{frame}{Abstract}#1\end{frame} } { \section*{Abstract}\addcontentsline{toc}{section}{Abstract}#1 } }
 \NewDocumentCommand \INSRKeywords { o } { \bool_if:NT \g_insr_frontmatter_keywords_bool { \par\noindent\textbf{Keywords:~}\tl_use:N\g_insr_keywords_tl\par } }
 \NewDocumentCommand \INSRDeclarations {} { \section*{Declarations}\addcontentsline{toc}{section}{Declarations} }
 \NewDocumentCommand \INSRTableOfContents {}
   {
-    \bool_if:NF \g__insr_toc_rendered_bool
+    \bool_if:NTF \g__insr_toc_rendered_bool
+      { \str_if_eq:VnT \g_insr_build_profile_tl { development } { \msg_warning:nn { insr } { duplicate-toc } } }
       {
         \bool_gset_true:N \g__insr_toc_rendered_bool
         \str_if_eq:VnTF \g_insr_base_class_tl { beamer }
           { \begin{frame}{Agenda}\tableofcontents\end{frame} }
-          { \section*{Contents}\pdfbookmark[section]{Contents}{insr-toc}\begingroup\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup\clearpage }
+          { \begingroup\thispagestyle{plain}\phantomsection\pdfbookmark[section]{Contents}{insr-global-toc}\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup }
       }
   }
 \ExplSyntaxOff

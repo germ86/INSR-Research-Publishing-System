@@ -20,7 +20,14 @@ def _atomic_write(path: Path, text: str) -> None:
 
 def write_active(target: str) -> str | None:
     old = ACTIVE.read_text(encoding="utf-8") if ACTIVE.exists() else None
-    _atomic_write(ACTIVE, f"% Temporary target selected by tools/insr_build.py\n\\INSRSelectTarget{{{target}}}\n")
+    info = TARGETS[target]
+    document_type = info.get("type", target)
+    output_target = info.get("target", "paper")
+    _atomic_write(
+        ACTIVE,
+        "% Temporary target selected by tools/insr_build.py\n"
+        f"\\INSRBootstrap{{document/type={document_type}, output/target={output_target}}}\n",
+    )
     return old
 
 def restore_active(old: str | None) -> None:
@@ -31,12 +38,14 @@ def restore_active(old: str | None) -> None:
 
 def run_latexmk(target: str) -> int:
     outdir = ROOT / "build" / target
+    if outdir.exists():
+        shutil.rmtree(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     if shutil.which("latexmk") is None:
         (outdir / "build.log").write_text("latexmk not found; build not executed\n", encoding="utf-8")
         print("latexmk not found")
         return 127
-    cmd = ["latexmk", "-lualatex", "-interaction=nonstopmode", "-halt-on-error", f"-outdir={outdir}", "main.tex"]
+    cmd = ["latexmk", "-lualatex", "-bibtex-", "-interaction=nonstopmode", "-halt-on-error", f"-outdir={outdir}", "main.tex"]
     proc = subprocess.run(cmd, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (outdir / "build.log").write_text(proc.stdout, encoding="utf-8")
     return proc.returncode

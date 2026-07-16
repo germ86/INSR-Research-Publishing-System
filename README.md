@@ -10,7 +10,7 @@ The production entry architecture is intentionally small:
 - one public root document: `main.tex`;
 - one authoritative project configuration file: `config/project-config.tex`.
 
-Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Switch paper, slides, poster, book, manual, protocol or review output by changing the `document/type` key in `config/project-config.tex`.
+Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Select the semantic document genre and rendering format in `config/active-target.tex` with `document/type` and `output/target`; keep project-wide defaults such as theme, palette, typography and metadata in `config/project-config.tex`.
 
 The canonical root document is always:
 
@@ -29,14 +29,18 @@ The canonical root document is always:
 
 1. Set the compiler to **LuaLaTeX**.
 2. Keep `main.tex` unchanged.
-3. Edit `config/project-config.tex` to select output type, theme, palette, typography and metadata.
+3. Edit `config/active-target.tex` to select `document/type` and `output/target`; edit `config/project-config.tex` for theme, palette, typography and metadata.
 4. Compile `main.tex`.
 
 A minimal configuration looks like this:
 
 ```tex
+\INSRBootstrap{
+  document/type = position-paper,
+  output/target = paper
+}
+
 \INSRConfigure{
-  document/type = paper,
   design/theme = clinical,
   design/palette = neuroclinical,
   design/font = libertinus,
@@ -169,7 +173,7 @@ Native distribution-style classes are available for production documents: `insr-
 
 ### Active target workflow
 
-The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with `\INSRSelectTarget{position-paper}` or via `output/target` in project configuration. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with the bootstrap-only setting `\INSRBootstrap{document/type=position-paper, output/target=paper}`. Broader project values remain in `config/project-config.tex` and no longer need to restate the target. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
 
 Frontmatter now suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.
 
@@ -177,3 +181,7 @@ Frontmatter now suppresses empty optional fields, resolves author affiliation ID
 ### Release readiness and golden reference
 
 The neutral golden-reference project lives in `examples/reference-publication/` and exercises paper, slides, handout and poster entry points without scientific or clinical claims. Metadata exports are prepared with `python3 tools/insr_metadata.py export-all --outdir build/metadata`; release bundles are prepared locally with `python3 tools/insr_release.py prepare --version <version>`. See `docs/RELEASE_GUIDE.md`.
+
+### Root build placeholder and TOC policy
+
+INSR v4 keeps placeholder rendering central in `tex/latex/insr/insr-content.sty`. Authors should mark intentional empty content with `\INSRPlaceholder` or `placeholder=true`; legacy prose placeholders are accepted only with a migration warning. Production builds and `content/placeholders=error` fail required empty units with unit ID, visible title, source, and target. `\INSRTableOfContents` is the only global TOC API and is guarded against duplicate visible contents pages.

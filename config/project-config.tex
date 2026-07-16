@@ -1,21 +1,19 @@
 % INSR Scientific Publishing Platform v4.0 project configuration.
 % Switch output in config/active-target.tex; do not edit main.tex for document-type changes.
-\InputIfFileExists{config/active-target.tex}{}{}
+\InputIfFileExists{config/active-target.tex}{}{\INSRBootstrap{document/type=position-paper, output/target=paper}}
 \INSRConfigure{
-  output/target = position-paper,
-  document/type = position-paper,
   document/density = standard,
   document/build-profile = development,
   design/theme = editorial,
-  design/palette = neuroclinical,
-  design/font = libertinus,
+  design/palette = ocean,
+  design/font = noto,
   design/mode = light,
   accessibility/high-contrast = false,
-  localization/language = english,
+  localization/language = ngerman,
   localization/direction = ltr,
   bibliography/resource = {},
   content/template = auto,
-  content/source = insr-position-paper,
+  content/source = auto,
   content/placeholders = compact
 }
 \InputIfFileExists{config/metadata-config.tex}{}{}

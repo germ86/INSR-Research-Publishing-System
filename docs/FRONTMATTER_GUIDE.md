@@ -48,3 +48,11 @@ Optional fields are rendered only when their trimmed value is nonblank. This app
 ## Optional field semantics
 
 Optional frontmatter labels are emitted only when their underlying token-list or author-role data is non-empty. Renderer macros alone do not make Funding, Conflict of interest, Ethics, Highlights, Key messages, Data availability, Code availability or Author contributions visible.
+
+## Content-unit roles and numbering
+
+Position-paper frontmatter should use semantic roles instead of title comparisons: `frontmatter-status`, `abstract`, `main`, `declarations`, and `references`. The standard profile renders Document status, Abstract, Keywords, Highlights, Key messages, and Contents as unnumbered frontmatter; Introduction is the first numbered main section.
+
+## CRediT rendering pipeline
+
+CRediT role lists are parsed as comma lists per author. Each item is trimmed, mapped to a human-readable label, stored only when recognized, and then joined with comma-space separators. Unknown roles warn only in development builds and are omitted from Review and Production output so raw technical slugs never appear in the PDF. The Author contributions block is suppressed when no manual contribution text and no valid role labels exist.

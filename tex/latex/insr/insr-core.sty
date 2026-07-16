@@ -102,6 +102,6 @@
 \DeclareRobustCommand{\INSRMakeTitle}{\ifcsname __insr_adapter_make_title:\endcsname\csname __insr_adapter_make_title:\endcsname\else\ClassError{insr}{Mandatory adapter title renderer missing}{The selected adapter did not define \string\__insr_adapter_make_title:.}\fi}
 \DeclareRobustCommand{\INSRRenderDocument}{\ifcsname __insr_template_render:\endcsname\csname __insr_template_render:\endcsname\else\ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}\par\noindent INSR template renderer unavailable.\par\fi}
 \DeclareRobustCommand{\INSRSelectTarget}[1]{\ExplSyntaxOn\tl_gset:Nn \g_insr_output_target_tl {#1}\tl_gset:Nn \g_insr_document_type_tl {#1}\ExplSyntaxOff}
-\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
+\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRBootstrap, \\INSRSelectTarget, \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
 \ExplSyntaxOff
 \endinput
