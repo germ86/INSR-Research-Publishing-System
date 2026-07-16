@@ -71,3 +71,5 @@ Content units support semantic keys `role`, `numbered`, `toc`, `required`, and `
 Automatic suggested citations are assembled from semantic author, year, title, subtitle, version, and publisher components. `publication/year` is used for the year; full publication dates remain title-page metadata. Pending DOI values are displayed as pending metadata rather than linked identifiers.
 
 CRediT role lists are parsed as comma lists and mapped to publication-facing labels, including Writing -- Original Draft, Writing -- Review and Editing, Formal Analysis, Data Curation, Funding Acquisition, and Resources. Unknown role slugs warn in development and are not printed as raw technical identifiers.
+
+Review builds render neutral placeholder text. Production builds fail required placeholder units, while optional units marked `required=false` may remain silent. The repository's official position-paper content uses explicit `\INSRPlaceholder` markers rather than legacy placeholder prose.

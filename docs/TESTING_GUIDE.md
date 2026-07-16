@@ -85,3 +85,5 @@ Run `python3 tools/insr_metadata.py validate`, `python3 tools/insr_metadata.py e
 ## Renderer regression checks
 
 `tools/validate_project.py` statically validates that internal `\__insr_...:` renderer/helper calls in the modular package layer are defined or explicitly supplied by adapters. This catches missing central renderers such as `\__insr_render_placeholder:` before merge.
+
+CRediT regression coverage includes a four-role author case and a multi-author case with an unknown role plus an empty role list. These tests verify the controlled rendered role strings and warning text rather than only checking macro names.

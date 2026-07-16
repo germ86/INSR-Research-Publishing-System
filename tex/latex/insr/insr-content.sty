@@ -52,6 +52,7 @@
 \msg_new:nnn { insr } { duplicate-toc } { Global~table~of~contents~already~rendered;~second~call~ignored. }
 \cs_new:Npn \__insr_placeholder_text: { Substantive~content~pending. }
 \cs_new:Npn \__insr_placeholder_verbose_text: { Substantive~content~for~this~unit~is~pending. }
+\cs_new:Npn \__insr_placeholder_review_text: { Content~pending~for~review. }
 \prg_new_conditional:Npnn \__insr_unit_required: { T, F, TF }
   { \str_if_eq:VnTF \l_insr_unit_required_tl { false } { \prg_return_false: } { \prg_return_true: } }
 \cs_new:Npn \__insr_unit_source: { content/\tl_use:N\g_insr_content_source_tl/\tl_use:N\l_insr_unit_id_tl }
@@ -65,9 +66,13 @@
     \str_if_eq:VnTF \g_insr_build_profile_tl { production }
       { \__insr_unit_required:TF { \msg_error:nnxxxx { insr } { production-placeholder } { \tl_use:N\l_insr_unit_id_tl } { \tl_use:N\l_insr_unit_title_tl } { \__insr_unit_source: } { \tl_use:N\g_insr_document_type_tl } } { } }
       {
-        \str_case:VnF \g_insr_content_placeholders_tl
-          { { hide } { } { error } { \msg_error:nnxxxx { insr } { production-placeholder } { \tl_use:N\l_insr_unit_id_tl } { \tl_use:N\l_insr_unit_title_tl } { \__insr_unit_source: } { \tl_use:N\g_insr_document_type_tl } } { show } { \par\noindent\emph{\__insr_placeholder_verbose_text:}\par } }
-          { \par\noindent\textcolor{INSRTextMuted}{\emph{\__insr_placeholder_text:}}\par }
+        \str_if_eq:VnTF \g_insr_build_profile_tl { review }
+          { \par\noindent\emph{\__insr_placeholder_review_text:}\par }
+          {
+            \str_case:VnF \g_insr_content_placeholders_tl
+              { { hide } { } { error } { \msg_error:nnxxxx { insr } { production-placeholder } { \tl_use:N\l_insr_unit_id_tl } { \tl_use:N\l_insr_unit_title_tl } { \__insr_unit_source: } { \tl_use:N\g_insr_document_type_tl } } { show } { \par\noindent\emph{\__insr_placeholder_verbose_text:}\par } }
+              { \par\noindent\textcolor{INSRTextMuted}{\emph{\__insr_placeholder_text:}}\par }
+          }
       }
   }
 \cs_new_protected:Npn \__insr_render_unit_body:
@@ -89,7 +94,7 @@
         \bool_gset_true:N \g__insr_toc_rendered_bool
         \str_if_eq:VnTF \g_insr_base_class_tl { beamer }
           { \begin{frame}{Agenda}\tableofcontents\end{frame} }
-          { \phantomsection\pdfbookmark[section]{Contents}{insr-global-toc}\begingroup\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup }
+          { \begingroup\thispagestyle{plain}\phantomsection\pdfbookmark[section]{Contents}{insr-global-toc}\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup }
       }
   }
 \ExplSyntaxOff
