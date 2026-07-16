@@ -37,3 +37,8 @@ Use `publication/profile` for document intent: `generic-preprint`, `journal`, `b
 ## Stabilization notes
 
 The frontmatter renderer now delegates page-state changes to `insr-page-style.sty`, keeping title/frontmatter metadata rendering separate from page-style implementation. DOI values are displayed only when configured and are also forwarded to PDF metadata.
+
+
+## Optional field semantics
+
+Optional frontmatter labels are emitted only when their underlying token-list or author-role data is non-empty. Renderer macros alone do not make Funding, Conflict of interest, Ethics, Highlights, Key messages, Data availability, Code availability or Author contributions visible. Automatic citations use publication year, title/subtitle, version, publisher/institution and real DOI/URL values; pending DOI values are displayed as pending metadata, not as DOI links.

@@ -43,3 +43,8 @@ The frontmatter renderer now delegates page-state changes to `insr-page-style.st
 The title page renders the publication type once, then the title and subtitle. Author output is built from the author/institution registries: internal affiliation IDs are resolved to institution names, ORCID values are shown separately, and CRediT roles are moved into an author-contributions block using human-readable labels.
 
 Optional fields are rendered only when their trimmed value is nonblank. This applies to funding, conflicts of interest, ethics, highlights, key messages, author contributions, data availability, code availability, repository, license, and suggested citation.
+
+
+## Optional field semantics
+
+Optional frontmatter labels are emitted only when their underlying token-list or author-role data is non-empty. Renderer macros alone do not make Funding, Conflict of interest, Ethics, Highlights, Key messages, Data availability, Code availability or Author contributions visible.

@@ -33,3 +33,8 @@ Header and footer separators are controlled through `layout/header-separator-sty
 Page styles use three header zones and three footer zones backed by semantic palette colors. Separator rules use KOMA `headsepline` and `footsepline` options rather than deprecated `scrlayer-scrpage` commands. The default footer uses body-only numbering, with `layout/page-numbering` reserved for `body-only`, `physical`, and `frontmatter-roman` workflows.
 
 `\INSRTableOfContents` provides a palette-aware contents page for paper-like outputs and an agenda frame for Beamer outputs. The default position-paper profile enables the contents page and leaves Abstract unnumbered so Introduction starts the numbered main text.
+
+
+## Release page-style checks
+
+Release candidates should inspect the root document and the reference-publication paper for title page, table of contents, normal content page, bibliography and appendix page styles. `body-only`, `physical` and `frontmatter-roman` numbering modes must be checked in a TeX-enabled environment.
