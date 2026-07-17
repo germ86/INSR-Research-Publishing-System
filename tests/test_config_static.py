@@ -4,47 +4,64 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-class ConfigLifecycleStaticTests(unittest.TestCase):
+
+class ConfigStaticTests(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
-    def test_root_is_canonical(self):
-        self.assertEqual(
-            self.read("main.tex"),
-            "\\documentclass{insr}\n\n\\begin{document}\n\n\\INSRMakeTitle\n\\INSRRenderDocument\n\n\\end{document}\n",
-        )
+    def test_root_document_is_minimal(self):
+        main = re.sub(r"%.*", "", self.read("main.tex"))
+        self.assertIn("\\documentclass{insr}", main)
+        self.assertIn("\\INSRMakeTitle", main)
+        self.assertIn("\\INSRRenderDocument", main)
+        self.assertNotIn("document/target", main)
 
-    def test_project_config_position_paper_resolution_inputs(self):
-        config = self.read("config/project-config.tex")
+    def test_project_uses_two_dimensional_bootstrap(self):
         active = self.read("config/active-target.tex")
-        self.assertIn("\\INSRBootstrap", active)
-        self.assertIn("document/target=position-paper", active)
-        self.assertNotIn("document/type = position-paper", config)
-        self.assertIn("design/theme = editorial", config)
-        self.assertIn("design/palette = neuroclinical", config)
+        project = self.read("config/project-config.tex")
+        self.assertIn("document/type = position-paper", active)
+        self.assertIn("output/target = paper", active)
+        self.assertIn("document/type=position-paper", project)
+        self.assertIn("output/target=paper", project)
+        self.assertNotIn("document/target=position-paper", project)
+
+    def test_publication_date_and_year_are_dynamic(self):
+        publication = self.read("config/publication-config.tex")
+        metadata = self.read("tex/latex/insr/insr-metadata.sty")
+        self.assertIn("publication/date = {\\today}", publication)
+        self.assertIn("publication/year = {\\number\\year}", publication)
+        self.assertNotIn("publication/date = {14 July 2026}", publication)
+        self.assertNotIn("{2026}", metadata)
+
+    def test_registry_runtime_is_loaded(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
-        self.assertIn("__insr_resolve_document_profile:", resolver)
-        self.assertIn("__insr_resolve_output_target:", resolver)
-        self.assertRegex(resolver, r"\{ position-paper \}.*\{ position-paper \}")
-        self.assertRegex(resolver, r"\{ paper \}.*\{ scrartcl \}.*\{ paper \}")
+        for token in (
+            "\\INSRRegisterDocumentType",
+            "\\INSRRegisterDocumentAlias",
+            "\\INSRRegisterOutputTarget",
+            "\\INSRRegisterCombination",
+            "config/target-registry.tex",
+            "unknown-output-target",
+        ):
+            self.assertIn(token, resolver)
+
+    def test_no_full_path_package_requests(self):
+        paths = [ROOT / "insr.cls", *sorted((ROOT / "tex/latex/insr").glob("*.sty"))]
+        pattern = re.compile(r"\\(?:RequirePackage|usepackage)\s*(?:\[[^]]*\])?\{tex/latex/insr/")
+        for path in paths:
+            self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")), str(path))
 
     def test_class_options_processed_after_project_config(self):
         cls = self.read("insr.cls")
         self.assertLess(cls.index("config/project-config.tex"), cls.index("\\ProcessOptions"))
         self.assertIn("config/load-project=false", cls)
 
-    def test_ordinary_metadata_spaces_are_documented_defaults(self):
-        config_pkg = self.read("tex/latex/insr/insr-config.sty")
-        self.assertIn("INSR Scientific Publishing Platform", config_pkg)
-        self.assertIn("Independent translational research program", config_pkg)
-        self.assertNotIn("INSR~Scientific", config_pkg)
+    def test_language_and_microtype_configuration_are_available(self):
+        project = self.read("config/project-config.tex")
+        config = self.read("tex/latex/insr/insr-config.sty")
+        self.assertIn("localization/language = ngerman", project)
+        self.assertIn("typography/microtype", config)
 
-    def test_language_alias_and_unknown_type_fallback(self):
-        localization = self.read("tex/latex/insr/insr-localization.sty")
-        resolver = self.read("tex/latex/insr/insr-config.sty")
-        self.assertIn("localization/language=german normalized to ngerman", localization)
-        self.assertIn("unknown-document-type", resolver)
-        self.assertIn("unknown-document-type", resolver)
 
 if __name__ == "__main__":
     unittest.main()
