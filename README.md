@@ -11,7 +11,7 @@ The production entry architecture is intentionally small:
 - one authoritative project configuration file: `config/project-config.tex`;
 - one checked-in document/output registry: `config/target-registry.tex`.
 
-Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Select the semantic document genre and rendering format in `config/active-target.tex` with `document/type` and `output/target`; keep project-wide defaults such as theme, palette, typography and metadata in `config/project-config.tex`.
+Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Select the complete registered build in `config/active-target.tex` with the authoritative `build/preset` key; keep project-wide defaults such as theme, palette, typography and metadata in `config/project-config.tex`.
 
 The canonical root document is always:
 
@@ -30,15 +30,16 @@ The canonical root document is always:
 
 1. Set the compiler to **LuaLaTeX**.
 2. Keep `main.tex` unchanged.
-3. Edit `config/active-target.tex` to select `document/type` and `output/target`; edit `config/project-config.tex` for theme, palette, typography and metadata.
+3. Edit only `build/preset` in `config/active-target.tex`; edit `config/project-config.tex` for theme, palette, typography and metadata.
 4. Compile `main.tex`.
 
-A minimal configuration looks like this:
+The checked-in active configuration is intentionally explicit:
 
 ```tex
 \INSRBootstrap{
   document/type = position-paper,
-  output/target = paper
+  output/target = slides,
+  build/preset = slides
 }
 
 \INSRConfigure{
@@ -51,6 +52,8 @@ A minimal configuration looks like this:
   metadata/institution = {Independent Research Development}
 }
 ```
+
+The first two bootstrap values remain for older tooling. `build/preset` is deliberately last and authoritative. Change only its value, for example to `position-paper`, `slides`, `handout`, `rct-protocol`, `rct-protocol-slides`, `clinical-protocol` or `submission-package`.
 
 Normal spaces in human-readable metadata are supported; `~` is not required for titles, authors or institutions.
 
@@ -93,7 +96,7 @@ The runtime packages must not contain hard-coded manuscript prose. Scientific co
 
 ## Examples
 
-Official examples use the public `insr` class and set `config/load-project=false` so they do not inherit productive position-paper metadata, templates or bibliography settings. Focused examples may pass class options such as `document/type=slides` to demonstrate a specific adapter without editing the production `config/project-config.tex`.
+Official examples use the public `insr` class and set `config/load-project=false` so they do not inherit productive position-paper metadata, templates or bibliography settings. Focused examples may pass class options such as `build/preset=slides` or the supported compatibility shorthand `document/type=slides` without editing the productive project configuration.
 
 ```bash
 latexmk -lualatex main.tex
@@ -109,9 +112,9 @@ See `examples/README.md` for the example policy. To list every documented entryp
 1. Upload or sync the repository to Overleaf.
 2. Set the main document to `main.tex`.
 3. Set the compiler to LuaLaTeX.
-4. Change document type/output only in `config/active-target.tex`; keep broader defaults in `config/project-config.tex`.
+4. Change only `build/preset` in `config/active-target.tex`; keep broader defaults in `config/project-config.tex`.
 5. Use Biber when bibliography output is enabled.
-6. After importing or pulling from GitHub, use **Recompile from scratch** once so stale auxiliary files cannot mask the current package graph.
+6. After importing, pulling from GitHub, or changing between KOMA and Beamer targets, use **Recompile from scratch** once so stale auxiliary files cannot mask the current package graph.
 
 The root-level `insr-*.sty` compatibility shims are required in source-tree and Overleaf builds. Do not delete them and do not replace short package requests such as `\RequirePackage{insr-core}` with repository paths.
 
@@ -178,16 +181,19 @@ Native distribution-style classes are available for production documents: `insr-
 
 ### Active target workflow
 
-The root `main.tex` remains stable. Select the semantic source and rendered format in `config/active-target.tex`:
+The root `main.tex` remains stable. Select the complete registered build in `config/active-target.tex`:
 
 ```tex
 \INSRBootstrap{
   document/type = position-paper,
-  output/target = paper
+  output/target = slides,
+  build/preset = slides
 }
 ```
 
-Changing `output/target` to `slides`, `handout` or `poster` reuses the selected semantic source through the registered adapter. Broader project values remain in `config/project-config.tex`. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+The authoritative preset resolves the semantic source, profile, rendered output, base class and adapter in one operation. `build/preset = slides` reuses the position-paper source through Beamer. `build/preset = position-paper` returns to KOMA paper output. `build/preset = rct-protocol-slides` selects the RCT source and slide adapter together.
+
+For compatibility, output-shaped `document/type` values are normalized as registered preset shorthands. Thus `document/type=slides` now overrides a stale `submission-package` output instead of silently producing another paper. Broader project values remain in `config/project-config.tex`. Resolution occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
 
 Frontmatter suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.
 

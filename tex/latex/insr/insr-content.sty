@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-content}[2026/07/16 INSR content units]
+\ProvidesPackage{insr-content}[2026/07/17 INSR content units]
 \ExplSyntaxOn
 \tl_new:N \l_insr_unit_id_tl
 \tl_new:N \l_insr_unit_title_tl
@@ -98,8 +98,19 @@
       {
         \bool_gset_true:N \g__insr_toc_rendered_bool
         \str_if_eq:VnTF \g_insr_base_class_tl { beamer }
-          { \begin{frame}{Agenda}\tableofcontents\end{frame} }
-          { \begingroup\thispagestyle{plain}\phantomsection\pdfbookmark[section]{Contents}{insr-global-toc}\hypersetup{linkcolor=INSRTOCLink}\tableofcontents\endgroup }
+          { \begin{frame}{\contentsname}\tableofcontents\end{frame} }
+          {
+            \begingroup
+              \INSRPageStyleTOC
+              \thispagestyle{plain.scrheadings}
+              \color{INSRTOCSection}
+              \setkomafont{disposition}{\color{INSRTOCHeading}\bfseries}
+              \phantomsection
+              \pdfbookmark[section]{\contentsname}{insr-global-toc}
+              \hypersetup{linkcolor=INSRTOCLink}
+              \tableofcontents
+            \endgroup
+          }
       }
   }
 \ExplSyntaxOff
