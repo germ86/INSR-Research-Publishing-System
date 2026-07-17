@@ -1,5 +1,4 @@
 import json
-import re
 import subprocess
 import tempfile
 import unittest
@@ -47,7 +46,7 @@ class ReleaseMetadataStaticTests(unittest.TestCase):
             self.assertEqual(codemeta["@type"], "SoftwareSourceCode")
             self.assertRegex(str(codemeta["datePublished"]), r"^\d{4}-\d{2}-\d{2}$")
 
-    def test_release_prepare_creates_manifest(self):
+    def test_release_prepare_creates_complete_runtime_manifest(self):
         proc = subprocess.run(
             ["python3", "tools/insr_release.py", "prepare", "--version", "test-alpha"],
             cwd=ROOT,
@@ -56,11 +55,29 @@ class ReleaseMetadataStaticTests(unittest.TestCase):
             stderr=subprocess.PIPE,
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
-        manifest = ROOT / "dist/insr-test-alpha/release-manifest.json"
+        bundle = ROOT / "dist/insr-test-alpha"
+        manifest = bundle / "release-manifest.json"
         self.assertTrue(manifest.is_file())
         data = json.loads(manifest.read_text(encoding="utf-8"))
         self.assertEqual(data["version"], "test-alpha")
-        self.assertTrue(any(item["path"] == "metadata/CITATION.cff" for item in data["files"]))
+        paths = {item["path"] for item in data["files"]}
+        for required in (
+            "metadata/CITATION.cff",
+            "main.tex",
+            "insr.cls",
+            "insr-core.sty",
+            "insr-adapters.sty",
+            "tex/latex/insr/insr-core.sty",
+            "config/target-registry.tex",
+            "content/manifest.tex",
+            "framework/adapters/paper.tex",
+            "profiles/documents/position-paper.profile.tex",
+            "themes/insr-default.tex",
+            "palettes/neuroclinical.tex",
+            "typography/libertinus.tex",
+        ):
+            self.assertIn(required, paths)
+            self.assertTrue((bundle / required).is_file(), required)
 
 
 if __name__ == "__main__":
