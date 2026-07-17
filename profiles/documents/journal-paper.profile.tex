@@ -1,3 +1,9 @@
-% INSR target profile placeholder; target behavior is resolved by insr-config.sty.
+% INSR v4 document profile: journal article.
 \ExplSyntaxOn
+\tl_gset:Nn \g_insr_template_tl { journal-paper }
+\tl_gset:Nn \g_insr_publication_type_tl { Journal article }
+\tl_gset:Nn \g_insr_publication_profile_tl { journal-article }
+\bool_gset_true:N \g_insr_frontmatter_toc_bool
+\bool_gset_false:N \g_insr_frontmatter_abstract_numbered_bool
+\bool_gset_true:N \g_insr_frontmatter_keywords_bool
 \ExplSyntaxOff
