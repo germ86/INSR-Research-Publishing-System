@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  TEXINPUTS: .//:./tex/latex/insr//:./examples//:
+  TEXINPUTS: .:./examples//:
   BIBINPUTS: .//:
 
 jobs:
