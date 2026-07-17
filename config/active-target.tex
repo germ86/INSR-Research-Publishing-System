@@ -1,11 +1,10 @@
-% Active one-switch build selection for Overleaf.
-% Change only build/preset. The two compatibility defaults below keep older
-% tooling readable; the preset is deliberately last and resolves both the
-% semantic document type and the output adapter/base class.
-% Common presets: position-paper, slides, handout, position-paper-poster,
-% rct-protocol, rct-protocol-slides, clinical-protocol, submission-package.
+% Active document/output selection for Overleaf builds.
+% Keep this bootstrap limited to keys supported by all INSR v4 repository
+% snapshots so a partial or cached GitHub sync cannot fail on a newer key.
+% For position-paper slides, change only output/target between paper, slides,
+% handout, or poster. Change document/type as well only when changing the
+% semantic source, for example to rct-protocol or clinical-protocol.
 \INSRBootstrap{
   document/type = position-paper,
-  output/target = slides,
-  build/preset = slides
+  output/target = slides
 }
