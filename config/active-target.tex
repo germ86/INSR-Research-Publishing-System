@@ -1,10 +1,2 @@
-% Active document/output selection for Overleaf builds.
-% Keep this bootstrap limited to keys supported by all INSR v4 repository
-% snapshots so a partial or cached GitHub sync cannot fail on a newer key.
-% For position-paper slides, change only output/target between paper, slides,
-% handout, or poster. Change document/type as well only when changing the
-% semantic source, for example to rct-protocol or clinical-protocol.
-\INSRBootstrap{
-  document/type = rct-protocol,
-  output/target = rct-protocol 
-}
+% Active output target for Overleaf builds. Keep this file to bootstrap-only target selection.
+\INSRBootstrap{document/target=position-paper}

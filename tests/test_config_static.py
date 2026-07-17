@@ -32,18 +32,37 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("\\documentclass{insr}", main)
         self.assertIn("\\INSRMakeTitle", main)
         self.assertIn("\\INSRRenderDocument", main)
+        self.assertNotIn("\\INSRBootstrap", main)
         self.assertNotIn("document/target", main)
+        self.assertNotIn("output/target", main)
+        self.assertNotIn("build/preset", main)
 
-    def test_active_build_uses_backward_compatible_slide_keys(self):
+    def test_active_build_uses_one_pre_class_selector(self):
         active = self.read("config/active-target.tex")
         project = self.read("config/project-config.tex")
-        self.assertIn("document/type = position-paper", active)
-        self.assertIn("output/target = slides", active)
+        self.assertIn("document/target = rct-protocol", active)
+        self.assertNotIn("document/type", active)
+        self.assertNotIn("output/target", active)
         self.assertNotIn("build/preset", active)
-        self.assertIn("document/type=position-paper", project)
-        self.assertIn("output/target=paper", project)
+        self.assertIn("document/target=position-paper", project)
+        self.assertNotIn("document/type=position-paper", project)
+        self.assertNotIn("output/target=paper", project)
         self.assertNotIn("build/preset", project)
-        self.assertNotIn("document/target=position-paper", project)
+
+    def test_rct_combination_is_canonicalized_when_used_as_output_target(self):
+        registry = self.read("config/target-registry.tex")
+        compatibility = self.read("config/target-compatibility.tex")
+        fixture = self.read("tests/fixtures/rct-combination-as-output-target.tex")
+        profile = self.read("profiles/documents/rct-protocol.profile.tex")
+        self.assertIn("config/target-compatibility.tex", registry)
+        self.assertIn("\\__insr_set_output_target_compat:n", compatibility)
+        self.assertIn("\\g__insr_combination_target_prop", compatibility)
+        self.assertIn("\\tl_gset_eq:NN \\g_insr_output_target_tl \\l_tmpa_tl", compatibility)
+        self.assertNotIn("\\INSRRegisterOutputTarget{rct-protocol}", registry)
+        self.assertIn("document/type=rct-protocol", fixture)
+        self.assertIn("output/target=rct-protocol", fixture)
+        self.assertIn("outputs = {paper}", fixture)
+        self.assertIn("Randomized~controlled~trial~protocol", profile)
 
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
