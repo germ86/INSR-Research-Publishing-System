@@ -10,33 +10,16 @@ REGISTRY = ROOT / "config" / "target-registry.tex"
 
 _CALL_RE = re.compile(r"\\INSRRegister(DocumentType|OutputTarget|Combination|DocumentAlias)\{([^}]*)\}(?:\{([^}]*)\})?")
 
-def _split_top_level_commas(text: str) -> list[str]:
-    parts: list[str] = []
-    buf: list[str] = []
-    depth = 0
-    for char in text:
-        if char == "{":
-            depth += 1
-        elif char == "}" and depth:
-            depth -= 1
-        if char == "," and depth == 0:
-            parts.append("".join(buf))
-            buf = []
-        else:
-            buf.append(char)
-    parts.append("".join(buf))
-    return parts
-
 def _parse_kv(text: str | None) -> dict[str, str]:
     if not text:
         return {}
     out: dict[str, str] = {}
-    for part in _split_top_level_commas(text):
+    for part in text.split(','):
         if not part.strip():
             continue
         key, sep, value = part.partition('=')
         if sep:
-            out[key.strip()] = value.strip().strip('{}')
+            out[key.strip()] = value.strip()
     return out
 
 def load_registry(path: Path = REGISTRY) -> dict[str, Dict[str, dict[str, str] | str]]:
@@ -70,10 +53,6 @@ def targets_from_registry() -> dict[str, dict[str, str]]:
     for name, combo in combos.items():
         doc_type = combo["type"]
         output_target = combo["target"]
-        if doc_type not in docs:
-            raise ValueError(f"combination {name} references unknown document type {doc_type}")
-        if output_target not in outputs:
-            raise ValueError(f"combination {name} references unknown output target {output_target}")
         doc = docs[doc_type]
         output = outputs[output_target]
         targets[name] = {
@@ -84,7 +63,6 @@ def targets_from_registry() -> dict[str, dict[str, str]]:
             "profile": doc["profile"],
             "source": doc["source"],
             "template": doc.get("template", doc_type),
-            "class_options": output.get("class-options", ""),
         }
     return targets
 

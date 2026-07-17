@@ -21,14 +21,7 @@ def _atomic_write(path: Path, text: str) -> None:
 
 def write_active(target: str) -> str | None:
     old = ACTIVE.read_text(encoding="utf-8") if ACTIVE.exists() else None
-    info = TARGETS[target]
-    document_type = info.get("type", target)
-    output_target = info.get("target", "paper")
-    _atomic_write(
-        ACTIVE,
-        "% Temporary target selected by tools/insr_build.py\n"
-        f"\\INSRBootstrap{{document/type={document_type}, output/target={output_target}}}\n",
-    )
+    _atomic_write(ACTIVE, f"% Temporary target selected by tools/insr_build.py\n\\INSRBootstrap{{document/target={target}}}\n")
     return old
 
 def restore_active(old: str | None) -> None:
@@ -51,7 +44,7 @@ def run_latexmk(target: str) -> int:
         (outdir / "build.log").write_text("latexmk not found; build not executed\n", encoding="utf-8")
         print("latexmk not found")
         return 127
-    cmd = ["latexmk", "-lualatex", "-interaction=nonstopmode", "-halt-on-error", f"-outdir={outdir}", "main.tex"]
+    cmd = ["latexmk", "-lualatex", "-bibtex-", "-interaction=nonstopmode", "-halt-on-error", f"-outdir={outdir}", "main.tex"]
     proc = subprocess.run(cmd, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (outdir / "build.log").write_text(proc.stdout, encoding="utf-8")
     return proc.returncode
@@ -100,8 +93,6 @@ def main() -> int:
     sub.add_parser("list-document-types")
     sub.add_parser("list-output-targets")
     sub.add_parser("list-combinations")
-    sub.add_parser("list-aliases")
-    bt = sub.add_parser("build-combination"); bt.add_argument("document_type"); bt.add_argument("output_target")
     args = parser.parse_args()
     if args.command == "list-targets":
         print("\n".join(TARGETS))
@@ -124,17 +115,6 @@ def main() -> int:
     if args.command == "list-combinations":
         list_combinations()
         return 0
-    if args.command == "list-aliases":
-        registry = load_registry()
-        for name, target in sorted(registry["aliases"].items()):
-            print(f"{name}: {target}")
-        return 0
-    if args.command == "build-combination":
-        for name, info in TARGETS.items():
-            if info.get("type") == args.document_type and info.get("target") == args.output_target:
-                return build(name)
-        print(f"unsupported combination: document/type={args.document_type} output/target={args.output_target}")
-        return 1
     return 1
 
 if __name__ == "__main__":

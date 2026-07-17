@@ -54,7 +54,7 @@ Publication-specific project values are split across `config/metadata-config.tex
 
 ## Active target, frontmatter, and placeholders
 
-The canonical Overleaf entrypoint remains `main.tex`. Select the semantic document type and output format in `config/active-target.tex` with `\INSRBootstrap{document/type=position-paper, output/target=paper}`. Keep type/target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+The canonical Overleaf entrypoint remains `main.tex`. Select the output in `config/active-target.tex` with `\INSRBootstrap{document/target=position-paper}`. Keep target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
 
 Implemented targets are validated by `tools/overleaf_doctor.py check-target <target>` and share the single source tree under `content/insr-position-paper`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
 

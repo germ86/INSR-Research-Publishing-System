@@ -30,11 +30,9 @@ active_target = Path('config/active-target.tex').read_text(encoding='utf-8')
 for token in ['\\INSRConfigure', 'document/build-profile', 'design/theme', 'design/palette', 'design/font']:
     if token not in config:
         raise SystemExit(f'Missing configuration token: {token}')
-for token in ['\\INSRBootstrap', 'document/type', 'output/target']:
+for token in ['\\INSRBootstrap', 'document/target']:
     if token not in active_target:
         raise SystemExit(f'Missing active target bootstrap token: {token}')
-if 'content/source = auto' not in config:
-    raise SystemExit('project config must use content/source = auto for document-type presets')
 
 cls = Path('insr.cls').read_text(encoding='utf-8')
 required_packages = ['insr-core','insr-config','insr-metadata','insr-content','insr-adapters','insr-bibliography','insr-localization','insr-typography','insr-colors','insr-layout','insr-page-style','insr-boxes','insr-accessibility','insr-neuro','insr-utils']
@@ -126,14 +124,13 @@ for token in ['\\INSRRegisterDocumentType', '\\INSRRegisterOutputTarget', '\\INS
 for token in ['\\INSRRegisterDocumentType', '\\INSRRegisterOutputTarget', '\\INSRRegisterCombination', 'config/target-registry.tex']:
     if token not in config_pkg:
         raise SystemExit(f'insr-config.sty must load/use registry token: {token}')
-required_document_types = ['article','paper','position-paper','report','book','monograph','thesis','letter','protocol','systematic-review','narrative-review','technical-documentation','developer-documentation','manual','rct-protocol','clinical-protocol','clinical-manual','technical-report','journal-article','grant-proposal']
-legacy_aliases = ['whitepaper','grant','clinical-trial-protocol','rct','slides','handout','poster']
-for doc_type in required_document_types:
-    if f'\\INSRRegisterDocumentType{{{doc_type}}}' not in registry_text:
+required_types = ['article','paper','position-paper','whitepaper','report','book','monograph','thesis','slides','handout','poster','letter','grant','protocol','clinical-trial-protocol','rct','systematic-review','narrative-review','technical-documentation','developer-documentation','manual']
+for doc_type in required_types:
+    if f'{{{doc_type}}}' not in registry_text and f'{{ {doc_type} }}' not in registry_text:
         raise SystemExit(f'Document type is not registered in config/target-registry.tex: {doc_type}')
-for alias in legacy_aliases:
-    if f'\\INSRRegisterDocumentAlias{{{alias}}}' not in registry_text:
-        raise SystemExit(f'Legacy document alias is not registered in config/target-registry.tex: {alias}')
+    profile = Path(f'profiles/documents/{doc_type}.profile.tex')
+    if not profile.is_file():
+        raise SystemExit(f'Missing document profile: {profile}')
 
 for adapter in ['article','paper','report','book','slides','poster','letter','manual','thesis']:
     path = Path(f'framework/adapters/{adapter}.tex')
