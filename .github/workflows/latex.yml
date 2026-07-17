@@ -64,6 +64,7 @@ jobs:
           - examples/publication-multi-author/main.tex
           - examples/publication-funded-research/main.tex
           - examples/reference-publication/paper.tex
+          - tests/fixtures/rct-combination-as-output-target.tex
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
