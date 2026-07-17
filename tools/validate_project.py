@@ -9,6 +9,24 @@ from pathlib import Path
 from insr_registry import load_registry, targets_from_registry, validate_registry
 
 ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_NAMES = [
+    "insr-core",
+    "insr-config",
+    "insr-metadata",
+    "insr-utils",
+    "insr-localization",
+    "insr-bibliography",
+    "insr-typography",
+    "insr-colors",
+    "insr-layout",
+    "insr-frontmatter",
+    "insr-page-style",
+    "insr-boxes",
+    "insr-accessibility",
+    "insr-neuro",
+    "insr-content",
+    "insr-adapters",
+]
 
 
 def fail(message: str) -> None:
@@ -17,6 +35,14 @@ def fail(message: str) -> None:
 
 def read(path: str | Path) -> str:
     return (ROOT / path).read_text(encoding="utf-8") if not isinstance(path, Path) else path.read_text(encoding="utf-8")
+
+
+def expected_shim(package: str) -> str:
+    return (
+        "% INSR source-tree compatibility shim for Overleaf and local builds.\n"
+        f"\\input{{tex/latex/insr/{package}.sty}}\n"
+        "\\endinput\n"
+    )
 
 
 required = [
@@ -37,6 +63,7 @@ required = [
     "tools/insr_registry.py",
     "tools/insr_build.py",
     "tools/overleaf_doctor.py",
+    "tools/check_latex_log.py",
 ]
 missing = [path for path in required if not (ROOT / path).is_file()]
 if missing:
@@ -101,18 +128,17 @@ for token in (
 if "tl_gset_eq:NN \\g_insr_document_type_tl \\g_insr_output_target_tl" in config_pkg:
     fail("output/target must never be copied blindly into document/type")
 
-required_packages = [
-    "insr-core", "insr-config", "insr-metadata", "insr-content", "insr-adapters",
-    "insr-bibliography", "insr-localization", "insr-typography", "insr-colors",
-    "insr-layout", "insr-page-style", "insr-boxes", "insr-accessibility",
-    "insr-neuro", "insr-utils",
-]
-for package in required_packages:
-    path = ROOT / f"tex/latex/insr/{package}.sty"
-    if not path.is_file():
-        fail(f"Missing modular package: {path.relative_to(ROOT)}")
-    if f"\\ProvidesPackage{{{package}}}" not in path.read_text(encoding="utf-8"):
-        fail(f"Package name does not match request name in {path.relative_to(ROOT)}")
+for package in PACKAGE_NAMES:
+    implementation = ROOT / f"tex/latex/insr/{package}.sty"
+    shim = ROOT / f"{package}.sty"
+    if not implementation.is_file():
+        fail(f"Missing modular package: {implementation.relative_to(ROOT)}")
+    if f"\\ProvidesPackage{{{package}}}" not in implementation.read_text(encoding="utf-8"):
+        fail(f"Package name does not match request name in {implementation.relative_to(ROOT)}")
+    if not shim.is_file():
+        fail(f"Missing root compatibility shim: {shim.relative_to(ROOT)}")
+    if shim.read_text(encoding="utf-8") != expected_shim(package):
+        fail(f"Root compatibility shim is not canonical: {shim.relative_to(ROOT)}")
 
 cls = read("insr.cls")
 order = [
@@ -131,6 +157,10 @@ if any(position < 0 for position in positions) or positions != sorted(positions)
     fail("insr.cls bootstrap order does not match the v4 architecture")
 if len(cls.splitlines()) > 250:
     fail("insr.cls must remain a thin bootstrap class")
+if "\\input@path" in cls:
+    fail("insr.cls must not modify \\input@path; root shims provide deterministic source-tree package resolution")
+if "local package path:" in cls:
+    fail("insr.cls diagnostics must report the resolved short package name only")
 
 full_path_request = re.compile(r"\\(?:RequirePackage|usepackage)\s*(?:\[[^]]*\])?\{(?:\./)?tex/latex/insr/")
 for path in ROOT.rglob("*"):

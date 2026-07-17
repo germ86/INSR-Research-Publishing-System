@@ -3,6 +3,24 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_NAMES = [
+    "insr-core",
+    "insr-config",
+    "insr-metadata",
+    "insr-utils",
+    "insr-localization",
+    "insr-bibliography",
+    "insr-typography",
+    "insr-colors",
+    "insr-layout",
+    "insr-frontmatter",
+    "insr-page-style",
+    "insr-boxes",
+    "insr-accessibility",
+    "insr-neuro",
+    "insr-content",
+    "insr-adapters",
+]
 
 
 class ConfigStaticTests(unittest.TestCase):
@@ -50,6 +68,33 @@ class ConfigStaticTests(unittest.TestCase):
         pattern = re.compile(r"\\(?:RequirePackage|usepackage)\s*(?:\[[^]]*\])?\{tex/latex/insr/")
         for path in paths:
             self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")), str(path))
+
+    def test_root_shims_are_canonical(self):
+        for package in PACKAGE_NAMES:
+            shim = self.read(f"{package}.sty")
+            expected = (
+                "% INSR source-tree compatibility shim for Overleaf and local builds.\n"
+                f"\\input{{tex/latex/insr/{package}.sty}}\n"
+                "\\endinput\n"
+            )
+            self.assertEqual(shim, expected, package)
+            implementation = self.read(f"tex/latex/insr/{package}.sty")
+            self.assertIn(f"\\ProvidesPackage{{{package}}}", implementation)
+
+    def test_class_does_not_mutate_input_path(self):
+        cls = self.read("insr.cls")
+        self.assertNotIn("\\input@path", cls)
+        self.assertNotIn("local package path:", cls)
+        for package in PACKAGE_NAMES:
+            self.assertIn(f"\\RequirePackage{{{package}}}", cls)
+
+    def test_texinputs_prefers_root_shims(self):
+        latexmkrc = self.read("latexmkrc")
+        workflow = self.read(".github/workflows/latex.yml")
+        self.assertIn("$ENV{'TEXINPUTS'} = '.:./examples//:'", latexmkrc)
+        self.assertNotIn("./tex/latex/insr//", latexmkrc)
+        self.assertIn("TEXINPUTS: .:./examples//:", workflow)
+        self.assertNotIn("TEXINPUTS: .//:./tex/latex/insr//", workflow)
 
     def test_class_options_processed_after_project_config(self):
         cls = self.read("insr.cls")
