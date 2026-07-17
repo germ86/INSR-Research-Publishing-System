@@ -44,26 +44,6 @@
 \INSRRegisterOutputTarget{manual}{base=scrreprt, adapter=manual}
 \INSRRegisterOutputTarget{letter}{base=scrlttr2, adapter=letter}
 
-% Compatibility output aliases. These make the complete combination names safe
-% in output/target as well as in document/target. This supports older two-key
-% configurations such as document/type=rct-protocol,
-% output/target=rct-protocol without falling back to paper through an unknown
-% target warning. The canonical one-switch interface remains document/target.
-\INSRRegisterOutputTarget{position-paper}{base=scrartcl, adapter=paper}
-\INSRRegisterOutputTarget{position-paper-slides}{base=beamer, adapter=slides}
-\INSRRegisterOutputTarget{position-paper-handout}{base=beamer, adapter=slides, class-options=handout}
-\INSRRegisterOutputTarget{position-paper-poster}{base=beamer, adapter=poster}
-\INSRRegisterOutputTarget{journal-paper}{base=scrartcl, adapter=paper}
-\INSRRegisterOutputTarget{rct-protocol}{base=scrartcl, adapter=paper}
-\INSRRegisterOutputTarget{rct-protocol-slides}{base=beamer, adapter=slides}
-\INSRRegisterOutputTarget{rct-protocol-handout}{base=beamer, adapter=slides, class-options=handout}
-\INSRRegisterOutputTarget{rct-protocol-poster}{base=beamer, adapter=poster}
-\INSRRegisterOutputTarget{clinical-protocol}{base=scrartcl, adapter=paper}
-\INSRRegisterOutputTarget{clinical-protocol-slides}{base=beamer, adapter=slides}
-\INSRRegisterOutputTarget{clinical-protocol-handout}{base=beamer, adapter=slides, class-options=handout}
-\INSRRegisterOutputTarget{clinical-manual}{base=scrreprt, adapter=manual}
-\INSRRegisterOutputTarget{technical-report}{base=scrreprt, adapter=report}
-
 \INSRRegisterCombination{position-paper}{type=position-paper, target=paper}
 \INSRRegisterCombination{position-paper-slides}{type=position-paper, target=slides}
 \INSRRegisterCombination{position-paper-handout}{type=position-paper, target=handout}
@@ -86,3 +66,8 @@
 \INSRRegisterCombination{submission-package}{type=position-paper, target=submission-package}
 \INSRRegisterCombination{book}{type=book, target=book}
 \INSRRegisterCombination{thesis}{type=thesis, target=thesis}
+
+% Load the compatibility key handler after insr-config has finished defining its
+% registry and resolver internals. This keeps canonical output targets distinct
+% from complete build-combination names while accepting both user interfaces.
+\AtEndOfPackage{\InputIfFileExists{config/target-compatibility.tex}{}{}}
