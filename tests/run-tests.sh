@@ -27,6 +27,7 @@ python3 -m unittest \
 mapfile -t documents < <(python3 tools/overleaf_doctor.py list-entrypoints --plain)
 documents+=(tests/fixtures/position-paper-editorial-content-unit.tex)
 documents+=(tests/fixtures/slides-editorial-content-unit.tex)
+documents+=(tests/fixtures/document-type-slides-overrides-submission.tex)
 for document in "${documents[@]}"; do
   if [[ ! -f "$document" ]]; then
     echo "missing entrypoint: $document" >&2

@@ -34,14 +34,31 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("\\INSRRenderDocument", main)
         self.assertNotIn("document/target", main)
 
-    def test_project_uses_two_dimensional_bootstrap(self):
+    def test_active_build_uses_authoritative_slide_preset(self):
         active = self.read("config/active-target.tex")
         project = self.read("config/project-config.tex")
         self.assertIn("document/type = position-paper", active)
-        self.assertIn("output/target = paper", active)
+        self.assertIn("output/target = slides", active)
+        self.assertIn("build/preset = slides", active)
+        self.assertLess(active.index("output/target = slides"), active.index("build/preset = slides"))
         self.assertIn("document/type=position-paper", project)
         self.assertIn("output/target=paper", project)
+        self.assertIn("build/preset=position-paper", project)
         self.assertNotIn("document/target=position-paper", project)
+
+    def test_build_preset_and_slide_shorthand_are_resolved(self):
+        resolver = self.read("tex/latex/insr/insr-config.sty")
+        for token in (
+            "build/preset",
+            "\\__insr_set_build_preset:n",
+            "\\__insr_apply_document_type_preset_shorthand:",
+            "\\__insr_resolve_output_target:",
+        ):
+            self.assertIn(token, resolver)
+        self.assertLess(
+            resolver.index("\\__insr_apply_document_type_preset_shorthand:"),
+            resolver.rindex("\\__insr_resolve_output_target:"),
+        )
 
     def test_publication_date_and_year_are_dynamic(self):
         publication = self.read("config/publication-config.tex")
