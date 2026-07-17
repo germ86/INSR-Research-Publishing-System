@@ -80,6 +80,7 @@
 \keys_define:nn { insr }
   {
     config/load-project .bool_gset:N = \g_insr_load_project_config_bool,
+    build/preset .code:n = { \__insr_set_build_preset:n {#1} },
     document/type .code:n = { \tl_gset:Nn \g_insr_document_type_tl {#1} \bool_gset_true:N \g__insr_document_type_explicit_bool },
     document/target .code:n = { \__insr_set_legacy_target:n {#1} },
     document/density .tl_gset:N = \g_insr_density_tl,
@@ -209,21 +210,52 @@
     \prop_gput:NnV \g__insr_combination_target_prop {#1} \l__insr_register_target_tl
   }
 \InputIfFileExists{config/target-registry.tex}{}{\msg_error:nnn { insr } { missing-slot } { config/target-registry.tex }}
-\cs_new_protected:Npn \__insr_set_legacy_target:n #1
+\msg_new:nnn { insr } { unknown-build-preset } { Unknown~build/preset~'#1'.~Keeping~the~previous~document/output~selection. }
+\cs_new_protected:Npn \__insr_set_build_preset:n #1
   {
     \prop_get:NnNTF \g__insr_combination_type_prop {#1} \l_tmpa_tl
       {
-        \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl
         \prop_get:NnNTF \g__insr_combination_target_prop {#1} \l_tmpb_tl
-          { \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpb_tl }
-          { \tl_gset:Nn \g_insr_output_target_tl { paper } }
-        \bool_gset_true:N \g__insr_document_type_explicit_bool
-        \bool_gset_true:N \g__insr_output_target_explicit_bool
+          {
+            \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl
+            \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpb_tl
+            \bool_gset_true:N \g__insr_document_type_explicit_bool
+            \bool_gset_true:N \g__insr_output_target_explicit_bool
+          }
+          { \msg_warning:nnn { insr } { unknown-build-preset } {#1} }
       }
+      { \msg_warning:nnn { insr } { unknown-build-preset } {#1} }
+  }
+\cs_new_protected:Npn \__insr_set_legacy_target:n #1
+  {
+    \prop_get:NnNTF \g__insr_combination_type_prop {#1} \l_tmpa_tl
+      { \__insr_set_build_preset:n {#1} }
       {
         \tl_gset:Nn \g_insr_output_target_tl {#1}
         \bool_gset_true:N \g__insr_output_target_explicit_bool
       }
+  }
+\cs_new_protected:Npn \__insr_apply_document_type_preset_shorthand:
+  {
+    \prop_get:NVNTF \g__insr_combination_type_prop \g_insr_document_type_tl \l_tmpa_tl
+      {
+        % Output-shaped values such as document/type=slides historically looked
+        % valid but left a stale paper or submission target in place. When the
+        % registered combination resolves to a different semantic type, treat
+        % the value as a one-switch preset and resolve both dimensions.
+        \tl_if_eq:VVF \g_insr_document_type_tl \l_tmpa_tl
+          {
+            \prop_get:NVNTF \g__insr_combination_target_prop \g_insr_document_type_tl \l_tmpb_tl
+              {
+                \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl
+                \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpb_tl
+                \bool_gset_true:N \g__insr_document_type_explicit_bool
+                \bool_gset_true:N \g__insr_output_target_explicit_bool
+              }
+              { }
+          }
+      }
+      { }
   }
 \cs_new_protected:Npn \__insr_normalize_document_type:
   {
@@ -294,6 +326,7 @@
 \cs_new_protected:Npn \insr_resolve_document_type:
   {
     \__insr_apply_legacy_target_if_needed:
+    \__insr_apply_document_type_preset_shorthand:
     \__insr_normalize_document_type:
     \__insr_resolve_document_profile:
     \__insr_resolve_output_target:
