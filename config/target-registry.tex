@@ -45,6 +45,9 @@
 \INSRRegisterOutputTarget{letter}{base=scrlttr2, adapter=letter}
 
 \INSRRegisterCombination{position-paper}{type=position-paper, target=paper}
+\INSRRegisterCombination{position-paper-slides}{type=position-paper, target=slides}
+\INSRRegisterCombination{position-paper-handout}{type=position-paper, target=handout}
+\INSRRegisterCombination{position-paper-poster}{type=position-paper, target=poster}
 \INSRRegisterCombination{paper}{type=paper, target=paper}
 \INSRRegisterCombination{journal-paper}{type=journal-article, target=paper}
 \INSRRegisterCombination{slides}{type=position-paper, target=slides}
@@ -52,10 +55,19 @@
 \INSRRegisterCombination{poster}{type=position-paper, target=poster}
 \INSRRegisterCombination{rct-protocol}{type=rct-protocol, target=paper}
 \INSRRegisterCombination{rct-protocol-slides}{type=rct-protocol, target=slides}
+\INSRRegisterCombination{rct-protocol-handout}{type=rct-protocol, target=handout}
+\INSRRegisterCombination{rct-protocol-poster}{type=rct-protocol, target=poster}
 \INSRRegisterCombination{clinical-protocol}{type=clinical-protocol, target=paper}
+\INSRRegisterCombination{clinical-protocol-slides}{type=clinical-protocol, target=slides}
 \INSRRegisterCombination{clinical-protocol-handout}{type=clinical-protocol, target=handout}
 \INSRRegisterCombination{clinical-manual}{type=clinical-manual, target=manual}
 \INSRRegisterCombination{technical-report}{type=technical-report, target=report}
 \INSRRegisterCombination{executive-brief}{type=position-paper, target=executive-brief}
-\INSRRegisterCombination{book}{type=position-paper, target=book}
-\INSRRegisterCombination{thesis}{type=position-paper, target=thesis}
+\INSRRegisterCombination{submission-package}{type=position-paper, target=submission-package}
+\INSRRegisterCombination{book}{type=book, target=book}
+\INSRRegisterCombination{thesis}{type=thesis, target=thesis}
+
+% Load the compatibility key handler after insr-config has finished defining its
+% registry and resolver internals. This keeps canonical output targets distinct
+% from complete build-combination names while accepting both user interfaces.
+\AtEndOfPackage{\InputIfFileExists{config/target-compatibility.tex}{}{}}
