@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-metadata}[2026/07/16 INSR metadata registries]
+\ProvidesPackage{insr-metadata}[2026/07/17 INSR metadata registries]
 \ExplSyntaxOn
 \tl_new:N \l_insr_author_id_tl
 \tl_new:N \l_insr_author_name_tl
@@ -43,7 +43,6 @@
 \keys_define:nn { insr/institution }
   { id .tl_set:N=\l_insr_institution_id_tl, name .tl_set:N=\l_insr_institution_name_tl, short-name .tl_set:N=\l_insr_institution_short_name_tl, department .tl_set:N=\l_insr_institution_department_tl, city .tl_set:N=\l_insr_institution_city_tl, country .tl_set:N=\l_insr_institution_country_tl, type .code:n={}, logo .tl_set:N=\l_insr_institution_logo_tl, logo-dark .code:n={}, url .tl_set:N=\l_insr_institution_website_tl, website .tl_set:N=\l_insr_institution_website_tl, ror .tl_set:N=\l_insr_institution_ror_tl, unknown .code:n={\msg_warning:nnn { insr } { unknown-key } { institution/#1 }} }
 \keys_define:nn { insr/funding } { grant-number .tl_set:N=\l_insr_funding_grant_tl, agency .tl_set:N=\l_insr_funding_agency_tl, project-acronym .tl_set:N=\l_insr_funding_project_tl, unknown .code:n={\msg_warning:nnn { insr } { unknown-key } { funding/#1 }} }
-
 
 \msg_new:nnn { insr } { unknown-credit-role } { Unknown~CRediT~role~'#1';~omitting~technical~slug~from~PDF. }
 \cs_new_protected:Npn \__insr_credit_role_label_set:n #1
@@ -137,7 +136,6 @@
 \cs_new_protected:Npn \insr_affiliation_title_block:
   { \seq_if_empty:NTF \g_insr_author_affiliation_seq { \insr_institution_block: } { \seq_remove_duplicates:N \g_insr_author_affiliation_seq \seq_use:Nn \g_insr_author_affiliation_seq {;~} } }
 
-
 \cs_new_protected:Npn \insr_credit_block:
   {
     \tl_if_blank:VTF \g_insr_author_contributions_tl
@@ -158,9 +156,6 @@
       { \tl_use:N \g_insr_author_contributions_tl }
   }
 
-
-
-
 \cs_new_protected:Npn \__insr_citation_doi_valid_set:
   {
     \bool_set_false:N \l__insr_citation_doi_valid_bool
@@ -179,7 +174,7 @@
       { \tl_if_blank:VTF \g_insr_suggested_citation_tl { \tl_use:N \g_insr_citation_tl } { \tl_use:N \g_insr_suggested_citation_tl } }
       {
         \seq_if_empty:NTF \g_insr_author_short_seq { \tl_use:N \g_insr_author_tl } { \seq_use:Nn \g_insr_author_short_seq {;~} }\space
-        (\tl_if_blank:VTF \g_insr_publication_year_tl {2026} {\tl_use:N \g_insr_publication_year_tl}).\space
+        (\tl_if_blank:VTF \g_insr_publication_year_tl {\number\year} {\tl_use:N \g_insr_publication_year_tl}).\space
         \tl_use:N \g_insr_title_tl
         \tl_if_blank:VF \g_insr_subtitle_tl {:~\tl_use:N \g_insr_subtitle_tl}
         \tl_if_blank:VF \g_insr_publication_version_tl {~(Version~\tl_use:N \g_insr_publication_version_tl)}.\space
