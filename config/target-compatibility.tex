@@ -1,0 +1,38 @@
+% Compatibility normalization for two-key document/output configurations.
+% Loaded at the end of insr-config so the registry and helper functions exist.
+\ExplSyntaxOn
+\cs_new_protected:Npn \__insr_set_output_target_compat:n #1
+  {
+    \prop_if_in:NnTF \g__insr_output_base_prop {#1}
+      {
+        % Canonical output target such as paper, slides, handout or poster.
+        % Preserve an explicitly selected semantic document type.
+        \tl_gset:Nn \g_insr_output_target_tl {#1}
+      }
+      {
+        \prop_get:NnNTF \g__insr_combination_target_prop {#1} \l_tmpa_tl
+          {
+            % A complete build combination was supplied through output/target.
+            % Canonicalize it before class loading so downstream content filters
+            % see paper/slides/handout/poster rather than the combination name.
+            \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpa_tl
+            \bool_if:NF \g__insr_document_type_explicit_bool
+              {
+                \prop_get:NnNTF \g__insr_combination_type_prop {#1} \l_tmpb_tl
+                  { \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpb_tl }
+                  { }
+              }
+          }
+          {
+            % Keep unknown values intact so the normal resolver emits its
+            % established diagnostic and fallback behavior.
+            \tl_gset:Nn \g_insr_output_target_tl {#1}
+          }
+      }
+    \bool_gset_true:N \g__insr_output_target_explicit_bool
+  }
+\keys_define:nn { insr }
+  {
+    output/target .code:n = { \__insr_set_output_target_compat:n {#1} }
+  }
+\ExplSyntaxOff

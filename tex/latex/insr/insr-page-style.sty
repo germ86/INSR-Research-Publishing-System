@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-page-style}[2026/07/16 INSR scientific publisher page styles]
+\ProvidesPackage{insr-page-style}[2026/07/17 INSR scientific publisher page styles]
 \ExplSyntaxOn
 % User keys: header-separator, footer-separator, logo, git-revision.
 \str_if_eq:VnF \g_insr_base_class_tl { beamer }
@@ -80,18 +80,36 @@
         \setkomafont{pagefoot}{\sffamily\small\color{INSRFooterText}}
         \__insr_page_style_foot_rule:
       }
-    \setkomafont{disposition}{\color{INSRTOCHeading}\bfseries}
-    \hypersetup{linkcolor=INSRTOCLink,urlcolor=INSRLink,citecolor=INSRLink}
+    % General document headings use a contrast-safe semantic role. The TOC
+    % applies its dedicated heading role locally when it is rendered.
+    \setkomafont{disposition}{\color{INSRHeading}\bfseries}
+    \hypersetup{linkcolor=INSRLink,urlcolor=INSRLink,citecolor=INSRLink}
     \pagestyle{scrheadings}
   }
+
 \cs_new_protected:Npn \__insr_page_style_apply_beamer:
   {
+    % Complete the theme with palette-aware foreground/background roles. This
+    % prevents black default Beamer text from disappearing on dark palettes.
+    \setbeamercolor{normal text}{fg=INSRText,bg=INSRBackground}
+    \setbeamercolor{background canvas}{bg=INSRBackground}
+    \setbeamercolor{title}{fg=INSRHeading}
+    \setbeamercolor{subtitle}{fg=INSRTextMuted}
+    \setbeamercolor{author}{fg=INSRText}
+    \setbeamercolor{institute}{fg=INSRTextMuted}
+    \setbeamercolor{date}{fg=INSRTextMuted}
+    \setbeamercolor{structure}{fg=INSRAccent}
+    \setbeamercolor{alerted text}{fg=INSRWarning}
+    \setbeamercolor{example text}{fg=INSRSuccess}
     \setbeamercolor{section in toc}{fg=INSRTOCSection}
     \setbeamercolor{subsection in toc}{fg=INSRTOCSubsection}
-    \setbeamercolor{section in toc shaded}{fg=INSRTOCCurrent}
-    \setbeamercolor{page number in head/foot}{fg=INSRFooterText,bg=INSRFooterBackground}
-    \setbeamertemplate{headline}{\vskip1pt{\color{INSRHeaderSeparator}\rule{\paperwidth}{\tl_use:N\g_insr_layout_header_separator_thickness_tl}}}
-    \setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1ex,leftskip=1em]{author in head/foot}\textcolor{INSRFooterText}{\insertshorttitle}\end{beamercolorbox}\begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1ex,center]{date in head/foot}\textcolor{INSRFooterAccent}{\insertframenumber/\inserttotalframenumber}\end{beamercolorbox}}{\color{INSRFooterSeparator}\rule{\paperwidth}{\tl_use:N\g_insr_layout_footer_separator_thickness_tl}}}
+    \setbeamercolor{section in toc shaded}{fg=INSRTextMuted}
+    \setbeamercolor{subsection in toc shaded}{fg=INSRTextMuted}
+    \setbeamercolor{section number projected}{fg=INSRBackground,bg=INSRTOCNumber}
+    \setbeamercolor{subsection number projected}{fg=INSRBackground,bg=INSRTOCNumber}
+    \setbeamertemplate{navigation symbols}{}
+    \setbeamertemplate{headline}{}
+    \setbeamertemplate{footline}{\hfill\textcolor{INSRFooterAccent}{\insertframenumber/\inserttotalframenumber}\hspace{1em}\vspace{0.5ex}}
   }
 \cs_new_protected:Npn \__insr_page_style_setup:
   { \str_if_eq:VnTF \g_insr_base_class_tl { beamer } { \__insr_page_style_apply_beamer: } { \__insr_page_style_apply_koma: } }

@@ -1,0 +1,24 @@
+\documentclass[
+  config/load-project=false,
+  document/type=slides,
+  output/target=submission-package,
+  design/theme=research,
+  design/palette=midnight,
+  design/mode=dark,
+  metadata/title={Slide target precedence regression},
+  metadata/short-title={Slide precedence},
+  metadata/author={INSR Test Suite},
+  metadata/institution={Automated validation}
+]{insr}
+
+\begin{document}
+\INSRMakeTitle
+\begin{INSRContentUnit}[
+  id = target-precedence,
+  title = {Resolved as Beamer slides},
+  outputs = {slides}
+]
+\INSRSummary{The semantic slides shorthand must replace a stale submission-package target.}
+\INSRKeyMessage{The resolved base class is Beamer and the active adapter is slides.}
+\end{INSRContentUnit}
+\end{document}

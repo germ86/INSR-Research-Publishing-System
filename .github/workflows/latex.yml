@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  TEXINPUTS: .//:./tex/latex/insr//:./examples//:
+  TEXINPUTS: .:./examples//:
   BIBINPUTS: .//:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
           python3 tools/validate_project.py
           python3 tools/validate_bibliography.py references.bib
           python3 tools/validate_palette.py
-          python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py tests/test_publication_layer_static.py tests/test_release_metadata_static.py
+          python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py tests/test_publication_layer_static.py tests/test_release_metadata_static.py tests/test_latex_log_checker.py tests/test_color_contrast_static.py
           python3 tools/insr_metadata.py validate
           python3 tools/insr_metadata.py export-all --outdir build/metadata
           python3 tools/insr_release.py prepare --version ci-alpha
@@ -40,6 +40,8 @@ jobs:
           latexmk_use_lualatex: true
           latexmk_shell_escape: false
           args: -interaction=nonstopmode -halt-on-error
+      - name: Reject INSR warning regressions
+        run: python3 tools/check_latex_log.py main.log
 
   paper-examples:
     name: Paper examples (${{ matrix.document }})
@@ -62,6 +64,7 @@ jobs:
           - examples/publication-multi-author/main.tex
           - examples/publication-funded-research/main.tex
           - examples/reference-publication/paper.tex
+          - tests/fixtures/rct-combination-as-output-target.tex
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
@@ -84,6 +87,7 @@ jobs:
           - examples/hebrew-rtl-slides.tex
           - examples/reference-publication/slides.tex
           - examples/reference-publication/handout.tex
+          - tests/fixtures/document-type-slides-overrides-submission.tex
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3

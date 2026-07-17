@@ -3,8 +3,7 @@
 \RequirePackage{ifluatex}
 \ifluatex\else\ClassError{insr}{INSR requires LuaLaTeX}{Select LuaLaTeX in Overleaf or run latexmk -lualatex locally.}\fi
 \RequirePackage{fontspec}
-\RequirePackage[english]{babel}
-\babelprovide[import,main]{english}
+\RequirePackage[provide=*,english]{babel}
 \ExplSyntaxOn
 \cs_new_protected:Npn \__insr_select_language:
   {
@@ -15,9 +14,9 @@
       }
     \str_case:Vn \g_insr_language_tl
       {
-        { ngerman } { \babelprovide[import]{ngerman} }
-        { arabic } { \babelprovide[import]{arabic} }
-        { hebrew } { \babelprovide[import]{hebrew} }
+        { ngerman } { \babelprovide[import,main]{ngerman} }
+        { arabic } { \babelprovide[import,main]{arabic} }
+        { hebrew } { \babelprovide[import,main]{hebrew} }
       }
     \exp_args:NV \selectlanguage \g_insr_language_tl
   }
