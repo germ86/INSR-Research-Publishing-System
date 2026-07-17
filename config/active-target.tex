@@ -1,7 +1,11 @@
 % Active one-switch build selection for Overleaf.
-% Change only the preset value; main.tex and the content source stay unchanged.
-% Common values: position-paper, slides, handout, position-paper-poster,
+% Change only build/preset. The two compatibility defaults below keep older
+% tooling readable; the preset is deliberately last and resolves both the
+% semantic document type and the output adapter/base class.
+% Common presets: position-paper, slides, handout, position-paper-poster,
 % rct-protocol, rct-protocol-slides, clinical-protocol, submission-package.
 \INSRBootstrap{
+  document/type = position-paper,
+  output/target = slides,
   build/preset = slides
 }
