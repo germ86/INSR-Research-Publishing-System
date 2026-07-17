@@ -1,10 +1,12 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-config}[2026/07/15 INSR configuration]
+\ProvidesPackage{insr-config}[2026/07/17 INSR configuration and target registry]
 \ExplSyntaxOn
 \bool_gset_true:N \g_insr_load_project_config_bool
-\tl_gset:Nn \g_insr_document_type_tl { paper }
-\tl_gset:Nn \g_insr_output_target_tl { }
-\tl_gset:Nn \g_insr_content_source_tl { insr-position-paper }
+\tl_gset:Nn \g_insr_document_type_tl { position-paper }
+\tl_gset:Nn \g_insr_output_target_tl { paper }
+\tl_gset:Nn \g_insr_content_source_tl { auto }
+\bool_new:N \g__insr_document_type_explicit_bool
+\bool_new:N \g__insr_output_target_explicit_bool
 \tl_gset:Nn \g_insr_density_tl { standard }
 \tl_gset:Nn \g_insr_build_profile_tl { development }
 \tl_gset:Nn \g_insr_theme_tl { clinical }
@@ -21,13 +23,12 @@
 \tl_gset:Nn \g_insr_institution_tl { Independent translational research program }
 \tl_gset:Nn \g_insr_bibresource_tl { references.bib }
 \tl_gset:Nn \g_insr_keywords_tl { INSR, scientific publishing, LuaLaTeX }
-
 \tl_gset:Nn \g_insr_publication_type_tl { preprint }
 \tl_gset:Nn \g_insr_publication_status_tl { draft }
 \tl_gset:Nn \g_insr_publication_version_tl { 1.0 }
 \tl_gset:Nn \g_insr_publication_revision_tl { }
 \tl_gset:Nn \g_insr_publication_date_tl { \today }
-\tl_gset:Nn \g_insr_publication_year_tl { }
+\tl_gset:Nn \g_insr_publication_year_tl { \number\year }
 \tl_gset:Nn \g_insr_publication_revision_date_tl { }
 \tl_gset:Nn \g_insr_publication_doi_tl { }
 \tl_gset:Nn \g_insr_publication_url_tl { }
@@ -35,7 +36,6 @@
 \tl_gset:Nn \g_insr_publication_license_tl { }
 \tl_gset:Nn \g_insr_publication_copyright_tl { }
 \tl_gset:Nn \g_insr_publication_profile_tl { generic-preprint }
-
 \tl_gset:Nn \g_insr_publication_publisher_tl { }
 \tl_gset:Nn \g_insr_publication_git_revision_tl { }
 \tl_gset:Nn \g_insr_layout_header_separator_style_tl { single }
@@ -73,18 +73,22 @@
 \tl_gset:Nn \g_insr_layout_footer_right_tl { doi }
 \tl_gset:Nn \g_insr_layout_page_numbering_tl { body-only }
 \tl_gset:Nn \g_insr_content_placeholders_tl { compact }
+\tl_gset:Nn \g_insr_typography_microtype_tl { false }
 \bool_gset_true:N \g_insr_frontmatter_toc_bool
 \bool_gset_false:N \g_insr_frontmatter_abstract_numbered_bool
 \bool_gset_true:N \g_insr_frontmatter_keywords_bool
 \keys_define:nn { insr }
   {
     config/load-project .bool_gset:N = \g_insr_load_project_config_bool,
-    document/type .tl_gset:N = \g_insr_document_type_tl,
+    build/preset .code:n = { \__insr_set_build_preset:n {#1} },
+    document/type .code:n = { \tl_gset:Nn \g_insr_document_type_tl {#1} \bool_gset_true:N \g__insr_document_type_explicit_bool },
+    document/target .code:n = { \__insr_set_legacy_target:n {#1} },
     document/density .tl_gset:N = \g_insr_density_tl,
     document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
     design/theme .tl_gset:N = \g_insr_theme_tl,
     design/palette .tl_gset:N = \g_insr_palette_tl,
     design/font .tl_gset:N = \g_insr_font_tl,
+    typography/microtype .tl_gset:N = \g_insr_typography_microtype_tl,
     design/mode .tl_gset:N = \g_insr_mode_tl,
     accessibility/high-contrast .bool_gset:N = \g_insr_high_contrast_bool,
     localization/language .tl_gset:N = \g_insr_language_tl,
@@ -97,7 +101,6 @@
     metadata/institution .tl_gset:N = \g_insr_institution_tl,
     bibliography/resource .tl_gset:N = \g_insr_bibresource_tl,
     metadata/keywords .tl_gset:N = \g_insr_keywords_tl,
-
     publication/type .tl_gset:N = \g_insr_publication_type_tl,
     publication/status .tl_gset:N = \g_insr_publication_status_tl,
     publication/version .tl_gset:N = \g_insr_publication_version_tl,
@@ -114,7 +117,6 @@
     publication/review .tl_gset:N = \g_insr_publication_review_tl,
     publication/citation-mode .tl_gset:N = \g_insr_citation_mode_tl,
     publication/suggested-citation .tl_gset:N = \g_insr_suggested_citation_tl,
-
     publication/publisher .tl_gset:N = \g_insr_publication_publisher_tl,
     publication/git-revision .tl_gset:N = \g_insr_publication_git_revision_tl,
     layout/logo .tl_gset:N = \g_insr_layout_logo_tl,
@@ -150,46 +152,185 @@
     content/template .tl_gset:N = \g_insr_template_tl,
     content/source .tl_gset:N = \g_insr_content_source_tl,
     content/placeholders .tl_gset:N = \g_insr_content_placeholders_tl,
-    output/target .tl_gset:N = \g_insr_output_target_tl,
+    output/target .code:n = { \tl_gset:Nn \g_insr_output_target_tl {#1} \bool_gset_true:N \g__insr_output_target_explicit_bool },
     layout/page-numbering .tl_gset:N = \g_insr_layout_page_numbering_tl,
     frontmatter/toc .bool_gset:N = \g_insr_frontmatter_toc_bool,
     frontmatter/abstract-numbered .bool_gset:N = \g_insr_frontmatter_abstract_numbered_bool,
     frontmatter/keywords .bool_gset:N = \g_insr_frontmatter_keywords_bool,
     unknown .code:n = { \msg_warning:nnx { insr } { unknown-key } { \l_keys_key_str } }
   }
-\NewDocumentCommand \INSRConfigure { m } { \ExplSyntaxOn \keys_set:nn { insr } { #1 } \ExplSyntaxOff }
+\NewDocumentCommand \INSRConfigure { m } { \ExplSyntaxOn \keys_set:nn { insr } {#1} \ExplSyntaxOff }
+\NewDocumentCommand \INSRBootstrap { m } { \ExplSyntaxOn \keys_set:nn { insr } {#1} \ExplSyntaxOff }
 \NewDocumentCommand \INSRSetup { m } { \msg_warning:nnn { insr } { deprecated-command } { \string\INSRSetup } \INSRConfigure{#1} }
-\cs_new_protected:Npn \insr_resolve_document_type: {
-  \tl_if_blank:VF \g_insr_output_target_tl { \tl_gset_eq:NN \g_insr_document_type_tl \g_insr_output_target_tl }
-  \str_case:VnF \g_insr_document_type_tl
-    {
-      { article } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { article } }
-      { paper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
-      { position-paper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
-      { whitepaper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
-      { report } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { grant } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { protocol } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { clinical-trial-protocol } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { rct } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { systematic-review } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { narrative-review } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { technical-documentation } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { developer-documentation } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { manual } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { manual } }
-      { book } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
-      { monograph } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { book } }
-      { thesis } { \tl_gset:Nn \g_insr_base_class_tl { scrbook } \tl_gset:Nn \g_insr_adapter_tl { thesis } }
-      { slides } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } }
-      { handout } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { slides } \PassOptionsToClass{handout}{beamer} }
-      { journal-paper } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
-      { clinical-manual } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { manual } }
-      { technical-report } { \tl_gset:Nn \g_insr_base_class_tl { scrreprt } \tl_gset:Nn \g_insr_adapter_tl { report } }
-      { executive-brief } { \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
-      { poster } { \tl_gset:Nn \g_insr_base_class_tl { beamer } \tl_gset:Nn \g_insr_adapter_tl { poster } }
-      { letter } { \tl_gset:Nn \g_insr_base_class_tl { scrlttr2 } \tl_gset:Nn \g_insr_adapter_tl { letter } }
-    }
-    { \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl } \tl_gset:Nn \g_insr_document_type_tl { paper } \tl_gset:Nn \g_insr_output_target_tl { } \tl_gset:Nn \g_insr_content_source_tl { insr-position-paper } \tl_gset:Nn \g_insr_base_class_tl { scrartcl } \tl_gset:Nn \g_insr_adapter_tl { paper } }
-}
+\tl_new:N \l__insr_register_profile_tl
+\tl_new:N \l__insr_register_source_tl
+\tl_new:N \l__insr_register_template_tl
+\tl_new:N \l__insr_register_base_tl
+\tl_new:N \l__insr_register_adapter_tl
+\tl_new:N \l__insr_register_class_options_tl
+\tl_new:N \l__insr_register_type_tl
+\tl_new:N \l__insr_register_target_tl
+\prop_new:N \g__insr_document_profile_prop
+\prop_new:N \g__insr_document_source_prop
+\prop_new:N \g__insr_document_template_prop
+\prop_new:N \g__insr_document_alias_prop
+\prop_new:N \g__insr_output_base_prop
+\prop_new:N \g__insr_output_adapter_prop
+\prop_new:N \g__insr_output_class_options_prop
+\prop_new:N \g__insr_combination_type_prop
+\prop_new:N \g__insr_combination_target_prop
+\keys_define:nn { insr/register/document }
+  { profile .tl_set:N = \l__insr_register_profile_tl, source .tl_set:N = \l__insr_register_source_tl, template .tl_set:N = \l__insr_register_template_tl }
+\keys_define:nn { insr/register/output }
+  { base .tl_set:N = \l__insr_register_base_tl, adapter .tl_set:N = \l__insr_register_adapter_tl, class-options .tl_set:N = \l__insr_register_class_options_tl }
+\keys_define:nn { insr/register/combination }
+  { type .tl_set:N = \l__insr_register_type_tl, target .tl_set:N = \l__insr_register_target_tl }
+\NewDocumentCommand \INSRRegisterDocumentType { m m }
+  {
+    \tl_clear:N \l__insr_register_profile_tl \tl_clear:N \l__insr_register_source_tl \tl_clear:N \l__insr_register_template_tl
+    \keys_set:nn { insr/register/document } {#2}
+    \prop_gput:NnV \g__insr_document_profile_prop {#1} \l__insr_register_profile_tl
+    \prop_gput:NnV \g__insr_document_source_prop {#1} \l__insr_register_source_tl
+    \prop_gput:NnV \g__insr_document_template_prop {#1} \l__insr_register_template_tl
+  }
+\NewDocumentCommand \INSRRegisterDocumentAlias { m m } { \prop_gput:Nnn \g__insr_document_alias_prop {#1} {#2} }
+\NewDocumentCommand \INSRRegisterOutputTarget { m m }
+  {
+    \tl_clear:N \l__insr_register_base_tl \tl_clear:N \l__insr_register_adapter_tl \tl_clear:N \l__insr_register_class_options_tl
+    \keys_set:nn { insr/register/output } {#2}
+    \prop_gput:NnV \g__insr_output_base_prop {#1} \l__insr_register_base_tl
+    \prop_gput:NnV \g__insr_output_adapter_prop {#1} \l__insr_register_adapter_tl
+    \prop_gput:NnV \g__insr_output_class_options_prop {#1} \l__insr_register_class_options_tl
+  }
+\NewDocumentCommand \INSRRegisterCombination { m m }
+  {
+    \tl_clear:N \l__insr_register_type_tl \tl_clear:N \l__insr_register_target_tl
+    \keys_set:nn { insr/register/combination } {#2}
+    \prop_gput:NnV \g__insr_combination_type_prop {#1} \l__insr_register_type_tl
+    \prop_gput:NnV \g__insr_combination_target_prop {#1} \l__insr_register_target_tl
+  }
+\InputIfFileExists{config/target-registry.tex}{}{\msg_error:nnn { insr } { missing-slot } { config/target-registry.tex }}
+\msg_new:nnn { insr } { unknown-build-preset } { Unknown~build/preset~'#1'.~Keeping~the~previous~document/output~selection. }
+\cs_new_protected:Npn \__insr_set_build_preset:n #1
+  {
+    \prop_get:NnNTF \g__insr_combination_type_prop {#1} \l_tmpa_tl
+      {
+        \prop_get:NnNTF \g__insr_combination_target_prop {#1} \l_tmpb_tl
+          {
+            \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl
+            \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpb_tl
+            \bool_gset_true:N \g__insr_document_type_explicit_bool
+            \bool_gset_true:N \g__insr_output_target_explicit_bool
+          }
+          { \msg_warning:nnn { insr } { unknown-build-preset } {#1} }
+      }
+      { \msg_warning:nnn { insr } { unknown-build-preset } {#1} }
+  }
+\cs_new_protected:Npn \__insr_set_legacy_target:n #1
+  {
+    \prop_get:NnNTF \g__insr_combination_type_prop {#1} \l_tmpa_tl
+      { \__insr_set_build_preset:n {#1} }
+      {
+        \tl_gset:Nn \g_insr_output_target_tl {#1}
+        \bool_gset_true:N \g__insr_output_target_explicit_bool
+      }
+  }
+\cs_new_protected:Npn \__insr_apply_document_type_preset_shorthand:
+  {
+    \prop_get:NVNTF \g__insr_combination_type_prop \g_insr_document_type_tl \l_tmpa_tl
+      {
+        % Output-shaped values such as document/type=slides historically looked
+        % valid but left a stale paper or submission target in place. When the
+        % registered combination resolves to a different semantic type, treat
+        % the value as a one-switch preset and resolve both dimensions.
+        \tl_if_eq:NNF \g_insr_document_type_tl \l_tmpa_tl
+          {
+            \prop_get:NVNTF \g__insr_combination_target_prop \g_insr_document_type_tl \l_tmpb_tl
+              {
+                \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl
+                \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpb_tl
+                \bool_gset_true:N \g__insr_document_type_explicit_bool
+                \bool_gset_true:N \g__insr_output_target_explicit_bool
+              }
+              { }
+          }
+      }
+      { }
+  }
+\cs_new_protected:Npn \__insr_normalize_document_type:
+  {
+    \prop_get:NVNTF \g__insr_document_alias_prop \g_insr_document_type_tl \l_tmpa_tl
+      { \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl }
+      { }
+  }
+\cs_new_protected:Npn \__insr_apply_legacy_target_if_needed:
+  {
+    \bool_if:NT \g__insr_output_target_explicit_bool
+      {
+        \bool_if:NF \g__insr_document_type_explicit_bool
+          {
+            \prop_get:NVNTF \g__insr_combination_type_prop \g_insr_output_target_tl \l_tmpa_tl
+              {
+                \tl_gset_eq:NN \g_insr_document_type_tl \l_tmpa_tl
+                \prop_get:NVNTF \g__insr_combination_target_prop \g_insr_output_target_tl \l_tmpb_tl
+                  { \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpb_tl }
+                  { }
+              }
+              { }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_resolve_document_profile:
+  {
+    \prop_get:NVNTF \g__insr_document_profile_prop \g_insr_document_type_tl \l_tmpa_tl
+      { \tl_gset_eq:NN \g_insr_profile_tl \l_tmpa_tl }
+      {
+        \msg_warning:nnx { insr } { unknown-document-type } { \tl_use:N \g_insr_document_type_tl }
+        \tl_gset:Nn \g_insr_document_type_tl { position-paper }
+        \tl_gset:Nn \g_insr_profile_tl { position-paper }
+      }
+    \prop_get:NVNTF \g__insr_document_template_prop \g_insr_document_type_tl \l_tmpa_tl
+      { \tl_gset_eq:NN \g_insr_template_tl \l_tmpa_tl }
+      { }
+  }
+\msg_new:nnn { insr } { unknown-output-target } { Unknown~output/target~'#1'.~Falling~back~to~paper. }
+\cs_new_protected:Npn \__insr_resolve_output_target:
+  {
+    \prop_get:NVNTF \g__insr_output_base_prop \g_insr_output_target_tl \l_tmpa_tl
+      {
+        \tl_gset_eq:NN \g_insr_base_class_tl \l_tmpa_tl
+        \prop_get:NVNTF \g__insr_output_adapter_prop \g_insr_output_target_tl \l_tmpb_tl
+          { \tl_gset_eq:NN \g_insr_adapter_tl \l_tmpb_tl }
+          { \tl_gset:Nn \g_insr_adapter_tl { paper } }
+        \prop_get:NVNTF \g__insr_output_class_options_prop \g_insr_output_target_tl \l_tmpa_tl
+          { \tl_if_blank:VF \l_tmpa_tl { \exp_args:NVV \PassOptionsToClass \l_tmpa_tl \g_insr_base_class_tl } }
+          { }
+        \str_if_eq:VnT \g_insr_base_class_tl { beamer } { \PassOptionsToClass{usepdftitle=false}{beamer} }
+      }
+      {
+        \msg_warning:nnx { insr } { unknown-output-target } { \tl_use:N \g_insr_output_target_tl }
+        \tl_gset:Nn \g_insr_output_target_tl { paper }
+        \tl_gset:Nn \g_insr_base_class_tl { scrartcl }
+        \tl_gset:Nn \g_insr_adapter_tl { paper }
+      }
+  }
+\cs_new_protected:Npn \__insr_resolve_content_source:
+  {
+    \str_if_eq:VnT \g_insr_content_source_tl { auto }
+      {
+        \prop_get:NVNTF \g__insr_document_source_prop \g_insr_document_type_tl \l_tmpa_tl
+          { \tl_gset_eq:NN \g_insr_content_source_tl \l_tmpa_tl }
+          { \tl_gset:Nn \g_insr_content_source_tl { insr-position-paper } }
+      }
+  }
+\cs_new_protected:Npn \insr_resolve_document_type:
+  {
+    \__insr_apply_legacy_target_if_needed:
+    \__insr_apply_document_type_preset_shorthand:
+    \__insr_normalize_document_type:
+    \__insr_resolve_document_profile:
+    \__insr_resolve_output_target:
+    \__insr_resolve_content_source:
+  }
 \ExplSyntaxOff
 \endinput

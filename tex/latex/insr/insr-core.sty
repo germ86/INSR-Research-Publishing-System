@@ -1,8 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-core}[2026/07/15 INSR core state and public API]
+\ProvidesPackage{insr-core}[2026/07/17 INSR core state and public API]
 \ExplSyntaxOn
 \msg_new:nnn { insr } { missing-config } { Missing~config/project-config.tex;~using~safe~defaults. }
-\msg_new:nnn { insr } { unknown-document-type } { Unknown~document/type~'#1'.~Falling~back~to~paper. }
+\msg_new:nnn { insr } { unknown-document-type } { Unknown~document/type~'#1'.~Falling~back~to~position-paper. }
 \msg_new:nnn { insr } { unknown-palette } { Unknown~palette~'#1'.~Falling~back~to~neuroclinical. }
 \msg_new:nnn { insr } { unknown-theme } { Unknown~theme~'#1'.~Falling~back~to~insr-default. }
 \msg_new:nnn { insr } { unknown-font } { Unknown~font~preset~'#1'.~Falling~back~to~libertinus. }
@@ -30,7 +30,6 @@
 \tl_new:N \g_insr_institution_tl
 \tl_new:N \g_insr_bibresource_tl
 \tl_new:N \g_insr_keywords_tl
-
 \tl_new:N \g_insr_publication_type_tl
 \tl_new:N \g_insr_publication_status_tl
 \tl_new:N \g_insr_publication_version_tl
@@ -43,7 +42,6 @@
 \tl_new:N \g_insr_publication_repository_tl
 \tl_new:N \g_insr_publication_license_tl
 \tl_new:N \g_insr_publication_copyright_tl
-
 \tl_new:N \g_insr_publication_publisher_tl
 \tl_new:N \g_insr_publication_git_revision_tl
 \tl_new:N \g_insr_layout_header_separator_style_tl
@@ -81,6 +79,7 @@
 \tl_new:N \g_insr_output_target_tl
 \tl_new:N \g_insr_content_source_tl
 \tl_new:N \g_insr_content_placeholders_tl
+\tl_new:N \g_insr_typography_microtype_tl
 \tl_new:N \g_insr_layout_page_numbering_tl
 \bool_new:N \g_insr_frontmatter_toc_bool
 \bool_new:N \g_insr_frontmatter_abstract_numbered_bool
@@ -99,9 +98,11 @@
 \cs_generate_variant:Nn \tl_if_blank:nTF { V }
 \cs_generate_variant:Nn \tl_if_blank:nF { V }
 \cs_generate_variant:Nn \clist_if_in:nnTF { VV }
+\cs_generate_variant:Nn \prop_get:NnNTF { NVNTF }
+\cs_generate_variant:Nn \prop_if_in:NnTF { NVTF }
 \DeclareRobustCommand{\INSRMakeTitle}{\ifcsname __insr_adapter_make_title:\endcsname\csname __insr_adapter_make_title:\endcsname\else\ClassError{insr}{Mandatory adapter title renderer missing}{The selected adapter did not define \string\__insr_adapter_make_title:.}\fi}
 \DeclareRobustCommand{\INSRRenderDocument}{\ifcsname __insr_template_render:\endcsname\csname __insr_template_render:\endcsname\else\ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}\par\noindent INSR template renderer unavailable.\par\fi}
-\DeclareRobustCommand{\INSRSelectTarget}[1]{\ExplSyntaxOn\tl_gset:Nn \g_insr_output_target_tl {#1}\tl_gset:Nn \g_insr_document_type_tl {#1}\ExplSyntaxOff}
-\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
+\DeclareRobustCommand{\INSRSelectTarget}[1]{\msg_warning:nnn { insr } { deprecated-command } { \string\INSRSelectTarget } \__insr_set_legacy_target:n {#1}}
+\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRBootstrap, \\INSRSelectTarget, \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
 \ExplSyntaxOff
 \endinput
