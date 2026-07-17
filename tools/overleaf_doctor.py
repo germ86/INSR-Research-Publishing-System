@@ -133,15 +133,10 @@ def palette_exists(name: str) -> bool:
 
 
 def canonical_main_ok() -> bool:
-    return read(ROOT / "main.tex").strip() == """\\documentclass{insr}
-
-\\begin{document}
-
-\\INSRMakeTitle
-\\INSRRenderDocument
-
-\\end{document}"""
-
+    text = re.sub(r"%.*", "", read(ROOT / "main.tex"))
+    pattern = r"\\documentclass(?:\[[^]]*\])?\{insr\}|\\begin\{document\}|\\INSRMakeTitle|\\INSRRenderDocument|\\end\{document\}"
+    tokens = re.findall(pattern, text)
+    return tokens == ["\\documentclass{insr}", "\\begin{document}", "\\INSRMakeTitle", "\\INSRRenderDocument", "\\end{document}"]
 
 def check_entry(path: Path) -> list[str]:
     problems: list[str] = []
@@ -297,16 +292,14 @@ def check_target(args: argparse.Namespace) -> int:
 def check_source(args: argparse.Namespace) -> int:
     source = args.source
     directory = ROOT / "content" / source
-    manifest = ROOT / "content/manifest.tex"
+    manifest = directory / "manifest.tex"
     problems: list[str] = []
     if not directory.is_dir():
         problems.append(f"missing content source: {source}")
-    if not manifest.is_file():
-        problems.append("missing content/manifest.tex")
-    else:
-        text = read(manifest)
-        if f"content/{source}/" not in text:
-            problems.append(f"manifest does not reference content/{source}/")
+    elif not manifest.is_file():
+        problems.append(f"missing source manifest: {rel(manifest)}")
+    elif not read(manifest).strip():
+        problems.append(f"empty source manifest: {rel(manifest)}")
     if problems:
         print(f"source {source}: invalid")
         for problem in problems:
@@ -335,7 +328,7 @@ def report(_: argparse.Namespace) -> int:
     out = ROOT / "build/overleaf-report.md"
     out.parent.mkdir(exist_ok=True)
     lines = [
-        "# INSR Overleaf Report", "", "- Recommended main document: `main.tex`", "- Compiler: LuaLaTeX", f"- Current document type: `{key('document/type')}`", f"- Theme: `{key('design/theme')}`", f"- Palette: `{key('design/palette')}`", f"- Typography: `{key('design/font')}`", "", "## Official entrypoints", "",
+        "# INSR Overleaf Report", "", "- Recommended main document: `main.tex`", "- Compiler: LuaLaTeX", f"- Current document type: `{key('document/type')}`", f"- Current output target: `{key('output/target')}`", f"- Theme: `{key('design/theme')}`", f"- Palette: `{key('design/palette')}`", f"- Typography: `{key('design/font')}`", "", "## Official entrypoints", "",
     ]
     for group, files in ENTRYPOINTS.items():
         lines.append(f"### {group}")
@@ -343,7 +336,7 @@ def report(_: argparse.Namespace) -> int:
         lines.append("")
     lines.append("## Detected problems")
     lines.extend(f"- {p}" for p in problems) if problems else lines.append("- none")
-    lines.extend(["", "## Recommended Overleaf steps", "", "1. Set Main document to `main.tex`.", "2. Set compiler to LuaLaTeX.", "3. Change output type only in `config/project-config.tex`."])
+    lines.extend(["", "## Recommended Overleaf steps", "", "1. Set Main document to `main.tex`.", "2. Set compiler to LuaLaTeX.", "3. Change document type/output only in `config/active-target.tex`; keep broader defaults in `config/project-config.tex`."])
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(rel(out))
     return 0

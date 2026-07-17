@@ -30,7 +30,12 @@ def restore_active(old: str | None) -> None:
     else:
         _atomic_write(ACTIVE, old)
 
+def _clean_root_aux() -> None:
+    for suffix in ["aux", "toc", "out", "bcf", "bbl", "blg", "run.xml", "fdb_latexmk", "fls", "log", "nav", "snm", "synctex.gz"]:
+        (ROOT / f"main.{suffix}").unlink(missing_ok=True)
+
 def run_latexmk(target: str) -> int:
+    _clean_root_aux()
     outdir = ROOT / "build" / target
     if outdir.exists():
         shutil.rmtree(outdir)
@@ -60,7 +65,8 @@ def validate(target: str | None = None) -> int:
     for name in names:
         ns = argparse.Namespace(target=name)
         rc = check_target(ns) or rc
-    rc = check_source(argparse.Namespace(source="insr-position-paper")) or rc
+    for source in sorted({info.get("source", "insr-position-paper") for info in TARGETS.values()}):
+        rc = check_source(argparse.Namespace(source=source)) or rc
     return rc
 
 def list_document_types() -> None:

@@ -12,6 +12,7 @@ Core keys:
 - `design/theme`: insr-default, clinical, research, editorial, technical, minimal, dark, protocol, consortium, conference, documentation, accessible, or a custom theme file.
 - `design/palette`: any file in `palettes/` or `palettes/custom/`.
 - `design/font`: libertinus, stix-two, ibm-plex, inter, source-serif-sans, noto, latin-modern.
+- `typography/microtype`: false by default in the supported build matrix; set to true only when the installed microtype/kernel combination is known not to emit `\showhyphens` patch diagnostics.
 - `design/mode`: light, dark, print.
 - `accessibility/high-contrast`: true or false.
 - `localization/language`: english, ngerman, arabic, hebrew.

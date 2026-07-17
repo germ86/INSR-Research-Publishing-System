@@ -46,6 +46,9 @@
 \ExplSyntaxOff
 \RequirePackage{insr-utils}
 \RequirePackage{insr-localization}
+\ExplSyntaxOn
+\__insr_select_language:
+\ExplSyntaxOff
 \RequirePackage{insr-bibliography}
 \RequirePackage{insr-typography}
 \RequirePackage{insr-colors}
