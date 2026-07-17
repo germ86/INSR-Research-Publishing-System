@@ -88,6 +88,14 @@ class ConfigStaticTests(unittest.TestCase):
         for package in PACKAGE_NAMES:
             self.assertIn(f"\\RequirePackage{{{package}}}", cls)
 
+    def test_texinputs_prefers_root_shims(self):
+        latexmkrc = self.read("latexmkrc")
+        workflow = self.read(".github/workflows/latex.yml")
+        self.assertIn("$ENV{'TEXINPUTS'} = '.:./examples//:'", latexmkrc)
+        self.assertNotIn("./tex/latex/insr//", latexmkrc)
+        self.assertIn("TEXINPUTS: .:./examples//:", workflow)
+        self.assertNotIn("TEXINPUTS: .//:./tex/latex/insr//", workflow)
+
     def test_class_options_processed_after_project_config(self):
         cls = self.read("insr.cls")
         self.assertLess(cls.index("config/project-config.tex"), cls.index("\\ProcessOptions"))
