@@ -34,16 +34,15 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("\\INSRRenderDocument", main)
         self.assertNotIn("document/target", main)
 
-    def test_active_build_uses_authoritative_slide_preset(self):
+    def test_active_build_uses_backward_compatible_slide_keys(self):
         active = self.read("config/active-target.tex")
         project = self.read("config/project-config.tex")
         self.assertIn("document/type = position-paper", active)
         self.assertIn("output/target = slides", active)
-        self.assertIn("build/preset = slides", active)
-        self.assertLess(active.index("output/target = slides"), active.index("build/preset = slides"))
+        self.assertNotIn("build/preset", active)
         self.assertIn("document/type=position-paper", project)
         self.assertIn("output/target=paper", project)
-        self.assertIn("build/preset=position-paper", project)
+        self.assertNotIn("build/preset", project)
         self.assertNotIn("document/target=position-paper", project)
 
     def test_build_preset_and_slide_shorthand_are_resolved(self):
