@@ -1,25 +1,59 @@
 # INSR v4.0 Configuration Reference
 
-Select the semantic document type and rendering output in `config/active-target.tex` with `\INSRBootstrap{document/type=..., output/target=...}`. Keep broader project defaults in `config/project-config.tex` with `\INSRConfigure{...}`. `main.tex` must remain the stable public entry document.
+Select the complete root build in `config/active-target.tex` with the one-switch key `build/preset`. Keep broader project defaults in `config/project-config.tex` with `\INSRConfigure{...}`. `main.tex` must remain the stable public entry document.
 
 Core keys:
 
+- `build/preset`: a registered document/output combination. Common presets are `position-paper`, `slides`, `handout`, `position-paper-poster`, `rct-protocol`, `rct-protocol-slides`, `clinical-protocol`, `submission-package`, `book` and `thesis`. The preset resolves the semantic document type, output target, base class, adapter, profile and content source together.
 - `document/type`: article, paper, position-paper, whitepaper, report, book, monograph, thesis, slides, handout, poster, letter, grant, protocol, clinical-trial-protocol, rct, systematic-review, narrative-review, technical-documentation, developer-documentation, manual.
 - `output/target`: paper, slides, handout, poster, executive-brief, submission-package, web, book, thesis, manual, report, article, letter.
-- `document/target`: deprecated compatibility alias for legacy one-dimensional target names; new projects should use `document/type` plus `output/target`.
+- `document/target`: compatibility alias for earlier one-dimensional target names. New root builds should use `build/preset`.
 - `document/density`: compact, standard, spacious.
 - `document/build-profile`: development, review, release.
 - `design/theme`: insr-default, clinical, research, editorial, technical, minimal, dark, protocol, consortium, conference, documentation, accessible, or a custom theme file.
 - `design/palette`: any file in `palettes/` or `palettes/custom/`.
 - `design/font`: libertinus, stix-two, ibm-plex, inter, source-serif-sans, noto, latin-modern.
 - `typography/microtype`: false by default in the supported build matrix; set to true only when the installed microtype/kernel combination is known not to emit `\showhyphens` patch diagnostics.
-- `design/mode`: light, dark, print.
-- `accessibility/high-contrast`: true or false.
+- `design/mode`: light, dark, print. This is operational rather than decorative: it selects contrast-safe semantic colours for headings, the table of contents, headers, footers and presentation text. Match dark palettes such as `midnight` with `design/mode = dark`.
+- `accessibility/high-contrast`: true or false. The high-contrast palette override is applied before rendered semantic colour aliases are resolved.
 - `localization/language`: english, ngerman, arabic, hebrew.
 - `localization/direction`: ltr or rtl.
 - `bibliography/resource`: BibLaTeX resource path.
 
-Unknown document types, themes, palettes and fonts warn and fall back safely.
+Unknown presets, document types, themes, palettes, modes and fonts warn and fall back safely or preserve the previous valid selection.
+
+## One-switch build selection
+
+The active Overleaf configuration intentionally retains `document/type` and `output/target` as compatibility metadata for older tooling, but `build/preset` is placed last and is authoritative. Change only its value:
+
+```tex
+\INSRBootstrap{
+  document/type = position-paper,
+  output/target = slides,
+  build/preset = slides
+}
+```
+
+To return to the paper build, change only:
+
+```tex
+build/preset = position-paper
+```
+
+To render the same position-paper source through Beamer, use `build/preset = slides`. For an RCT presentation, use `build/preset = rct-protocol-slides`. For a journal submission bundle, use `build/preset = submission-package`.
+
+For compatibility, output-shaped values supplied through `document/type`, such as `document/type = slides`, are now detected as registered combination shorthands and resolve both dimensions. This prevents a stale `paper` or `submission-package` output from overriding an attempted slide switch. Explicit `build/preset` remains the preferred and least ambiguous mechanism.
+
+## Semantic colour roles
+
+Palette files define base roles such as `INSRPrimary`, `INSRBackground`, `INSRText`, `INSRTextMuted`, `INSRAccent` and `INSRLink`. The runtime derives rendered roles from them:
+
+- `INSRHeading` for normal document headings;
+- `INSRHeaderText` and `INSRFooterText` for running page furniture;
+- `INSRTOCHeading`, `INSRTOCSection`, `INSRTOCSubsection`, `INSRTOCNumber`, `INSRTOCPageNumber` and `INSRTOCLink` for contents rendering;
+- Beamer normal text and background colours for slide, handout and poster targets.
+
+In dark mode, text-bearing roles use `INSRText` or `INSRTextMuted`, not the potentially dark identity colour `INSRPrimary`. This separation prevents a valid dark brand colour from becoming unreadable on a dark page.
 
 ## Normal spaces in metadata
 
@@ -44,6 +78,8 @@ Configuration precedence is:
 4. profile defaults for values that are still unset;
 5. theme, palette, typography and adapter finalisation.
 
+Within a single `\INSRBootstrap{...}` block, keys are processed in order. The checked-in `config/active-target.tex` therefore places `build/preset` last so that it resolves and overrides the compatibility fields atomically.
+
 `config/load-project` defaults to `true`. Official examples set `config/load-project=false` in their class options so they do not inherit productive position-paper metadata or content settings from the root project configuration.
 
 The alias `localization/language = german` is normalized to `ngerman`; `english`, `ngerman`, `arabic` and `hebrew` remain the supported canonical language identifiers.
@@ -54,22 +90,21 @@ Publication-specific project values are split across `config/metadata-config.tex
 
 ## Active target, frontmatter, and placeholders
 
-The canonical Overleaf entrypoint remains `main.tex`. Select the output in `config/active-target.tex` with `\INSRBootstrap{document/target=position-paper}`. Keep target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+The canonical Overleaf entrypoint remains `main.tex`. Keep build selection in `config/active-target.tex`; place theme, palette, typography, localization and metadata overrides in `config/project-config.tex`. Preset resolution happens before `\LoadClass`, so switching from KOMA paper output to Beamer slides changes the actual base class rather than merely changing a label.
 
-Implemented targets are validated by `tools/overleaf_doctor.py check-target <target>` and share the single source tree under `content/insr-position-paper`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
+Implemented combinations are validated by `tools/overleaf_doctor.py check-target <registered-combination>`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
 
 Automatic citation mode derives the suggested citation from the registered visible authors, title/subtitle, publication date, and publisher. Manual mode uses `publication/suggested-citation` exactly as configured. Pending DOI values are displayed as pending metadata, not fabricated DOI URLs.
-
 
 ## Release metadata keys
 
 `publication/year` is an optional explicit year override used by metadata exports and automatic citation formatting. Prefer it when `publication/date` is localized or otherwise not safely machine-readable.
 
-## Placeholder, role, and citation semantics
+## Placeholder, role, TOC, and citation semantics
 
 Content units support semantic keys `role`, `numbered`, `toc`, `required`, and `placeholder`. The default is `required=true`; production builds or `content/placeholders=error` raise a precise content-unit error for required empty/placeholder units, while optional units (`required=false`) may be omitted. Use `\INSRPlaceholder` or `placeholder=true` for controlled placeholders; legacy placeholder prose is accepted temporarily with a migration warning.
 
-`\INSRTableOfContents` is the single public global TOC API. Paper-like targets use the class-native `\tableofcontents` heading with one stable bookmark destination; Beamer targets render one Agenda frame. Repeated global calls are ignored and diagnosed in development builds.
+`\INSRTableOfContents` is the single public global TOC API. Paper-like targets use the localized class-native `\contentsname`, a stable bookmark destination, a dedicated TOC page style and explicit semantic contents colours. Beamer targets render one localized contents frame. Repeated global calls are ignored and diagnosed in development builds.
 
 Automatic suggested citations are assembled from semantic author, year, title, subtitle, version, and publisher components. `publication/year` is used for the year; full publication dates remain title-page metadata. Pending DOI values are displayed as pending metadata rather than linked identifiers.
 

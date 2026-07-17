@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export TEXINPUTS=".//:./tex/latex/insr//:./examples//:${TEXINPUTS:-}"
+# Resolve INSR packages through the canonical root-level shims. Keeping the
+# nested implementation directory out of the package search root prevents
+# package-name mismatch warnings in local and Overleaf-equivalent builds.
+export TEXINPUTS=".:./examples//:${TEXINPUTS:-}"
 export BIBINPUTS=".//:${BIBINPUTS:-}"
 
 static_only=false
@@ -13,11 +16,18 @@ python3 tools/overleaf_doctor.py check
 python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
-python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
+python3 -m unittest \
+  tests/test_overleaf_doctor.py \
+  tests/test_config_static.py \
+  tests/test_publication_layer_static.py \
+  tests/test_release_metadata_static.py \
+  tests/test_latex_log_checker.py \
+  tests/test_color_contrast_static.py
 
 mapfile -t documents < <(python3 tools/overleaf_doctor.py list-entrypoints --plain)
 documents+=(tests/fixtures/position-paper-editorial-content-unit.tex)
 documents+=(tests/fixtures/slides-editorial-content-unit.tex)
+documents+=(tests/fixtures/document-type-slides-overrides-submission.tex)
 for document in "${documents[@]}"; do
   if [[ ! -f "$document" ]]; then
     echo "missing entrypoint: $document" >&2

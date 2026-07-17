@@ -1,5 +1,9 @@
-% Active document/output selection for Overleaf builds. Keep this file to bootstrap-only selection.
+% Authoritative one-switch build selection for Overleaf.
+% Change only document/target. The selected combination resolves the semantic
+% source, base class and adapter before \LoadClass runs.
+% Examples: position-paper, slides, position-paper-handout,
+% rct-protocol, rct-protocol-slides, clinical-protocol,
+% clinical-protocol-slides, submission-package.
 \INSRBootstrap{
-  document/type = position-paper,
-  output/target = paper
+  document/target = rct-protocol
 }

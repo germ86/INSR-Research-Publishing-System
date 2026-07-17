@@ -66,3 +66,8 @@
 \INSRRegisterCombination{submission-package}{type=position-paper, target=submission-package}
 \INSRRegisterCombination{book}{type=book, target=book}
 \INSRRegisterCombination{thesis}{type=thesis, target=thesis}
+
+% Load the compatibility key handler after insr-config has finished defining its
+% registry and resolver internals. This keeps canonical output targets distinct
+% from complete build-combination names while accepting both user interfaces.
+\AtEndOfPackage{\InputIfFileExists{config/target-compatibility.tex}{}{}}

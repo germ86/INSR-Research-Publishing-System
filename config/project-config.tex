@@ -1,7 +1,7 @@
 % INSR Scientific Publishing Platform v4.0 project configuration.
-% Switch document type/output in config/active-target.tex; do not edit main.tex.
+% Switch the complete build in config/active-target.tex; do not edit main.tex.
 \InputIfFileExists{config/active-target.tex}{}{%
-  \INSRBootstrap{document/type=position-paper, output/target=paper}%
+  \INSRBootstrap{document/target=position-paper}%
 }
 \INSRConfigure{
   document/density = standard,
@@ -9,9 +9,11 @@
   design/theme = research,
   design/palette = midnight,
   design/font = noto,
+  % Midnight is a dark palette. The mode drives contrast-safe semantic roles
+  % for headings, contents, headers, footers and presentation text.
   design/mode = dark,
   accessibility/high-contrast = false,
-  localization/language = ngerman,
+  localization/language = english,
   localization/direction = ltr,
   bibliography/resource = {},
   content/template = auto,
