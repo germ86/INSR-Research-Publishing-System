@@ -1,7 +1,10 @@
 # Shared latexmk configuration for local, GitHub Actions and Overleaf builds.
 $pdf_mode = 4; # LuaLaTeX
 $bibtex_use = 2;
-$ENV{'TEXINPUTS'} = './tex/latex/insr//:./examples//:.//:' . ($ENV{'TEXINPUTS'} || '');
+# Resolve INSR packages through the canonical root-level shims. Do not prepend
+# tex/latex/insr here: loading implementation paths as package names triggers
+# LaTeX package-name mismatch warnings in Overleaf and recent TeX Live releases.
+$ENV{'TEXINPUTS'} = '.:./examples//:' . ($ENV{'TEXINPUTS'} || '');
 $ENV{'BIBINPUTS'} = './/:' . ($ENV{'BIBINPUTS'} || '');
 $lualatex = 'lualatex -interaction=nonstopmode -file-line-error -synctex=1 %O %S';
 add_cus_dep('glo', 'gls', 0, 'run_makeglossaries');
