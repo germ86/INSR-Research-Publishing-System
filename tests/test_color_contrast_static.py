@@ -53,11 +53,11 @@ class ColorContrastStaticTests(unittest.TestCase):
             self.assertIn(f"\\colorlet{{{role}}}{{INSRText}}", dark_block)
             self.assertNotIn(f"\\colorlet{{{role}}}{{INSRPrimary}}", dark_block)
 
-    def test_high_contrast_override_precedes_semantic_aliases(self):
+    def test_high_contrast_override_precedes_semantic_alias_application(self):
         colors = self.read("tex/latex/insr/insr-colors.sty")
         self.assertLess(
             colors.index("palettes/high-contrast.tex"),
-            colors.index("\\__insr_apply_semantic_color_roles:"),
+            colors.rindex("\\__insr_apply_semantic_color_roles:"),
         )
 
     def test_toc_uses_localized_title_and_explicit_roles(self):
