@@ -1,12 +1,13 @@
 # INSR v4.0 Configuration Reference
 
-Select the semantic document type and rendering output in `config/active-target.tex` with `\INSRBootstrap{document/type=..., output/target=...}`. Keep broader project defaults in `config/project-config.tex` with `\INSRConfigure{...}`. `main.tex` must remain the stable public entry document.
+Select the complete root build in `config/active-target.tex` with the one-switch key `build/preset`. Keep broader project defaults in `config/project-config.tex` with `\INSRConfigure{...}`. `main.tex` must remain the stable public entry document.
 
 Core keys:
 
+- `build/preset`: a registered document/output combination. Common presets are `position-paper`, `slides`, `handout`, `position-paper-poster`, `rct-protocol`, `rct-protocol-slides`, `clinical-protocol`, `submission-package`, `book` and `thesis`. The preset resolves the semantic document type, output target, base class, adapter, profile and content source together.
 - `document/type`: article, paper, position-paper, whitepaper, report, book, monograph, thesis, slides, handout, poster, letter, grant, protocol, clinical-trial-protocol, rct, systematic-review, narrative-review, technical-documentation, developer-documentation, manual.
 - `output/target`: paper, slides, handout, poster, executive-brief, submission-package, web, book, thesis, manual, report, article, letter.
-- `document/target`: deprecated compatibility alias for legacy one-dimensional target names; new projects should use `document/type` plus `output/target`.
+- `document/target`: compatibility alias for earlier one-dimensional target names. New root builds should use `build/preset`.
 - `document/density`: compact, standard, spacious.
 - `document/build-profile`: development, review, release.
 - `design/theme`: insr-default, clinical, research, editorial, technical, minimal, dark, protocol, consortium, conference, documentation, accessible, or a custom theme file.
@@ -19,7 +20,29 @@ Core keys:
 - `localization/direction`: ltr or rtl.
 - `bibliography/resource`: BibLaTeX resource path.
 
-Unknown document types, themes, palettes, modes and fonts warn and fall back safely.
+Unknown presets, document types, themes, palettes, modes and fonts warn and fall back safely or preserve the previous valid selection.
+
+## One-switch build selection
+
+The active Overleaf configuration intentionally retains `document/type` and `output/target` as compatibility metadata for older tooling, but `build/preset` is placed last and is authoritative. Change only its value:
+
+```tex
+\INSRBootstrap{
+  document/type = position-paper,
+  output/target = slides,
+  build/preset = slides
+}
+```
+
+To return to the paper build, change only:
+
+```tex
+build/preset = position-paper
+```
+
+To render the same position-paper source through Beamer, use `build/preset = slides`. For an RCT presentation, use `build/preset = rct-protocol-slides`. For a journal submission bundle, use `build/preset = submission-package`.
+
+For compatibility, output-shaped values supplied through `document/type`, such as `document/type = slides`, are now detected as registered combination shorthands and resolve both dimensions. This prevents a stale `paper` or `submission-package` output from overriding an attempted slide switch. Explicit `build/preset` remains the preferred and least ambiguous mechanism.
 
 ## Semantic colour roles
 
@@ -55,6 +78,8 @@ Configuration precedence is:
 4. profile defaults for values that are still unset;
 5. theme, palette, typography and adapter finalisation.
 
+Within a single `\INSRBootstrap{...}` block, keys are processed in order. The checked-in `config/active-target.tex` therefore places `build/preset` last so that it resolves and overrides the compatibility fields atomically.
+
 `config/load-project` defaults to `true`. Official examples set `config/load-project=false` in their class options so they do not inherit productive position-paper metadata or content settings from the root project configuration.
 
 The alias `localization/language = german` is normalized to `ngerman`; `english`, `ngerman`, `arabic` and `hebrew` remain the supported canonical language identifiers.
@@ -65,16 +90,7 @@ Publication-specific project values are split across `config/metadata-config.tex
 
 ## Active target, frontmatter, and placeholders
 
-The canonical Overleaf entrypoint remains `main.tex`. Select the semantic source and rendering target in `config/active-target.tex`:
-
-```tex
-\INSRBootstrap{
-  document/type = position-paper,
-  output/target = paper
-}
-```
-
-Keep target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+The canonical Overleaf entrypoint remains `main.tex`. Keep build selection in `config/active-target.tex`; place theme, palette, typography, localization and metadata overrides in `config/project-config.tex`. Preset resolution happens before `\LoadClass`, so switching from KOMA paper output to Beamer slides changes the actual base class rather than merely changing a label.
 
 Implemented combinations are validated by `tools/overleaf_doctor.py check-target <registered-combination>`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
 

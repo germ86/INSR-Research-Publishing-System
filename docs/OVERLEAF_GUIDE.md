@@ -1,6 +1,6 @@
 # Overleaf Guide
 
-Use LuaLaTeX. Keep `main.tex` unchanged, select the semantic document source and rendered output in `config/active-target.tex`, and keep broader project defaults in `config/project-config.tex`. The project avoids mandatory shell escape and mandatory Python. Biber is required for complete APA bibliography rendering.
+Use LuaLaTeX. Keep `main.tex` unchanged, select the complete root build with `build/preset` in `config/active-target.tex`, and keep broader project defaults in `config/project-config.tex`. The project avoids mandatory shell escape and mandatory Python. Biber is required for complete APA bibliography rendering.
 
 ## Modular v4 architecture and doctor
 
@@ -52,20 +52,35 @@ python3 tools/check_latex_log.py main.log
 
 The checker rejects INSR package-path mismatches, the known `\showhyphens` compatibility warning, duplicate `pdfauthor` metadata, missing `ngerman` BibLaTeX localisation, and unknown INSR document/output targets.
 
-## Switching document source and output target
+## One-switch build selection
 
-For Overleaf, keep `main.tex` unchanged and edit only `config/active-target.tex`:
+For Overleaf, keep `main.tex` unchanged and edit only the last line inside `config/active-target.tex`:
 
 ```tex
 \INSRBootstrap{
   document/type = position-paper,
-  output/target = paper
+  output/target = slides,
+  build/preset = slides
 }
 ```
 
-`document/type` selects the semantic source and its profile. `output/target` selects the rendering adapter and base class. For example, a single RCT source can be rendered as paper, slides, handout, or poster by keeping `document/type = rct-protocol` and changing only `output/target` to a registered compatible target.
+The first two values are retained as compatibility metadata for older repository tooling. `build/preset` is deliberately last and authoritative. Change only that value:
 
-Use `python3 tools/overleaf_doctor.py check-target <registered-combination>` to validate a named combination from `config/target-registry.tex`.
+- `position-paper` for the normal paper build;
+- `slides` for Beamer slides generated from the position-paper source;
+- `handout` for the Beamer handout output;
+- `rct-protocol` for the RCT paper;
+- `rct-protocol-slides` for RCT slides;
+- `clinical-protocol` for the clinical protocol;
+- `submission-package` for the submission-oriented paper package.
+
+Preset resolution happens before the base class is loaded. Switching from `position-paper` or `submission-package` to `slides` therefore changes the resolved class to Beamer and the adapter to `framework/adapters/slides.tex`; it does not merely rename the paper.
+
+For compatibility, `document/type = slides`, `document/type = handout`, or `document/type = poster` is also recognized as an output-shaped preset shorthand. Such a shorthand now replaces a stale paper or submission target automatically. `build/preset` is preferred because it is explicit and atomic.
+
+After changing the preset, use **Recompile from scratch**. A previous paper build may leave `.aux`, `.toc`, navigation, or bibliography files that are incompatible with the newly selected Beamer base class.
+
+Use `python3 tools/overleaf_doctor.py check-target <registered-combination>` to validate a named preset from `config/target-registry.tex`.
 
 ## Reference publication workflow
 
