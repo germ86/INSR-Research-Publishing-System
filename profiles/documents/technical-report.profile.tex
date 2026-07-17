@@ -1,3 +1,9 @@
-% INSR target profile placeholder; target behavior is resolved by insr-config.sty.
+% INSR v4 document profile: technical report.
 \ExplSyntaxOn
+\tl_gset:Nn \g_insr_template_tl { technical-report }
+\tl_gset:Nn \g_insr_publication_type_tl { Technical report }
+\tl_gset:Nn \g_insr_publication_profile_tl { technical-report }
+\bool_gset_true:N \g_insr_frontmatter_toc_bool
+\bool_gset_false:N \g_insr_frontmatter_abstract_numbered_bool
+\bool_gset_true:N \g_insr_frontmatter_keywords_bool
 \ExplSyntaxOff
