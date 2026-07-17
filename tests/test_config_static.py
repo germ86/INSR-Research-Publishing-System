@@ -40,7 +40,7 @@ class ConfigStaticTests(unittest.TestCase):
     def test_active_build_uses_one_pre_class_selector(self):
         active = self.read("config/active-target.tex")
         project = self.read("config/project-config.tex")
-        self.assertIn("document/target = position-paper", active)
+        self.assertIn("document/target = rct-protocol", active)
         self.assertNotIn("document/type", active)
         self.assertNotIn("output/target", active)
         self.assertNotIn("build/preset", active)
@@ -48,6 +48,18 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertNotIn("document/type=position-paper", project)
         self.assertNotIn("output/target=paper", project)
         self.assertNotIn("build/preset", project)
+
+    def test_rct_combination_is_accepted_as_compatibility_output_target(self):
+        registry = self.read("config/target-registry.tex")
+        fixture = self.read("tests/fixtures/rct-combination-as-output-target.tex")
+        profile = self.read("profiles/documents/rct-protocol.profile.tex")
+        self.assertIn(
+            "\\INSRRegisterOutputTarget{rct-protocol}{base=scrartcl, adapter=paper}",
+            registry,
+        )
+        self.assertIn("document/type=rct-protocol", fixture)
+        self.assertIn("output/target=rct-protocol", fixture)
+        self.assertIn("Randomized~controlled~trial~protocol", profile)
 
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
