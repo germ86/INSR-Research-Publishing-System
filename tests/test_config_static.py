@@ -91,10 +91,13 @@ class ConfigStaticTests(unittest.TestCase):
     def test_texinputs_prefers_root_shims(self):
         latexmkrc = self.read("latexmkrc")
         workflow = self.read(".github/workflows/latex.yml")
+        runner = self.read("tests/run-tests.sh")
         self.assertIn("$ENV{'TEXINPUTS'} = '.:./examples//:'", latexmkrc)
         self.assertNotIn("./tex/latex/insr//", latexmkrc)
         self.assertIn("TEXINPUTS: .:./examples//:", workflow)
         self.assertNotIn("TEXINPUTS: .//:./tex/latex/insr//", workflow)
+        self.assertIn('export TEXINPUTS=".:./examples//:', runner)
+        self.assertNotIn("./tex/latex/insr//", runner)
 
     def test_class_options_processed_after_project_config(self):
         cls = self.read("insr.cls")
@@ -104,7 +107,9 @@ class ConfigStaticTests(unittest.TestCase):
     def test_language_and_microtype_configuration_are_available(self):
         project = self.read("config/project-config.tex")
         config = self.read("tex/latex/insr/insr-config.sty")
-        self.assertIn("localization/language = ngerman", project)
+        localization = self.read("tex/latex/insr/insr-localization.sty")
+        self.assertIn("localization/language = english", project)
+        self.assertIn("babelprovide[import,main]{ngerman}", localization)
         self.assertIn("typography/microtype", config)
 
 
