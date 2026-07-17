@@ -1,0 +1,21 @@
+\documentclass[
+  config/load-project=false,
+  document/type=rct-protocol,
+  output/target=rct-protocol,
+  metadata/title={RCT target compatibility regression},
+  metadata/short-title={RCT target compatibility},
+  metadata/author={INSR Test Suite},
+  metadata/institution={Automated validation}
+]{insr}
+
+\begin{document}
+\INSRMakeTitle
+\begin{INSRContentUnit}[
+  id = rct-target-compatibility,
+  title = {Randomized Controlled Trial Protocol},
+  outputs = {paper}
+]
+\INSRSummary{A registered combination name used as output/target must resolve without an unknown-target fallback.}
+\INSRKeyMessage{The RCT semantic profile and paper adapter remain active.}
+\end{INSRContentUnit}
+\end{document}
