@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import re
 from pathlib import Path
+from insr_registry import load_registry, targets_from_registry
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRYPOINTS = {
@@ -66,26 +67,9 @@ GENERATED_SUFFIXES = {
     ".glg", ".acn", ".acr", ".alg",
 }
 
-TARGETS = {
-    "position-paper": {"base": "scrartcl", "adapter": "paper", "profile": "position-paper", "source": "insr-position-paper"},
-    "paper": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
-    "journal-paper": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
-    "slides": {"base": "beamer", "adapter": "slides", "profile": "slides", "source": "insr-position-paper"},
-    "handout": {"base": "beamer", "adapter": "slides", "profile": "handout", "source": "insr-position-paper"},
-    "poster": {"base": "beamer", "adapter": "poster", "profile": "poster", "source": "insr-position-paper"},
-    "clinical-manual": {"base": "scrreprt", "adapter": "manual", "profile": "manual", "source": "insr-position-paper"},
-    "technical-report": {"base": "scrreprt", "adapter": "report", "profile": "report", "source": "insr-position-paper"},
-    "executive-brief": {"base": "scrartcl", "adapter": "paper", "profile": "paper", "source": "insr-position-paper"},
-    "book": {"base": "scrbook", "adapter": "book", "profile": "book", "source": "insr-position-paper"},
-    "thesis": {"base": "scrbook", "adapter": "thesis", "profile": "thesis", "source": "insr-position-paper"},
-}
-
-SUPPORTED_DOCUMENT_TYPES = {
-    "article", "paper", "position-paper", "whitepaper", "report", "book", "monograph",
-    "thesis", "slides", "handout", "poster", "letter", "grant", "protocol",
-    "clinical-trial-protocol", "rct", "systematic-review", "narrative-review",
-    "technical-documentation", "developer-documentation", "manual",
-} | set(TARGETS)
+TARGETS = targets_from_registry()
+_REGISTRY = load_registry()
+SUPPORTED_DOCUMENT_TYPES = set(_REGISTRY["document_types"]) | set(_REGISTRY["aliases"])
 VALID_THEMES = {p.stem for p in (ROOT / "themes").glob("*.tex")}
 VALID_PALETTES = {p.stem for p in (ROOT / "palettes").glob("*.tex") if p.parent.name == "palettes"}
 VALID_FONTS = {p.stem for p in (ROOT / "typography").glob("*.tex")}
@@ -129,15 +113,10 @@ def palette_exists(name: str) -> bool:
 
 
 def canonical_main_ok() -> bool:
-    return read(ROOT / "main.tex").strip() == """\\documentclass{insr}
-
-\\begin{document}
-
-\\INSRMakeTitle
-\\INSRRenderDocument
-
-\\end{document}"""
-
+    text = re.sub(r"%.*", "", read(ROOT / "main.tex"))
+    pattern = r"\\documentclass(?:\[[^]]*\])?\{insr\}|\\begin\{document\}|\\INSRMakeTitle|\\INSRRenderDocument|\\end\{document\}"
+    tokens = re.findall(pattern, text)
+    return tokens == ["\\documentclass{insr}", "\\begin{document}", "\\INSRMakeTitle", "\\INSRRenderDocument", "\\end{document}"]
 
 def check_entry(path: Path) -> list[str]:
     problems: list[str] = []
@@ -206,20 +185,19 @@ def collect_problems() -> list[str]:
                 problems.append(f"missing documented {group} entrypoint: {item}")
             else:
                 problems.extend(f"{item}: {p}" for p in check_entry(path))
-    manifest = ROOT / "content/manifest.tex"
-    if manifest.is_file():
-        manifest_text = read(manifest)
-        for match in re.finditer(r"\\input\{([^}]+)\}", manifest_text):
-            target = ROOT / match.group(1)
-            if target.suffix == "":
-                target = target.with_suffix(".tex")
-            if not target.is_file():
-                problems.append(f"manifest references missing file: {rel(target)}")
-            elif not read(target).strip():
-                problems.append(f"manifest references empty file: {rel(target)}")
-    for doc_type in SUPPORTED_DOCUMENT_TYPES:
-        if not (ROOT / f"profiles/documents/{doc_type}.profile.tex").is_file():
-            problems.append(f"missing profile: {doc_type}")
+    for source in sorted({info.get("source", "insr-position-paper") for info in TARGETS.values()}):
+        directory = ROOT / "content" / source
+        manifest = directory / "manifest.tex"
+        if not directory.is_dir():
+            problems.append(f"missing registered content source: {source}")
+        elif not manifest.is_file():
+            problems.append(f"missing source manifest: {rel(manifest)}")
+        elif not read(manifest).strip():
+            problems.append(f"empty source manifest: {rel(manifest)}")
+    required_profiles = sorted({info.get("profile", name) for name, info in TARGETS.items()} | {doc.get("profile", name) for name, doc in _REGISTRY["document_types"].items()})
+    for profile in required_profiles:
+        if not (ROOT / f"profiles/documents/{profile}.profile.tex").is_file():
+            problems.append(f"missing profile: {profile}")
     for adapter in ["article", "paper", "report", "book", "slides", "poster", "letter", "manual", "thesis"]:
         if not (ROOT / f"framework/adapters/{adapter}.tex").is_file():
             problems.append(f"missing adapter: {adapter}")
@@ -273,9 +251,12 @@ def check_target(args: argparse.Namespace) -> int:
         problems.append(f"missing profile: {info['profile']}")
     if not (ROOT / f"content/{info['source']}").is_dir():
         problems.append(f"missing content source: {info['source']}")
-    config_pkg = read(ROOT / "tex/latex/insr/insr-config.sty")
-    if f"{{ {target} }}" not in config_pkg and f"{{{target}}}" not in config_pkg:
-        problems.append("target not mapped in insr-config.sty")
+    mapped_type = info.get("type", target)
+    mapped_target = info.get("target", "paper")
+    if mapped_type not in _REGISTRY["document_types"]:
+        problems.append(f"document type not registered: {mapped_type}")
+    if mapped_target not in _REGISTRY["output_targets"]:
+        problems.append(f"output target not registered: {mapped_target}")
     if problems:
         print(f"target {target}: invalid")
         for problem in problems:
@@ -288,16 +269,14 @@ def check_target(args: argparse.Namespace) -> int:
 def check_source(args: argparse.Namespace) -> int:
     source = args.source
     directory = ROOT / "content" / source
-    manifest = ROOT / "content/manifest.tex"
+    manifest = directory / "manifest.tex"
     problems: list[str] = []
     if not directory.is_dir():
         problems.append(f"missing content source: {source}")
-    if not manifest.is_file():
-        problems.append("missing content/manifest.tex")
-    else:
-        text = read(manifest)
-        if f"content/{source}/" not in text:
-            problems.append(f"manifest does not reference content/{source}/")
+    elif not manifest.is_file():
+        problems.append(f"missing source manifest: {rel(manifest)}")
+    elif not read(manifest).strip():
+        problems.append(f"empty source manifest: {rel(manifest)}")
     if problems:
         print(f"source {source}: invalid")
         for problem in problems:
@@ -326,7 +305,7 @@ def report(_: argparse.Namespace) -> int:
     out = ROOT / "build/overleaf-report.md"
     out.parent.mkdir(exist_ok=True)
     lines = [
-        "# INSR Overleaf Report", "", "- Recommended main document: `main.tex`", "- Compiler: LuaLaTeX", f"- Current document type: `{key('document/type')}`", f"- Theme: `{key('design/theme')}`", f"- Palette: `{key('design/palette')}`", f"- Typography: `{key('design/font')}`", "", "## Official entrypoints", "",
+        "# INSR Overleaf Report", "", "- Recommended main document: `main.tex`", "- Compiler: LuaLaTeX", f"- Current document type: `{key('document/type')}`", f"- Current output target: `{key('output/target')}`", f"- Theme: `{key('design/theme')}`", f"- Palette: `{key('design/palette')}`", f"- Typography: `{key('design/font')}`", "", "## Official entrypoints", "",
     ]
     for group, files in ENTRYPOINTS.items():
         lines.append(f"### {group}")
@@ -334,7 +313,7 @@ def report(_: argparse.Namespace) -> int:
         lines.append("")
     lines.append("## Detected problems")
     lines.extend(f"- {p}" for p in problems) if problems else lines.append("- none")
-    lines.extend(["", "## Recommended Overleaf steps", "", "1. Set Main document to `main.tex`.", "2. Set compiler to LuaLaTeX.", "3. Change output type only in `config/project-config.tex`."])
+    lines.extend(["", "## Recommended Overleaf steps", "", "1. Set Main document to `main.tex`.", "2. Set compiler to LuaLaTeX.", "3. Change document type/output only in `config/active-target.tex`; keep broader defaults in `config/project-config.tex`."])
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(rel(out))
     return 0

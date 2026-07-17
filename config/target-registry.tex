@@ -1,0 +1,67 @@
+% Authoritative INSR document/output registry.
+% Python tooling parses these public registration commands; keep values simple key/value pairs.
+\INSRRegisterDocumentType{position-paper}{profile=position-paper, source=insr-position-paper, template=position-paper}
+\INSRRegisterDocumentType{paper}{profile=paper, source=insr-position-paper, template=paper}
+\INSRRegisterDocumentType{journal-article}{profile=journal-paper, source=insr-position-paper, template=journal-paper}
+\INSRRegisterDocumentType{rct-protocol}{profile=rct-protocol, source=rct-protocol, template=rct-protocol}
+\INSRRegisterDocumentType{clinical-protocol}{profile=clinical-protocol, source=clinical-protocol, template=clinical-protocol}
+\INSRRegisterDocumentType{clinical-manual}{profile=clinical-manual, source=insr-position-paper, template=clinical-manual}
+\INSRRegisterDocumentType{technical-report}{profile=technical-report, source=insr-position-paper, template=technical-report}
+\INSRRegisterDocumentType{systematic-review}{profile=systematic-review, source=insr-position-paper, template=systematic-review}
+\INSRRegisterDocumentType{narrative-review}{profile=narrative-review, source=insr-position-paper, template=narrative-review}
+\INSRRegisterDocumentType{grant-proposal}{profile=grant, source=insr-position-paper, template=grant-proposal}
+\INSRRegisterDocumentType{article}{profile=article, source=insr-position-paper, template=article}
+\INSRRegisterDocumentType{report}{profile=report, source=insr-position-paper, template=report}
+\INSRRegisterDocumentType{book}{profile=book, source=insr-position-paper, template=book}
+\INSRRegisterDocumentType{monograph}{profile=monograph, source=insr-position-paper, template=monograph}
+\INSRRegisterDocumentType{thesis}{profile=thesis, source=insr-position-paper, template=thesis}
+\INSRRegisterDocumentType{letter}{profile=letter, source=insr-position-paper, template=letter}
+\INSRRegisterDocumentType{technical-documentation}{profile=technical-documentation, source=insr-position-paper, template=technical-documentation}
+\INSRRegisterDocumentType{developer-documentation}{profile=developer-documentation, source=insr-position-paper, template=developer-documentation}
+\INSRRegisterDocumentType{protocol}{profile=protocol, source=insr-position-paper, template=protocol}
+\INSRRegisterDocumentType{manual}{profile=manual, source=insr-position-paper, template=manual}
+
+\INSRRegisterDocumentAlias{rct}{rct-protocol}
+\INSRRegisterDocumentAlias{clinical-trial-protocol}{clinical-protocol}
+\INSRRegisterDocumentAlias{journal-paper}{journal-article}
+\INSRRegisterDocumentAlias{grant}{grant-proposal}
+\INSRRegisterDocumentAlias{whitepaper}{paper}
+\INSRRegisterDocumentAlias{slides}{position-paper}
+\INSRRegisterDocumentAlias{handout}{position-paper}
+\INSRRegisterDocumentAlias{poster}{position-paper}
+
+\INSRRegisterOutputTarget{paper}{base=scrartcl, adapter=paper}
+\INSRRegisterOutputTarget{article}{base=scrartcl, adapter=article}
+\INSRRegisterOutputTarget{report}{base=scrreprt, adapter=report}
+\INSRRegisterOutputTarget{slides}{base=beamer, adapter=slides}
+\INSRRegisterOutputTarget{handout}{base=beamer, adapter=slides, class-options=handout}
+\INSRRegisterOutputTarget{poster}{base=beamer, adapter=poster}
+\INSRRegisterOutputTarget{executive-brief}{base=scrartcl, adapter=paper}
+\INSRRegisterOutputTarget{submission-package}{base=scrartcl, adapter=paper}
+\INSRRegisterOutputTarget{web}{base=scrartcl, adapter=paper}
+\INSRRegisterOutputTarget{book}{base=scrbook, adapter=book}
+\INSRRegisterOutputTarget{thesis}{base=scrbook, adapter=thesis}
+\INSRRegisterOutputTarget{manual}{base=scrreprt, adapter=manual}
+\INSRRegisterOutputTarget{letter}{base=scrlttr2, adapter=letter}
+
+\INSRRegisterCombination{position-paper}{type=position-paper, target=paper}
+\INSRRegisterCombination{position-paper-slides}{type=position-paper, target=slides}
+\INSRRegisterCombination{position-paper-handout}{type=position-paper, target=handout}
+\INSRRegisterCombination{position-paper-poster}{type=position-paper, target=poster}
+\INSRRegisterCombination{paper}{type=paper, target=paper}
+\INSRRegisterCombination{journal-paper}{type=journal-article, target=paper}
+\INSRRegisterCombination{slides}{type=position-paper, target=slides}
+\INSRRegisterCombination{handout}{type=position-paper, target=handout}
+\INSRRegisterCombination{poster}{type=position-paper, target=poster}
+\INSRRegisterCombination{rct-protocol}{type=rct-protocol, target=paper}
+\INSRRegisterCombination{rct-protocol-slides}{type=rct-protocol, target=slides}
+\INSRRegisterCombination{rct-protocol-handout}{type=rct-protocol, target=handout}
+\INSRRegisterCombination{clinical-protocol}{type=clinical-protocol, target=paper}
+\INSRRegisterCombination{clinical-protocol-slides}{type=clinical-protocol, target=slides}
+\INSRRegisterCombination{clinical-protocol-handout}{type=clinical-protocol, target=handout}
+\INSRRegisterCombination{clinical-manual}{type=clinical-manual, target=manual}
+\INSRRegisterCombination{technical-report}{type=technical-report, target=report}
+\INSRRegisterCombination{executive-brief}{type=position-paper, target=executive-brief}
+\INSRRegisterCombination{submission-package}{type=position-paper, target=submission-package}
+\INSRRegisterCombination{book}{type=book, target=book}
+\INSRRegisterCombination{thesis}{type=thesis, target=thesis}

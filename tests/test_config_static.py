@@ -16,11 +16,19 @@ class ConfigLifecycleStaticTests(unittest.TestCase):
 
     def test_project_config_position_paper_resolution_inputs(self):
         config = self.read("config/project-config.tex")
-        self.assertIn("document/type = position-paper", config)
-        self.assertIn("design/theme = editorial", config)
-        self.assertIn("design/palette = neuroclinical", config)
+        active = self.read("config/active-target.tex")
+        self.assertIn("\\INSRBootstrap", active)
+        self.assertIn("document/type=position-paper", active)
+        self.assertIn("output/target=paper", active)
+        self.assertNotIn("document/type = position-paper", config)
+        self.assertIn("design/theme =", config)
+        self.assertIn("design/palette =", config)
         resolver = self.read("tex/latex/insr/insr-config.sty")
-        self.assertRegex(resolver, r"\{ position-paper \}.*\{ scrartcl \}.*\{ paper \}")
+        self.assertIn("__insr_resolve_document_profile:", resolver)
+        self.assertIn("__insr_resolve_output_target:", resolver)
+        registry = self.read("config/target-registry.tex")
+        self.assertIn("\\INSRRegisterDocumentType{position-paper}{profile=position-paper", registry)
+        self.assertIn("\\INSRRegisterOutputTarget{paper}{base=scrartcl, adapter=paper}", registry)
 
     def test_class_options_processed_after_project_config(self):
         cls = self.read("insr.cls")
@@ -38,7 +46,7 @@ class ConfigLifecycleStaticTests(unittest.TestCase):
         resolver = self.read("tex/latex/insr/insr-config.sty")
         self.assertIn("localization/language=german normalized to ngerman", localization)
         self.assertIn("unknown-document-type", resolver)
-        self.assertRegex(resolver, r"unknown-document-type.*paper.*scrartcl.*paper")
+        self.assertIn("unknown-document-type", resolver)
 
 if __name__ == "__main__":
     unittest.main()

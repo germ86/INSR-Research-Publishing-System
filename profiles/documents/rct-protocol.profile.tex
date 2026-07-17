@@ -1,0 +1,7 @@
+% INSR v4 document profile: rct-protocol
+\ExplSyntaxOn
+\tl_gset:Nn \g_insr_template_tl { rct-protocol }
+\tl_if_blank:VTF \g_insr_publication_type_tl
+  { \tl_gset:Nn \g_insr_publication_type_tl { RCT protocol } }
+  { }
+\ExplSyntaxOff
