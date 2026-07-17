@@ -15,12 +15,11 @@ class TargetDimensionStaticTests(unittest.TestCase):
 
     def test_resolver_no_longer_copies_output_target_to_document_type(self):
         config = self.read("tex/latex/insr/insr-config.sty")
-        registry = self.read("config/target-registry.tex")
-        self.assertNotIn(r"tl_gset_eq:NN \g_insr_document_type_tl \g_insr_output_target_tl", config)
+        self.assertNotIn("tl_gset_eq:NN \\g_insr_document_type_tl \\g_insr_output_target_tl", config)
         self.assertIn("__insr_resolve_document_profile", config)
         self.assertIn("__insr_resolve_output_target", config)
-        self.assertIn("\\INSRRegisterDocumentType{rct-protocol}", registry)
-        self.assertIn("\\INSRRegisterOutputTarget{slides}{base=beamer, adapter=slides}", registry)
+        self.assertRegex(config, r"\{ rct-protocol \}.*\{ rct-protocol \}")
+        self.assertRegex(config, r"\{ slides \}.*\{ beamer \}.*\{ slides \}")
 
     def test_auto_content_source_and_protocol_profiles_exist(self):
         config = self.read("config/project-config.tex")
