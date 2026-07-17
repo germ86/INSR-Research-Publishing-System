@@ -32,18 +32,22 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("\\documentclass{insr}", main)
         self.assertIn("\\INSRMakeTitle", main)
         self.assertIn("\\INSRRenderDocument", main)
+        self.assertNotIn("\\INSRBootstrap", main)
         self.assertNotIn("document/target", main)
+        self.assertNotIn("output/target", main)
+        self.assertNotIn("build/preset", main)
 
-    def test_active_build_uses_backward_compatible_slide_keys(self):
+    def test_active_build_uses_one_pre_class_selector(self):
         active = self.read("config/active-target.tex")
         project = self.read("config/project-config.tex")
-        self.assertIn("document/type = position-paper", active)
-        self.assertIn("output/target = slides", active)
+        self.assertIn("document/target = position-paper", active)
+        self.assertNotIn("document/type", active)
+        self.assertNotIn("output/target", active)
         self.assertNotIn("build/preset", active)
-        self.assertIn("document/type=position-paper", project)
-        self.assertIn("output/target=paper", project)
+        self.assertIn("document/target=position-paper", project)
+        self.assertNotIn("document/type=position-paper", project)
+        self.assertNotIn("output/target=paper", project)
         self.assertNotIn("build/preset", project)
-        self.assertNotIn("document/target=position-paper", project)
 
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
