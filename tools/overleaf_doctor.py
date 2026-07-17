@@ -12,9 +12,6 @@ ROOT = Path(__file__).resolve().parents[1]
 _REGISTRY = load_registry()
 TARGETS = targets_from_registry()
 SUPPORTED_DOCUMENT_TYPES = set(_REGISTRY["document_types"]) | set(_REGISTRY["aliases"])
-VALID_THEMES = {p.stem for p in (ROOT / "themes").glob("*.tex")}
-VALID_PALETTES = {p.stem for p in (ROOT / "palettes").glob("*.tex")}
-VALID_FONTS = {p.stem for p in (ROOT / "typography").glob("*.tex")}
 
 ENTRYPOINTS = {
     "root": ["main.tex"],
@@ -27,25 +24,46 @@ ENTRYPOINTS = {
         "examples/multi-institution-consortium-paper.tex",
         "examples/publication-minimal/main.tex",
         "examples/publication-journal-article/main.tex",
+        "examples/publication-position-paper/main.tex",
+        "examples/publication-blind-review/main.tex",
+        "examples/publication-zenodo-preprint/main.tex",
+        "examples/publication-multi-author/main.tex",
+        "examples/publication-funded-research/main.tex",
+        "examples/reference-publication/paper.tex",
     ],
     "slides": [
-        "examples/slides-demo.tex",
+        "examples/minimal-slides/main.tex",
+        "examples/beamer-demo.tex",
+        "examples/german-scientific-presentation.tex",
+        "examples/hebrew-rtl-slides.tex",
         "examples/reference-publication/slides.tex",
-    ],
-    "handout": [
-        "examples/handout-demo.tex",
         "examples/reference-publication/handout.tex",
     ],
+    "manual": [
+        "examples/clinical-manual/main.tex",
+        "examples/manual-demo.tex",
+        "doc/latex/insr/insr-latex-manual.tex",
+    ],
+    "protocol": [
+        "examples/clinical-protocol/main.tex",
+        "examples/rct-protocol/main.tex",
+        "examples/clinical-trial-protocol.tex",
+    ],
+    "review": ["examples/systematic-review/main.tex"],
     "poster": [
-        "examples/poster-demo.tex",
+        "examples/conference-poster/main.tex",
         "examples/reference-publication/poster.tex",
     ],
-}
-
-GENERATED_SUFFIXES = {
-    ".aux", ".bcf", ".bbl", ".blg", ".fdb_latexmk", ".fls", ".log", ".out",
-    ".run.xml", ".synctex.gz", ".toc", ".nav", ".snm", ".vrb", ".glo", ".gls",
-    ".glg", ".acn", ".acr", ".alg",
+    "documentation": [
+        "examples/technical-documentation/main.tex",
+        "examples/theme-gallery/main.tex",
+        "examples/custom-theme/main.tex",
+        "examples/custom-palette/main.tex",
+        "examples/custom-theme-palette.tex",
+        "examples/mixed-german-arabic-report.tex",
+        "examples/grant-proposal/main.tex",
+        "examples/thesis/main.tex",
+    ],
 }
 
 
@@ -62,13 +80,13 @@ def read(path: Path) -> str:
 
 def flattened_entrypoints() -> list[str]:
     seen: set[str] = set()
-    out: list[str] = []
+    result: list[str] = []
     for files in ENTRYPOINTS.values():
         for item in files:
             if item not in seen:
-                out.append(item)
+                result.append(item)
                 seen.add(item)
-    return out
+    return result
 
 
 def parse_class_options(text: str) -> tuple[str, list[str]]:
@@ -95,8 +113,8 @@ def canonical_main_ok() -> bool:
     ]
 
 
-def _bootstrap_values() -> dict[str, str]:
-    active = ROOT / "config" / "active-target.tex"
+def bootstrap_values() -> dict[str, str]:
+    active = ROOT / "config/active-target.tex"
     if not active.is_file():
         return {}
     match = re.search(r"\\INSRBootstrap\s*\{(.*?)\}", read(active), re.S)
@@ -104,13 +122,13 @@ def _bootstrap_values() -> dict[str, str]:
         return {}
     values: dict[str, str] = {}
     for part in match.group(1).split(","):
-        key, sep, value = part.partition("=")
-        if sep:
+        key, separator, value = part.partition("=")
+        if separator:
             values[key.strip()] = value.strip()
     return values
 
 
-def _config_value(name: str) -> str:
+def config_value(name: str) -> str:
     for relative in (
         "config/project-config.tex",
         "config/metadata-config.tex",
@@ -127,23 +145,20 @@ def _config_value(name: str) -> str:
 
 
 def check_entry(path: Path) -> list[str]:
-    problems: list[str] = []
     if not path.is_file():
         return [f"missing entrypoint: {rel(path)}"]
-    text = read(path)
-    docclass, _ = parse_class_options(text)
-    if not docclass:
-        problems.append(f"entrypoint has no document class: {rel(path)}")
-    return problems
+    document_class, _ = parse_class_options(read(path))
+    if not document_class:
+        return [f"entrypoint has no document class: {rel(path)}"]
+    return []
 
 
 def collect_problems() -> list[str]:
-    problems: list[str] = []
-    problems.extend(validate_registry())
+    problems: list[str] = list(validate_registry())
     if not canonical_main_ok():
         problems.append("main.tex is not the canonical minimal INSR root document")
 
-    active = _bootstrap_values()
+    active = bootstrap_values()
     if "document/type" not in active:
         problems.append("config/active-target.tex must set document/type")
     if "output/target" not in active:
@@ -160,13 +175,12 @@ def collect_problems() -> list[str]:
 
     for name, info in _REGISTRY["document_types"].items():
         profile = ROOT / f"profiles/documents/{info['profile']}.profile.tex"
+        manifest = ROOT / "content" / info["source"] / "manifest.tex"
         if not profile.is_file():
             problems.append(f"missing profile for {name}: {rel(profile)}")
-        source = ROOT / "content" / info["source"]
-        manifest = source / "manifest.tex"
-        if not source.is_dir():
-            problems.append(f"missing content source for {name}: {rel(source)}")
-        elif not manifest.is_file():
+        elif not read(profile).strip():
+            problems.append(f"empty profile for {name}: {rel(profile)}")
+        if not manifest.is_file():
             problems.append(f"missing source manifest for {name}: {rel(manifest)}")
         elif not read(manifest).strip():
             problems.append(f"empty source manifest for {name}: {rel(manifest)}")
@@ -177,8 +191,7 @@ def collect_problems() -> list[str]:
             problems.append(f"missing adapter for {name}: {rel(adapter)}")
 
     for manifest in (ROOT / "content").glob("*/manifest.tex"):
-        manifest_text = read(manifest)
-        for match in re.finditer(r"\\input\{([^}]+)\}", manifest_text):
+        for match in re.finditer(r"\\input\{([^}]+)\}", read(manifest)):
             target = ROOT / match.group(1)
             if target.suffix == "":
                 target = target.with_suffix(".tex")
@@ -187,9 +200,11 @@ def collect_problems() -> list[str]:
             elif not read(target).strip():
                 problems.append(f"manifest references empty file: {rel(target)}")
 
-    forbidden_package_paths = re.compile(r"\\(?:RequirePackage|usepackage)\s*(?:\[[^]]*\])?\{tex/latex/insr/")
+    full_path_request = re.compile(
+        r"\\(?:RequirePackage|usepackage)\s*(?:\[[^]]*\])?\{(?:\./)?tex/latex/insr/"
+    )
     for path in [ROOT / "insr.cls", *sorted((ROOT / "tex/latex/insr").glob("*.sty"))]:
-        if path.is_file() and forbidden_package_paths.search(read(path)):
+        if path.is_file() and full_path_request.search(read(path)):
             problems.append(f"full-path package request causes package-name warnings: {rel(path)}")
 
     publication = ROOT / "config/publication-config.tex"
@@ -230,22 +245,21 @@ def check_target(args: argparse.Namespace) -> int:
 
 
 def check_source(args: argparse.Namespace) -> int:
-    source = args.source
-    directory = ROOT / "content" / source
+    directory = ROOT / "content" / args.source
     manifest = directory / "manifest.tex"
     problems: list[str] = []
     if not directory.is_dir():
-        problems.append(f"missing content source: {source}")
+        problems.append(f"missing content source: {args.source}")
     elif not manifest.is_file():
         problems.append(f"missing source manifest: {rel(manifest)}")
     elif not read(manifest).strip():
         problems.append(f"empty source manifest: {rel(manifest)}")
     if problems:
-        print(f"source {source}: invalid")
+        print(f"source {args.source}: invalid")
         for problem in problems:
             print(f"- {problem}")
         return 1
-    print(f"source {source}: valid")
+    print(f"source {args.source}: valid")
     return 0
 
 
@@ -268,29 +282,28 @@ def check_entrypoint(args: argparse.Namespace) -> int:
         for problem in problems:
             print(problem)
         return 1
-    text = read(path)
-    docclass, opts = parse_class_options(text)
+    document_class, options = parse_class_options(read(path))
     print(f"file: {rel(path)}")
-    print(f"class: {docclass}")
-    print(f"options: {', '.join(opts) if opts else '(none)'}")
+    print(f"class: {document_class}")
+    print(f"options: {', '.join(options) if options else '(none)'}")
     return 0
 
 
 def report(_: argparse.Namespace) -> int:
     out = ROOT / "build/overleaf-report.md"
     out.parent.mkdir(exist_ok=True)
-    bootstrap = _bootstrap_values()
+    active = bootstrap_values()
     problems = collect_problems()
     lines = [
         "# INSR Overleaf Report",
         "",
         "- Recommended main document: `main.tex`",
         "- Compiler: LuaLaTeX",
-        f"- Current document type: `{bootstrap.get('document/type', '')}`",
-        f"- Current output target: `{bootstrap.get('output/target', '')}`",
-        f"- Theme: `{_config_value('design/theme')}`",
-        f"- Palette: `{_config_value('design/palette')}`",
-        f"- Typography: `{_config_value('design/font')}`",
+        f"- Current document type: `{active.get('document/type', '')}`",
+        f"- Current output target: `{active.get('output/target', '')}`",
+        f"- Theme: `{config_value('design/theme')}`",
+        f"- Palette: `{config_value('design/palette')}`",
+        f"- Typography: `{config_value('design/font')}`",
         "",
         "## Registered combinations",
         "",
