@@ -243,7 +243,7 @@
         % valid but left a stale paper or submission target in place. When the
         % registered combination resolves to a different semantic type, treat
         % the value as a one-switch preset and resolve both dimensions.
-        \tl_if_eq:VVF \g_insr_document_type_tl \l_tmpa_tl
+        \tl_if_eq:NNF \g_insr_document_type_tl \l_tmpa_tl
           {
             \prop_get:NVNTF \g__insr_combination_target_prop \g_insr_document_type_tl \l_tmpb_tl
               {
