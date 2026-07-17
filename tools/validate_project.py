@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 required = [
-    '.github/workflows/latex.yml', 'insr.cls', 'main.tex', 'config/project-config.tex',
+    '.github/workflows/latex.yml', 'insr.cls', 'main.tex', 'config/project-config.tex', 'config/target-registry.tex',
     'config/metadata-config.tex', 'config/publication-config.tex', 'config/layout-config.tex', 'config/authors-config.tex', 'references.bib', 'content/manifest.tex', 'themes/manifest.tex', 'plugins/README.md',
     'i18n/english.tex', 'docs/CONFIGURATION_REFERENCE.md', 'docs/THEME_DEVELOPER_GUIDE.md',
     'docs/PALETTE_DEVELOPER_GUIDE.md', 'docs/TEMPLATE_DEVELOPER_GUIDE.md',
@@ -26,9 +26,15 @@ if '\\begin{frame}' in main or '\\documentclass{insr-manual}' in main:
     raise SystemExit('main.tex must not contain class-incompatible Beamer/manual merge artefacts')
 
 config = Path('config/project-config.tex').read_text(encoding='utf-8')
-for token in ['\\INSRConfigure', 'document/type', 'design/theme', 'design/palette', 'design/font']:
+active_target = Path('config/active-target.tex').read_text(encoding='utf-8')
+for token in ['\\INSRConfigure', 'document/build-profile', 'design/theme', 'design/palette', 'design/font']:
     if token not in config:
         raise SystemExit(f'Missing configuration token: {token}')
+for token in ['\\INSRBootstrap', 'document/type', 'output/target']:
+    if token not in active_target:
+        raise SystemExit(f'Missing active target bootstrap token: {token}')
+if 'content/source = auto' not in config:
+    raise SystemExit('project config must use content/source = auto for document-type presets')
 
 cls = Path('insr.cls').read_text(encoding='utf-8')
 required_packages = ['insr-core','insr-config','insr-metadata','insr-content','insr-adapters','insr-bibliography','insr-localization','insr-typography','insr-colors','insr-layout','insr-page-style','insr-boxes','insr-accessibility','insr-neuro','insr-utils']
@@ -56,6 +62,29 @@ for implementation_token in ['NewDocumentEnvironment { INSRContentUnit }', 'Requ
 
 if 'config/load-project=false' not in cls or cls.find('config/load-project=false') > cls.find('config/project-config.tex'):
     raise SystemExit('insr.cls must detect config/load-project=false before reading project config')
+
+
+if '\\def\\input@path{{tex/latex/insr/}{./tex/latex/insr/}}' not in cls:
+    raise SystemExit('insr.cls must centrally register the local INSR package search path')
+for token in ['INSR v4 class path:', 'INSR v4 class version:', 'INSR v4 package path:', 'INSR v4 local package path:']:
+    if token not in cls:
+        raise SystemExit(f'Missing class/package resolution diagnostic: {token}')
+for path in Path('.').rglob('*'):
+    if '.git' in path.parts or not path.is_file():
+        continue
+    try:
+        text = path.read_text(encoding='utf-8')
+    except UnicodeDecodeError:
+        continue
+    stale_patterns = [
+        '\\RequirePackage{' + 'tex/latex/insr/',
+        '\\usepackage{' + 'tex/latex/insr/',
+        'RequirePackage{' + 'tex/latex/insr/',
+        'usepackage{' + 'tex/latex/insr/',
+    ]
+    for stale in stale_patterns:
+        if stale in text:
+            raise SystemExit(f'Stale full-path package request in {path}: {stale}')
 
 package_text = '\n'.join(Path(f'tex/latex/insr/{package}.sty').read_text(encoding='utf-8') for package in required_packages)
 if '\\__insr_load_adapter:' not in package_text or 'INSR #2:' not in package_text:
@@ -90,10 +119,17 @@ for legacy_token in ['INSRContentUnit', 'INSRAltFigure', 'INSRLoadPlugin']:
         raise SystemExit(f'Missing legacy compatibility/public token in modular packages: {legacy_token}')
 
 config_pkg = Path('tex/latex/insr/insr-config.sty').read_text(encoding='utf-8')
+registry_text = Path('config/target-registry.tex').read_text(encoding='utf-8')
+for token in ['\\INSRRegisterDocumentType', '\\INSRRegisterOutputTarget', '\\INSRRegisterCombination']:
+    if token not in registry_text:
+        raise SystemExit(f'Missing registry token: {token}')
+for token in ['\\INSRRegisterDocumentType', '\\INSRRegisterOutputTarget', '\\INSRRegisterCombination', 'config/target-registry.tex']:
+    if token not in config_pkg:
+        raise SystemExit(f'insr-config.sty must load/use registry token: {token}')
 required_types = ['article','paper','position-paper','whitepaper','report','book','monograph','thesis','slides','handout','poster','letter','grant','protocol','clinical-trial-protocol','rct','systematic-review','narrative-review','technical-documentation','developer-documentation','manual']
 for doc_type in required_types:
-    if f'{{ {doc_type} }}' not in config_pkg and f'{{{doc_type}}}' not in config_pkg:
-        raise SystemExit(f'Document type is not resolved in insr-config.sty: {doc_type}')
+    if f'{{{doc_type}}}' not in registry_text and f'{{ {doc_type} }}' not in registry_text:
+        raise SystemExit(f'Document type is not registered in config/target-registry.tex: {doc_type}')
     profile = Path(f'profiles/documents/{doc_type}.profile.tex')
     if not profile.is_file():
         raise SystemExit(f'Missing document profile: {profile}')
@@ -107,7 +143,7 @@ for adapter in ['article','paper','report','book','slides','poster','letter','ma
         if command not in text:
             raise SystemExit(f'Missing adapter command {command} in {path}')
 
-early_api_pos = Path('tex/latex/insr/insr-core.sty').read_text(encoding='utf-8').find('\\DeclareRobustCommand{\\INSRMakeTitle}')
+early_api_pos = (Path('tex/latex/insr') / 'insr-core.sty').read_text(encoding='utf-8').find('\\DeclareRobustCommand{\\INSRMakeTitle}')
 if early_api_pos < 0:
     raise SystemExit('INSRMakeTitle must be exported by insr-core.sty')
 for command in ['INSRMakeTitle','INSRRenderDocument','INSRShowResolvedConfiguration','ResearchQuestion','KeyFinding','SafetyStatement']:
@@ -187,7 +223,7 @@ for path in Path('.').rglob('*'):
             raise SystemExit(f'Merge conflict marker left in {path}')
 
 readme = Path('README.md').read_text(encoding='utf-8')
-for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type', 'Package architecture', 'Deprecated compatibility wrappers', 'config/load-project=false', 'content/insr-position-paper']:
+for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'config/target-registry.tex', 'document/type', 'Package architecture', 'Deprecated compatibility wrappers', 'config/load-project=false', 'content/insr-position-paper']:
     if token not in readme:
         raise SystemExit(f'Missing README documentation: {token}')
 for stale in ['Beamer smoke test for CI', '\\documentclass{insr-paper}', 'The repository root `main.tex` is a Beamer smoke test']:
@@ -229,5 +265,32 @@ if not page_style.is_file():
 for token in ['INSRHeaderText', 'INSRHeaderSeparator', 'INSRFooterText', 'INSRFooterSeparator', 'INSRTOCSection', 'INSRTOCLink']:
     if token not in Path('tex/latex/insr/insr-colors.sty').read_text(encoding='utf-8'):
         raise SystemExit(f'Missing semantic publication color: {token}')
+
+
+# Ensure central internal renderers called by content/adapters are defined or intentionally supplied by adapters.
+module_texts = {str(path): path.read_text(encoding='utf-8') for path in Path('tex/latex/insr').glob('insr-*.sty')}
+combined_modules = '\n'.join(module_texts.values())
+defined = set(re.findall(r'\\(?:cs_new(?:_protected)?|cs_set(?:_protected)?|cs_gset(?:_protected)?|prg_new_conditional):[^\s]*\s+(\\__[A-Za-z0-9_:]+)', combined_modules))
+called = set(re.findall(r'(\\__insr_[A-Za-z0-9_]+(?::[A-Za-z]+)?:)', combined_modules))
+allowed_imports = {'\\__insr_adapter_make_title:', '\\__insr_adapter_render_content_unit:', '\\__insr_adapter_part:', '\\__insr_adapter_chapter:', '\\__insr_adapter_section:', '\\__insr_adapter_subsection:', '\\__insr_adapter_subsubsection:', '\\__insr_adapter_bibliography:'}
+missing_internal = sorted(name for name in called if name not in defined and name not in allowed_imports and not any(d.startswith(name) for d in defined))
+if missing_internal:
+    raise SystemExit(f'Undefined internal renderer/helper calls: {missing_internal}')
+content_module = Path('tex/latex/insr/insr-content.sty').read_text(encoding='utf-8')
+for token in ['\\__insr_render_placeholder:', '\\INSRPlaceholder', 'placeholder .bool_set:N', 'required .tl_set:N', 'role .tl_set:N']:
+    if token not in content_module:
+        raise SystemExit(f'Missing central placeholder/content-unit semantic token: {token}')
+if r'\tl_if_in:VnTF \l_insr_unit_full_tl {placeholder}' in content_module:
+    raise SystemExit('Placeholder detection must not use arbitrary substring matching')
+if r'\section*{Contents}' in content_module:
+    raise SystemExit('INSRTableOfContents must not add a second manual Contents heading before native tableofcontents')
+metadata_module = Path('tex/latex/insr/insr-metadata.sty').read_text(encoding='utf-8')
+for slug in ['writing-original-draft', 'writing-review-editing', 'formal-analysis', 'data-curation', 'funding-acquisition']:
+    if slug not in metadata_module:
+        raise SystemExit(f'Missing CRediT mapping for {slug}')
+if 'publication/year' not in config_pkg or 'g_insr_publication_year_tl' not in metadata_module:
+    raise SystemExit('Automatic citation must use publication/year support')
+if r'\RequirePackage{bookmark}' not in Path('tex/latex/insr/insr-layout.sty').read_text(encoding='utf-8'):
+    raise SystemExit('bookmark must be loaded explicitly after hyperref')
 
 print('project validation passed')
