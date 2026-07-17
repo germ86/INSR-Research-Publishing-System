@@ -1,14 +1,14 @@
 % INSR Scientific Publishing Platform v4.0 project configuration.
 % Switch document type/output in config/active-target.tex; do not edit main.tex.
 \InputIfFileExists{config/active-target.tex}{}{%
-  \INSRBootstrap{document/type=position-paper, output/target=paper}%
+  \INSRBootstrap{document/type=slides, output/target=slides}%
 }
 \INSRConfigure{
   document/density = standard,
   document/build-profile = development,
-  design/theme = research,
-  design/palette = midnight,
-  design/font = noto,
+  design/theme = clinical,
+  design/palette = public-health,
+  design/font = inter,
   % Midnight is a dark palette. The mode drives contrast-safe semantic roles
   % for headings, contents, headers, footers and presentation text.
   design/mode = dark,
