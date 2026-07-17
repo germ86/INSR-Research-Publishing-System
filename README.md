@@ -56,7 +56,7 @@ Normal spaces in human-readable metadata are supported; `~` is not required for 
 
 ## Package architecture
 
-`insr.cls` is a bootstrap class only. It loads early configuration, resolves the requested base class, and delegates runtime implementation to packages under `tex/latex/insr/`:
+`insr.cls` is a bootstrap class only. It loads early configuration, resolves the requested base class, and delegates runtime implementation to packages under `tex/latex/insr/`. Canonical root-level `insr-*.sty` shims make those packages discoverable in Overleaf and ordinary source-tree builds without mutating `\input@path`; the implementation files remain authoritative under `tex/latex/insr/`.
 
 | Package | Responsibility |
 | --- | --- |
@@ -111,13 +111,16 @@ See `examples/README.md` for the example policy. To list every documented entryp
 3. Set the compiler to LuaLaTeX.
 4. Change document type/output only in `config/active-target.tex`; keep broader defaults in `config/project-config.tex`.
 5. Use Biber when bibliography output is enabled.
+6. After importing or pulling from GitHub, use **Recompile from scratch** once so stale auxiliary files cannot mask the current package graph.
+
+The root-level `insr-*.sty` compatibility shims are required in source-tree and Overleaf builds. Do not delete them and do not replace short package requests such as `\RequirePackage{insr-core}` with repository paths.
 
 Python is optional. The diagnostic helper can be run locally or in CI, but normal PDF generation must not depend on it:
 
 ```bash
 python3 tools/overleaf_doctor.py check
 python3 tools/overleaf_doctor.py list-entrypoints
-python3 tools/overleaf_doctor.py generate-overleaf-report
+python3 tools/overleaf_doctor.py report
 ```
 
 ## Local validation
@@ -127,6 +130,7 @@ python3 tools/overleaf_doctor.py check
 python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
+python3 tools/check_latex_log.py main.log
 ./tests/run-tests.sh --static-only
 ./scripts/test.sh --compile
 ```
@@ -174,10 +178,18 @@ Native distribution-style classes are available for production documents: `insr-
 
 ### Active target workflow
 
-The root `main.tex` remains stable. Select the generated output in `config/active-target.tex` with the bootstrap-only setting `\INSRBootstrap{document/target=position-paper}`. Broader project values remain in `config/project-config.tex` and no longer need to restate the target. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+The root `main.tex` remains stable. Select the semantic source and rendered format in `config/active-target.tex`:
 
-Frontmatter now suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.
+```tex
+\INSRBootstrap{
+  document/type = position-paper,
+  output/target = paper
+}
+```
 
+Changing `output/target` to `slides`, `handout` or `poster` reuses the selected semantic source through the registered adapter. Broader project values remain in `config/project-config.tex`. Target selection occurs before the base class is loaded, preserving safe KOMA/Beamer switching while retaining the modular `.sty` architecture.
+
+Frontmatter suppresses empty optional fields, resolves author affiliation IDs to publication-facing institution names, moves CRediT roles into author contributions, and can generate suggested citations from visible author metadata.
 
 ### Release readiness and golden reference
 
