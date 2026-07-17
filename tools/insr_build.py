@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from overleaf_doctor import TARGETS, ROOT, check_source, check_target
+from insr_registry import load_registry
 
 ACTIVE = ROOT / "config" / "active-target.tex"
 
@@ -53,27 +54,45 @@ def build(target: str) -> int:
     finally:
         restore_active(old)
 
-def validate() -> int:
+def validate(target: str | None = None) -> int:
     rc = 0
-    for target in TARGETS:
-        ns = argparse.Namespace(target=target)
+    names = [target] if target else list(TARGETS)
+    for name in names:
+        ns = argparse.Namespace(target=name)
         rc = check_target(ns) or rc
     rc = check_source(argparse.Namespace(source="insr-position-paper")) or rc
     return rc
+
+def list_document_types() -> None:
+    registry = load_registry()
+    for name in sorted(registry["document_types"]):
+        print(name)
+
+def list_output_targets() -> None:
+    registry = load_registry()
+    for name in sorted(registry["output_targets"]):
+        print(name)
+
+def list_combinations() -> None:
+    for name, info in TARGETS.items():
+        print(f"{name}: document/type={info['type']} output/target={info['target']} base={info['base']} adapter={info['adapter']} profile={info['profile']} source={info['source']}")
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     b = sub.add_parser("build"); b.add_argument("target")
+    v = sub.add_parser("validate"); v.add_argument("target", nargs="?")
     sub.add_parser("build-all")
     sub.add_parser("list-targets")
-    sub.add_parser("validate")
+    sub.add_parser("list-document-types")
+    sub.add_parser("list-output-targets")
+    sub.add_parser("list-combinations")
     args = parser.parse_args()
     if args.command == "list-targets":
         print("\n".join(TARGETS))
         return 0
     if args.command == "validate":
-        return validate()
+        return validate(args.target)
     if args.command == "build":
         return build(args.target)
     if args.command == "build-all":
@@ -81,6 +100,15 @@ def main() -> int:
         for target in TARGETS:
             rc = build(target) or rc
         return rc
+    if args.command == "list-document-types":
+        list_document_types()
+        return 0
+    if args.command == "list-output-targets":
+        list_output_targets()
+        return 0
+    if args.command == "list-combinations":
+        list_combinations()
+        return 0
     return 1
 
 if __name__ == "__main__":

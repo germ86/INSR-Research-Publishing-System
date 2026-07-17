@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import re
 from pathlib import Path
+from insr_registry import load_registry, targets_from_registry
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRYPOINTS = {
@@ -220,9 +221,10 @@ def collect_problems() -> list[str]:
                 problems.append(f"manifest references missing file: {rel(target)}")
             elif not read(target).strip():
                 problems.append(f"manifest references empty file: {rel(target)}")
-    for doc_type in SUPPORTED_DOCUMENT_TYPES:
-        if not (ROOT / f"profiles/documents/{doc_type}.profile.tex").is_file():
-            problems.append(f"missing profile: {doc_type}")
+    required_profiles = sorted({info.get("profile", name) for name, info in TARGETS.items()} | {doc.get("profile", name) for name, doc in _REGISTRY["document_types"].items()})
+    for profile in required_profiles:
+        if not (ROOT / f"profiles/documents/{profile}.profile.tex").is_file():
+            problems.append(f"missing profile: {profile}")
     for adapter in ["article", "paper", "report", "book", "slides", "poster", "letter", "manual", "thesis"]:
         if not (ROOT / f"framework/adapters/{adapter}.tex").is_file():
             problems.append(f"missing adapter: {adapter}")

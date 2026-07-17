@@ -8,7 +8,8 @@ The production entry architecture is intentionally small:
 
 - one public class: `insr.cls`;
 - one public root document: `main.tex`;
-- one authoritative project configuration file: `config/project-config.tex`.
+- one authoritative project configuration file: `config/project-config.tex`;
+- one checked-in document/output registry: `config/target-registry.tex`.
 
 Do **not** switch output types by editing `main.tex` or by changing to a legacy class. Select the semantic document genre and rendering format in `config/active-target.tex` with `document/type` and `output/target`; keep project-wide defaults such as theme, palette, typography and metadata in `config/project-config.tex`.
 
@@ -108,7 +109,7 @@ See `examples/README.md` for the example policy. To list every documented entryp
 1. Upload or sync the repository to Overleaf.
 2. Set the main document to `main.tex`.
 3. Set the compiler to LuaLaTeX.
-4. Change document output only in `config/project-config.tex`.
+4. Change document type/output only in `config/active-target.tex`; keep broader defaults in `config/project-config.tex`.
 5. Use Biber when bibliography output is enabled.
 
 Python is optional. The diagnostic helper can be run locally or in CI, but normal PDF generation must not depend on it:

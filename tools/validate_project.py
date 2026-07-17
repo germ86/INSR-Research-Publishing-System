@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 required = [
-    '.github/workflows/latex.yml', 'insr.cls', 'main.tex', 'config/project-config.tex',
+    '.github/workflows/latex.yml', 'insr.cls', 'main.tex', 'config/project-config.tex', 'config/target-registry.tex',
     'config/metadata-config.tex', 'config/publication-config.tex', 'config/layout-config.tex', 'config/authors-config.tex', 'references.bib', 'content/manifest.tex', 'themes/manifest.tex', 'plugins/README.md',
     'i18n/english.tex', 'docs/CONFIGURATION_REFERENCE.md', 'docs/THEME_DEVELOPER_GUIDE.md',
     'docs/PALETTE_DEVELOPER_GUIDE.md', 'docs/TEMPLATE_DEVELOPER_GUIDE.md',
@@ -117,10 +117,17 @@ for legacy_token in ['INSRContentUnit', 'INSRAltFigure', 'INSRLoadPlugin']:
         raise SystemExit(f'Missing legacy compatibility/public token in modular packages: {legacy_token}')
 
 config_pkg = Path('tex/latex/insr/insr-config.sty').read_text(encoding='utf-8')
+registry_text = Path('config/target-registry.tex').read_text(encoding='utf-8')
+for token in ['\\INSRRegisterDocumentType', '\\INSRRegisterOutputTarget', '\\INSRRegisterCombination']:
+    if token not in registry_text:
+        raise SystemExit(f'Missing registry token: {token}')
+for token in ['\\INSRRegisterDocumentType', '\\INSRRegisterOutputTarget', '\\INSRRegisterCombination', 'config/target-registry.tex']:
+    if token not in config_pkg:
+        raise SystemExit(f'insr-config.sty must load/use registry token: {token}')
 required_types = ['article','paper','position-paper','whitepaper','report','book','monograph','thesis','slides','handout','poster','letter','grant','protocol','clinical-trial-protocol','rct','systematic-review','narrative-review','technical-documentation','developer-documentation','manual']
 for doc_type in required_types:
-    if f'{{ {doc_type} }}' not in config_pkg and f'{{{doc_type}}}' not in config_pkg:
-        raise SystemExit(f'Document type is not resolved in insr-config.sty: {doc_type}')
+    if f'{{{doc_type}}}' not in registry_text and f'{{ {doc_type} }}' not in registry_text:
+        raise SystemExit(f'Document type is not registered in config/target-registry.tex: {doc_type}')
     profile = Path(f'profiles/documents/{doc_type}.profile.tex')
     if not profile.is_file():
         raise SystemExit(f'Missing document profile: {profile}')
@@ -214,7 +221,7 @@ for path in Path('.').rglob('*'):
             raise SystemExit(f'Merge conflict marker left in {path}')
 
 readme = Path('README.md').read_text(encoding='utf-8')
-for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'document/type', 'Package architecture', 'Deprecated compatibility wrappers', 'config/load-project=false', 'content/insr-position-paper']:
+for token in ['INSR v4.0 public entry model', 'config/project-config.tex', 'config/target-registry.tex', 'document/type', 'Package architecture', 'Deprecated compatibility wrappers', 'config/load-project=false', 'content/insr-position-paper']:
     if token not in readme:
         raise SystemExit(f'Missing README documentation: {token}')
 for stale in ['Beamer smoke test for CI', '\\documentclass{insr-paper}', 'The repository root `main.tex` is a Beamer smoke test']:

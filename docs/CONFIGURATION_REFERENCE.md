@@ -1,10 +1,12 @@
 # INSR v4.0 Configuration Reference
 
-Select output only in `config/project-config.tex` with `\INSRConfigure{...}`. `main.tex` must remain the stable public entry document.
+Select the semantic document type and rendering output in `config/active-target.tex` with `\INSRBootstrap{document/type=..., output/target=...}`. Keep broader project defaults in `config/project-config.tex` with `\INSRConfigure{...}`. `main.tex` must remain the stable public entry document.
 
 Core keys:
 
 - `document/type`: article, paper, position-paper, whitepaper, report, book, monograph, thesis, slides, handout, poster, letter, grant, protocol, clinical-trial-protocol, rct, systematic-review, narrative-review, technical-documentation, developer-documentation, manual.
+- `output/target`: paper, slides, handout, poster, executive-brief, submission-package, web, book, thesis, manual, report, article, letter.
+- `document/target`: deprecated compatibility alias for legacy one-dimensional target names; new projects should use `document/type` plus `output/target`.
 - `document/density`: compact, standard, spacious.
 - `document/build-profile`: development, review, release.
 - `design/theme`: insr-default, clinical, research, editorial, technical, minimal, dark, protocol, consortium, conference, documentation, accessible, or a custom theme file.
