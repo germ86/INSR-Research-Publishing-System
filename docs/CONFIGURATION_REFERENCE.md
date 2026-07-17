@@ -13,13 +13,24 @@ Core keys:
 - `design/palette`: any file in `palettes/` or `palettes/custom/`.
 - `design/font`: libertinus, stix-two, ibm-plex, inter, source-serif-sans, noto, latin-modern.
 - `typography/microtype`: false by default in the supported build matrix; set to true only when the installed microtype/kernel combination is known not to emit `\showhyphens` patch diagnostics.
-- `design/mode`: light, dark, print.
-- `accessibility/high-contrast`: true or false.
+- `design/mode`: light, dark, print. This is operational rather than decorative: it selects contrast-safe semantic colours for headings, the table of contents, headers, footers and presentation text. Match dark palettes such as `midnight` with `design/mode = dark`.
+- `accessibility/high-contrast`: true or false. The high-contrast palette override is applied before rendered semantic colour aliases are resolved.
 - `localization/language`: english, ngerman, arabic, hebrew.
 - `localization/direction`: ltr or rtl.
 - `bibliography/resource`: BibLaTeX resource path.
 
-Unknown document types, themes, palettes and fonts warn and fall back safely.
+Unknown document types, themes, palettes, modes and fonts warn and fall back safely.
+
+## Semantic colour roles
+
+Palette files define base roles such as `INSRPrimary`, `INSRBackground`, `INSRText`, `INSRTextMuted`, `INSRAccent` and `INSRLink`. The runtime derives rendered roles from them:
+
+- `INSRHeading` for normal document headings;
+- `INSRHeaderText` and `INSRFooterText` for running page furniture;
+- `INSRTOCHeading`, `INSRTOCSection`, `INSRTOCSubsection`, `INSRTOCNumber`, `INSRTOCPageNumber` and `INSRTOCLink` for contents rendering;
+- Beamer normal text and background colours for slide, handout and poster targets.
+
+In dark mode, text-bearing roles use `INSRText` or `INSRTextMuted`, not the potentially dark identity colour `INSRPrimary`. This separation prevents a valid dark brand colour from becoming unreadable on a dark page.
 
 ## Normal spaces in metadata
 
@@ -54,22 +65,30 @@ Publication-specific project values are split across `config/metadata-config.tex
 
 ## Active target, frontmatter, and placeholders
 
-The canonical Overleaf entrypoint remains `main.tex`. Select the output in `config/active-target.tex` with `\INSRBootstrap{document/target=position-paper}`. Keep target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+The canonical Overleaf entrypoint remains `main.tex`. Select the semantic source and rendering target in `config/active-target.tex`:
 
-Implemented targets are validated by `tools/overleaf_doctor.py check-target <target>` and share the single source tree under `content/insr-position-paper`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
+```tex
+\INSRBootstrap{
+  document/type = position-paper,
+  output/target = paper
+}
+```
+
+Keep target selection in that bootstrap file; place other user overrides in `config/project-config.tex`. Target resolution happens before `\LoadClass`, so Beamer and KOMA outputs are selected safely.
+
+Implemented combinations are validated by `tools/overleaf_doctor.py check-target <registered-combination>`. Current public keys include `content/source`, `content/placeholders`, `layout/page-numbering`, `frontmatter/toc`, `frontmatter/abstract-numbered`, `frontmatter/keywords`, `publication/citation-mode`, and `publication/suggested-citation`.
 
 Automatic citation mode derives the suggested citation from the registered visible authors, title/subtitle, publication date, and publisher. Manual mode uses `publication/suggested-citation` exactly as configured. Pending DOI values are displayed as pending metadata, not fabricated DOI URLs.
-
 
 ## Release metadata keys
 
 `publication/year` is an optional explicit year override used by metadata exports and automatic citation formatting. Prefer it when `publication/date` is localized or otherwise not safely machine-readable.
 
-## Placeholder, role, and citation semantics
+## Placeholder, role, TOC, and citation semantics
 
 Content units support semantic keys `role`, `numbered`, `toc`, `required`, and `placeholder`. The default is `required=true`; production builds or `content/placeholders=error` raise a precise content-unit error for required empty/placeholder units, while optional units (`required=false`) may be omitted. Use `\INSRPlaceholder` or `placeholder=true` for controlled placeholders; legacy placeholder prose is accepted temporarily with a migration warning.
 
-`\INSRTableOfContents` is the single public global TOC API. Paper-like targets use the class-native `\tableofcontents` heading with one stable bookmark destination; Beamer targets render one Agenda frame. Repeated global calls are ignored and diagnosed in development builds.
+`\INSRTableOfContents` is the single public global TOC API. Paper-like targets use the localized class-native `\contentsname`, a stable bookmark destination, a dedicated TOC page style and explicit semantic contents colours. Beamer targets render one localized contents frame. Repeated global calls are ignored and diagnosed in development builds.
 
 Automatic suggested citations are assembled from semantic author, year, title, subtitle, version, and publisher components. `publication/year` is used for the year; full publication dates remain title-page metadata. Pending DOI values are displayed as pending metadata rather than linked identifiers.
 
