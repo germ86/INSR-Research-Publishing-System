@@ -1,7 +1,7 @@
 % INSR Scientific Publishing Platform v4.0 project configuration.
-% Switch document type/output in config/active-target.tex; do not edit main.tex.
+% Switch the complete build in config/active-target.tex; do not edit main.tex.
 \InputIfFileExists{config/active-target.tex}{}{%
-  \INSRBootstrap{document/type=position-paper, output/target=paper}%
+  \INSRBootstrap{build/preset=position-paper}%
 }
 \INSRConfigure{
   document/density = standard,
