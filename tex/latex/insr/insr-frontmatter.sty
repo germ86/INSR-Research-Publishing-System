@@ -21,7 +21,7 @@
 \cs_new_protected:Npn \__insr_frontmatter_author_contributions:
   {
     \tl_if_blank:VTF \g_insr_author_contributions_tl
-      { \seq_if_empty:NF \g_insr_author_credit_seq { \__insr_frontmatter_optional:nn {Author~contributions} {\insr_credit_block:} } }
+      { \insr_credit_has_valid:T { \__insr_frontmatter_optional:nn {Author~contributions} {\insr_credit_block:} } }
       { \__insr_frontmatter_optional:nn {Author~contributions} {\tl_use:N \g_insr_author_contributions_tl} }
   }
 \cs_new_protected:Npn \__insr_metadata_panel:

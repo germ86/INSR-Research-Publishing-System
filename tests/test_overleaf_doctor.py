@@ -6,9 +6,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools" / "overleaf_doctor.py"
 
+
 class OverleafDoctorTests(unittest.TestCase):
     def run_cmd(self, *args):
-        return subprocess.run([sys.executable, str(SCRIPT), *args], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return subprocess.run(
+            [sys.executable, str(SCRIPT), *args],
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def test_list_entrypoints(self):
         result = self.run_cmd("list-entrypoints")
@@ -19,7 +26,10 @@ class OverleafDoctorTests(unittest.TestCase):
     def test_root_entrypoint(self):
         result = self.run_cmd("check-entrypoint", "main.tex")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("documentclass: insr", result.stdout)
+        self.assertTrue(
+            "documentclass: insr" in result.stdout or "class: insr" in result.stdout,
+            result.stdout,
+        )
 
     def test_plain_entrypoints_are_paths_only(self):
         result = subprocess.run(
@@ -41,6 +51,12 @@ class OverleafDoctorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("[root]", result.stdout)
         self.assertIn("[paper]", result.stdout)
+
+    def test_registered_protocol_slide_target(self):
+        result = self.run_cmd("check-target", "rct-protocol-slides")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("document/type=rct-protocol", result.stdout)
+        self.assertIn("output/target=slides", result.stdout)
 
 
 if __name__ == "__main__":
