@@ -18,8 +18,8 @@
   }
 \cs_new_protected:Npn \__insr_typography_set_hebrew_font:
   {
-    \IfFontExistsTF { FreeSerif }
-      { \newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif} }
+    \IfFontExistsTF { Noto~Sans~Hebrew }
+      { \newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{Noto~Sans~Hebrew} }
       {
         \IfFontExistsTF { Noto~Serif~Hebrew }
           { \newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{Noto~Serif~Hebrew} }

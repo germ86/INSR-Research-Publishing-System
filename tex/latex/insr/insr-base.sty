@@ -32,7 +32,7 @@
 \setdefaultlanguage{english}
 \setotherlanguages{german,arabic,hebrew,french,spanish}
 \IfFontExistsTF{Amiri}{\newfontfamily\arabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\IfFontExistsTF{Noto Naskh Arabic}{\newfontfamily\arabicfont[Script=Arabic,Scale=1.05]{Noto Naskh Arabic}}{\newfontfamily\arabicfont{TeX Gyre Pagella}}}
-\IfFontExistsTF{FreeSerif}{\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\IfFontExistsTF{Noto Serif Hebrew}{\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{Noto Serif Hebrew}}{\newfontfamily\hebrewfont{TeX Gyre Pagella}}}
+\IfFontExistsTF{Noto Sans Hebrew}{\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{Noto Sans Hebrew}}{\IfFontExistsTF{Noto Serif Hebrew}{\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{Noto Serif Hebrew}}{\newfontfamily\hebrewfont{TeX Gyre Pagella}}}
 \ifinsr@rtl\setdefaultlanguage{arabic}\fi
 
 \RequirePackage{xcolor}
