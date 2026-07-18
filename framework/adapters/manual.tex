@@ -1,10 +1,5 @@
+\input{framework/adapters/common-document.tex}
 \ExplSyntaxOn
 \cs_set_protected:Npn \__insr_adapter_make_title: { \__insr_frontmatter_render_manual: }
-\cs_set_protected:Npn \__insr_adapter_part:n #1 { \part{#1} }
 \cs_set_protected:Npn \__insr_adapter_chapter:n #1 { \chapter{#1} }
-\cs_set_protected:Npn \__insr_adapter_section:n #1 { \section{#1} }
-\cs_set_protected:Npn \__insr_adapter_subsection:n #1 { \subsection{#1} }
-\cs_set_protected:Npn \__insr_adapter_subsubsection:n #1 { \subsubsection{#1} }
-\cs_set_protected:Npn \__insr_adapter_render_content_unit: { \__insr_render_content_unit_block: }
-\cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \__insr_print_bibliography:n {#1} }
 \ExplSyntaxOff
