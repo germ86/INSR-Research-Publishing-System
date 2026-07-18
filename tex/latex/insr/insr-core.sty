@@ -100,6 +100,39 @@
 \cs_generate_variant:Nn \clist_if_in:nnTF { VV }
 \cs_generate_variant:Nn \prop_get:NnNTF { NVNTF }
 \cs_generate_variant:Nn \prop_if_in:NnTF { NVTF }
+
+\seq_new:N \g__insr_plugin_loaded_seq
+\prop_new:N \g__insr_plugin_registry_prop
+\prop_new:N \g__insr_theme_registry_prop
+\prop_new:N \g__insr_fontset_registry_prop
+\msg_new:nnn { insr } { plugin-duplicate } { Plugin~'#1'~is~already~loaded;~skipping. }
+\msg_new:nnn { insr } { plugin-unknown } { Plugin~'#1'~is~not~registered~or~available. }
+\cs_new_protected:Npn \insr_plugin_register:nn #1#2 { \prop_gput:Nnn \g__insr_plugin_registry_prop {#1} {#2} }
+\cs_new_protected:Npn \insr_plugin_load:n #1
+  {
+    \seq_if_in:NnTF \g__insr_plugin_loaded_seq {#1}
+      { \msg_warning:nnn { insr } { plugin-duplicate } {#1} }
+      {
+        \prop_if_in:NnTF \g__insr_plugin_registry_prop {#1}
+          { \seq_gput_right:Nn \g__insr_plugin_loaded_seq {#1} }
+          {
+            \file_if_exist:nTF { plugins/#1.tex }
+              { \file_input:n { plugins/#1.tex } \seq_gput_right:Nn \g__insr_plugin_loaded_seq {#1} }
+              { \msg_warning:nnn { insr } { plugin-unknown } {#1} }
+          }
+      }
+  }
+\prg_new_conditional:Npnn \insr_plugin_if_loaded:n #1 { T, F, TF }
+  { \seq_if_in:NnTF \g__insr_plugin_loaded_seq {#1} { \prg_return_true: } { \prg_return_false: } }
+\cs_new_protected:Npn \insr_theme_register:nn #1#2 { \prop_gput:Nnn \g__insr_theme_registry_prop {#1} {#2} }
+\cs_new_protected:Npn \insr_theme_activate:n #1
+  { \prop_if_in:NnTF \g__insr_theme_registry_prop {#1} { \tl_gset:Nn \g_insr_theme_tl {#1} } { \msg_warning:nnn { insr } { unknown-theme } {#1} } }
+\prg_new_conditional:Npnn \insr_theme_if_exist:n #1 { T, F, TF }
+  { \prop_if_in:NnTF \g__insr_theme_registry_prop {#1} { \prg_return_true: } { \prg_return_false: } }
+\cs_new_protected:Npn \insr_fontset_register:nn #1#2 { \prop_gput:Nnn \g__insr_fontset_registry_prop {#1} {#2} }
+\NewDocumentCommand \INSRUsePlugin { m } { \insr_plugin_load:n {#1} }
+\NewDocumentCommand \INSRUseTheme { m } { \insr_theme_activate:n {#1} }
+
 \DeclareRobustCommand{\INSRMakeTitle}{\ifcsname __insr_adapter_make_title:\endcsname\csname __insr_adapter_make_title:\endcsname\else\ClassError{insr}{Mandatory adapter title renderer missing}{The selected adapter did not define \string\__insr_adapter_make_title:.}\fi}
 \DeclareRobustCommand{\INSRRenderDocument}{\ifcsname __insr_template_render:\endcsname\csname __insr_template_render:\endcsname\else\ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}\par\noindent INSR template renderer unavailable.\par\fi}
 \DeclareRobustCommand{\INSRSelectTarget}[1]{\msg_warning:nnn { insr } { deprecated-command } { \string\INSRSelectTarget } \__insr_set_legacy_target:n {#1}}
