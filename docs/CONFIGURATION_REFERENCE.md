@@ -106,6 +106,8 @@ Content units support semantic keys `role`, `numbered`, `toc`, `required`, and `
 
 `\INSRTableOfContents` is the single public global TOC API. Paper-like targets use the localized class-native `\contentsname`, a stable bookmark destination, a dedicated TOC page style and explicit semantic contents colours. Beamer targets render one localized contents frame. Repeated global calls are ignored and diagnosed in development builds.
 
+Content files must call the public `\INSRPrintBibliography` adapter macro instead of raw `\printbibliography`. The adapter preserves paper-like bibliography output and lets Beamer targets render the bibliography in the target-specific References frame.
+
 Automatic suggested citations are assembled from semantic author, year, title, subtitle, version, and publisher components. `publication/year` is used for the year; full publication dates remain title-page metadata. Pending DOI values are displayed as pending metadata rather than linked identifiers.
 
 CRediT role lists are parsed as comma lists and mapped to publication-facing labels, including Writing -- Original Draft, Writing -- Review and Editing, Formal Analysis, Data Curation, Funding Acquisition, and Resources. Unknown role slugs warn in development and are not printed as raw technical identifiers.

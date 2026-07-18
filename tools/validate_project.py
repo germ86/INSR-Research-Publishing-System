@@ -195,6 +195,31 @@ for name, info in registry["output_targets"].items():
     if "__insr_adapter_make_title" not in adapter_text and "input{framework/adapters/" not in adapter_text:
         fail(f"Adapter does not provide or delegate title rendering: {adapter.relative_to(ROOT)}")
 
+content_raw_bibliographies = []
+for search_root in (ROOT / "content", ROOT / "examples"):
+    for content_root in search_root.rglob("*.tex"):
+        if "content" not in content_root.parts:
+            continue
+        if "\\printbibliography" in content_root.read_text(encoding="utf-8"):
+            content_raw_bibliographies.append(str(content_root.relative_to(ROOT)))
+if content_raw_bibliographies:
+    fail(r"Content files must use \INSRPrintBibliography, not raw \printbibliography: " + ", ".join(content_raw_bibliographies))
+
+adapters_pkg = read("tex/latex/insr/insr-adapters.sty")
+if "\\NewDocumentCommand \\INSRPrintBibliography { O{} } { \\__insr_adapter_bibliography:n {#1} }" not in adapters_pkg:
+    fail(r"\INSRPrintBibliography must route through the public adapter bibliography path")
+for adapter_name in ("paper", "slides", "poster", "book", "report", "thesis", "manual"):
+    adapter = ROOT / f"framework/adapters/{adapter_name}.tex"
+    adapter_text = adapter.read_text(encoding="utf-8")
+    if adapter_name == "poster":
+        if "input{framework/adapters/slides.tex}" not in adapter_text:
+            fail("Poster adapter must delegate bibliography handling to the slides adapter")
+    elif "__insr_adapter_bibliography:n" not in adapter_text or "__insr_print_bibliography:n" not in adapter_text:
+        fail(f"Adapter must provide bibliography rendering: {adapter.relative_to(ROOT)}")
+slides_adapter = read("framework/adapters/slides.tex")
+if "\\begin{frame}[allowframebreaks]{References}" not in slides_adapter or "\\__insr_print_bibliography:n {#1}" not in slides_adapter or "\\end{frame}" not in slides_adapter:
+    fail("Slides bibliography adapter must render a clean allowframebreaks References frame")
+
 for name, info in targets.items():
     if info["type"] not in registry["document_types"]:
         fail(f"Combination {name} has unknown document type")
