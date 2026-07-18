@@ -208,14 +208,20 @@ if content_raw_bibliographies:
 adapters_pkg = read("tex/latex/insr/insr-adapters.sty")
 if "\\NewDocumentCommand \\INSRPrintBibliography { O{} } { \\__insr_adapter_bibliography:n {#1} }" not in adapters_pkg:
     fail(r"\INSRPrintBibliography must route through the public adapter bibliography path")
-for adapter_name in ("paper", "slides", "poster", "book", "report", "thesis", "manual"):
+common_adapter = read("framework/adapters/common-document.tex")
+for token in ("__insr_adapter_part:n", "__insr_adapter_section:n", "__insr_adapter_subsection:n", "__insr_adapter_subsubsection:n", "__insr_adapter_render_content_unit:", "__insr_adapter_bibliography:n", "__insr_print_bibliography:n"):
+    if token not in common_adapter:
+        fail(f"Common document adapter must provide {token}")
+for adapter_name in ("paper", "article", "book", "report", "thesis", "manual"):
     adapter = ROOT / f"framework/adapters/{adapter_name}.tex"
     adapter_text = adapter.read_text(encoding="utf-8")
-    if adapter_name == "poster":
-        if "input{framework/adapters/slides.tex}" not in adapter_text:
-            fail("Poster adapter must delegate bibliography handling to the slides adapter")
-    elif "__insr_adapter_bibliography:n" not in adapter_text or "__insr_print_bibliography:n" not in adapter_text:
-        fail(f"Adapter must provide bibliography rendering: {adapter.relative_to(ROOT)}")
+    if "input{framework/adapters/common-document.tex}" not in adapter_text:
+        fail(f"Adapter must load common document adapter defaults: {adapter.relative_to(ROOT)}")
+    if "__insr_adapter_bibliography:n" in adapter_text or "__insr_adapter_render_content_unit:" in adapter_text:
+        fail(f"Adapter must not duplicate common bibliography/content rendering: {adapter.relative_to(ROOT)}")
+poster_adapter = read("framework/adapters/poster.tex")
+if "__insr_adapter_bibliography:n" not in poster_adapter or "Poster~References" not in poster_adapter or "__insr_adapter_render_content_unit:" not in poster_adapter:
+    fail("Poster adapter must provide poster-specific bibliography and content frames")
 slides_adapter = read("framework/adapters/slides.tex")
 if "\\begin{frame}[allowframebreaks]{References}" not in slides_adapter or "\\__insr_print_bibliography:n {#1}" not in slides_adapter or "\\end{frame}" not in slides_adapter:
     fail("Slides bibliography adapter must render a clean allowframebreaks References frame")
