@@ -1,13 +1,13 @@
 % INSR typography preset: libertinus
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{TeX Gyre Pagella}}
-\IfFontExistsTF{Libertinus Sans}{\setsansfont{Libertinus Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}}
+\IfFontExistsTF{Libertinus Sans}{\setsansfont{Libertinus Sans}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
 \IfFontExistsTF{Libertinus Mono}{\setmonofont[BoldFont={},ItalicFont={},BoldItalicFont={}]{Libertinus Mono}}{\setmonofont{Latin Modern Mono}}
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { arabic } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}} }
+  { \IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\IfFontExistsTF{Noto Naskh Arabic}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Noto Naskh Arabic}}{\IfFontExistsTF{FreeSerif}{\newfontfamily\insrarabicfont{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrarabicfont{TeX Gyre Pagella}}{\newfontfamily\insrarabicfont{Latin Modern Roman}}}}} }
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { hebrew } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}} }
+  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}} }

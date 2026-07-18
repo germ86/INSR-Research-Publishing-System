@@ -21,7 +21,7 @@
 \tl_gset:Nn \g_insr_date_tl { \today }
 \tl_gset:Nn \g_insr_author_tl { INSR Research Consortium }
 \tl_gset:Nn \g_insr_institution_tl { Independent translational research program }
-\tl_gset:Nn \g_insr_bibresource_tl { references.bib }
+\tl_gset:Nn \g_insr_bibresource_tl { }
 \tl_gset:Nn \g_insr_keywords_tl { INSR, scientific publishing, LuaLaTeX }
 \tl_gset:Nn \g_insr_publication_type_tl { preprint }
 \tl_gset:Nn \g_insr_publication_status_tl { draft }
@@ -85,9 +85,10 @@
     document/target .code:n = { \__insr_set_legacy_target:n {#1} },
     document/density .tl_gset:N = \g_insr_density_tl,
     document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
-    design/theme .tl_gset:N = \g_insr_theme_tl,
+    design/theme .code:n = { \insr_theme_activate:n {#1} },
     design/palette .tl_gset:N = \g_insr_palette_tl,
-    design/font .tl_gset:N = \g_insr_font_tl,
+    design/font .code:n = { \insr_fontset_activate:n {#1} },
+    typography/fontset .code:n = { \insr_fontset_activate:n {#1} },
     typography/microtype .tl_gset:N = \g_insr_typography_microtype_tl,
     design/mode .tl_gset:N = \g_insr_mode_tl,
     accessibility/high-contrast .bool_gset:N = \g_insr_high_contrast_bool,
@@ -99,7 +100,7 @@
     metadata/date .tl_gset:N = \g_insr_date_tl,
     metadata/author .tl_gset:N = \g_insr_author_tl,
     metadata/institution .tl_gset:N = \g_insr_institution_tl,
-    bibliography/resource .tl_gset:N = \g_insr_bibresource_tl,
+    bibliography/resource .code:n = { \tl_gset:Nn \g_insr_bibresource_tl {#1} },
     metadata/keywords .tl_gset:N = \g_insr_keywords_tl,
     publication/type .tl_gset:N = \g_insr_publication_type_tl,
     publication/status .tl_gset:N = \g_insr_publication_status_tl,
@@ -209,6 +210,9 @@
     \prop_gput:NnV \g__insr_combination_type_prop {#1} \l__insr_register_type_tl
     \prop_gput:NnV \g__insr_combination_target_prop {#1} \l__insr_register_target_tl
   }
+\InputIfFileExists{config/theme-registry.tex}{}{}
+\InputIfFileExists{config/plugin-registry.tex}{}{}
+\InputIfFileExists{config/fontset-registry.tex}{}{}
 \InputIfFileExists{config/target-registry.tex}{}{\msg_error:nnn { insr } { missing-slot } { config/target-registry.tex }}
 \msg_new:nnn { insr } { unknown-build-preset } { Unknown~build/preset~'#1'.~Keeping~the~previous~document/output~selection. }
 \cs_new_protected:Npn \__insr_set_build_preset:n #1

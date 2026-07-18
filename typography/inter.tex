@@ -1,7 +1,7 @@
 % INSR typography preset: inter
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{TeX Gyre Pagella}}
-\IfFontExistsTF{Inter}{\setsansfont{Inter}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}
+\IfFontExistsTF{Inter}{\setsansfont{Inter}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
 \IfFontExistsTF{Inconsolata}{\setmonofont{Inconsolata}}{\setmonofont{Latin Modern Mono}}
-\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}}
-\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}
+\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\IfFontExistsTF{Noto Naskh Arabic}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Noto Naskh Arabic}}{\IfFontExistsTF{FreeSerif}{\newfontfamily\insrarabicfont{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrarabicfont{TeX Gyre Pagella}}{\newfontfamily\insrarabicfont{Latin Modern Roman}}}}}
+\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}}

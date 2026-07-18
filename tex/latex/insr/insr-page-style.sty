@@ -3,7 +3,13 @@
 \ExplSyntaxOn
 % User keys: header-separator, footer-separator, logo, git-revision.
 \str_if_eq:VnF \g_insr_base_class_tl { beamer }
-  { \RequirePackage[automark]{scrlayer-scrpage} \RequirePackage{lastpage} }
+  { \RequirePackage[automark]{scrlayer-scrpage} }
+\cs_new:Npn \__insr_total_pages:
+  {
+    \cs_if_exist:cTF { r@LastPage }
+      { \pageref{LastPage} }
+      { \thepage }
+  }
 \tl_new:N \l__insr_page_style_placeholder_tl
 \cs_new:Npn \__insr_page_style_logo:
   { \tl_if_blank:VTF \g_insr_layout_logo_tl { } { \includegraphics[height=1.8ex]{\tl_use:N \g_insr_layout_logo_tl} } }
@@ -23,7 +29,7 @@
         {institution}{\insr_institution_block:}
         {logo}{\__insr_page_style_logo:}
         {page-number}{\thepage}
-        {total-pages}{\pageref{LastPage}}
+        {total-pages}{\__insr_total_pages:}
         {version}{v\tl_use:N\g_insr_publication_version_tl}
         {doi}{\INSRDOILabel}
         {copyright}{\tl_use:N\g_insr_publication_copyright_tl}
