@@ -49,6 +49,12 @@ When TeX Live is installed, run:
 
 The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0. If a PDF exists but the build status is failed because references or Biber are unresolved, follow the Overleaf troubleshooting section in [`docs/OVERLEAF_GUIDE.md`](OVERLEAF_GUIDE.md#troubleshooting-pdf-was-generated-but-the-build-failed).
 
+### GitHub bibliography and font failures
+
+A log can show `Output written on main.pdf` and still fail when `latexmk` exits nonzero because BibLaTeX has not converged. Treat `Package biblatex Warning: Please (re)run Biber on the file: main` together with `LaTeX Warning: There were undefined references` as a toolchain/convergence failure: Biber must run and LuaLaTeX must rerun until references settle. The repository `latexmkrc` enables this with `$bibtex_use = 2`, the explicit `biber %O %B` command and enough repeat passes. Root smoke builds without a configured `bibliography/resource` do not load the BibLaTeX backend, so they should not emit a Biber rerun warning merely because the framework bibliography package is present.
+
+Multilingual examples also require usable Arabic/Hebrew fonts. The INSR typography layer falls back from Amiri/Noto language fonts to TeX Gyre/Latin Modern so missing optional fonts do not abort smoke builds before the actual document can be validated.
+
 Static-only mode does not require TeX Live and is suitable for lightweight containers. The default `./tests/run-tests.sh` remains developer-friendly and skips compilation when the toolchain is unavailable; CI and `./scripts/test.sh --compile` use strict mode and fail when required TeX tools are missing.
 
 ## Publication stabilization checks
