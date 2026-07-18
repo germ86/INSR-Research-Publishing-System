@@ -17,7 +17,7 @@ python3 tools/insr_metadata.py export-all --outdir build/metadata
 python3 tools/insr_release.py prepare --version v1.0.0-alpha.1
 ```
 
-A PDF file is not considered successful unless `latexmk` exits with code 0. Expected negative tests, such as production placeholder failures, must be asserted explicitly.
+A PDF file is not considered successful unless `latexmk` exits with code 0. An already-written or visibly updated PDF does not count as a successful release build when `latexmk` returns a nonzero exit code because Biber, bibliography, citation, cross-reference, rerun, or other reference-resolution work remains open. Expected negative tests, such as production placeholder failures, must be asserted explicitly.
 
 ## Metadata exports
 

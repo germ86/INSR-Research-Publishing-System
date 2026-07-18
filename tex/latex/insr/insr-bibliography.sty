@@ -1,13 +1,25 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insr-bibliography}[2026/07/15 INSR bibliography]
 \RequirePackage{csquotes}
+% BibLaTeX is intentionally loaded globally even when bibliography/resource is
+% empty: public citation commands such as \cite must exist before adapters know
+% whether a target will print a bibliography or register a resource later.
 \RequirePackage[backend=biber,style=apa,sortcites=true]{biblatex}
 \ExplSyntaxOn
+\bool_new:N \g__insr_bibliography_backend_loaded_bool
 \prg_new_conditional:Npnn \__insr_bibliography_resource_configured: { T, F, TF }
   {
     \tl_if_blank:VTF \g_insr_bibresource_tl
       { \prg_return_false: }
       { \prg_return_true: }
+  }
+\cs_new_protected:Npn \__insr_bibliography_load_backend:
+  {
+    \bool_if:NF \g__insr_bibliography_backend_loaded_bool
+      {
+        \RequirePackage[backend=biber,style=apa,sortcites=true]{biblatex}
+        \bool_gset_true:N \g__insr_bibliography_backend_loaded_bool
+      }
   }
 \seq_new:N \g__insr_registered_bibresources_seq
 \cs_generate_variant:Nn \seq_if_in:NnF { NV }
@@ -16,6 +28,7 @@
   {
     \__insr_bibliography_resource_configured:T
       {
+        \__insr_bibliography_load_backend:
         \seq_if_in:NVF \g__insr_registered_bibresources_seq \g_insr_bibresource_tl
           {
             \seq_gput_right:NV \g__insr_registered_bibresources_seq \g_insr_bibresource_tl
@@ -26,7 +39,11 @@
 \cs_new_protected:Npn \__insr_print_bibliography:n #1
   {
     \__insr_bibliography_resource_configured:T
-      { \printbibliography[#1] }
+      {
+        \__insr_bibliography_load_backend:
+        \printbibliography[#1]
+      }
   }
+\__insr_setup_bibliography:
 \ExplSyntaxOff
 \endinput
