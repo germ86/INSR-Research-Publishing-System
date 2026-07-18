@@ -103,6 +103,13 @@ jobs:
             fonts-noto-core \
             fonts-noto-cjk
 
+      - name: Verify required TeX packages
+        shell: bash
+        run: |
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+          kpsewhich unicode-math.sty >/dev/null
+
       - name: Run required compile suite
         shell: bash
         run: bash scripts/test.sh --compile
