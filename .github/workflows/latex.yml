@@ -8,8 +8,8 @@ permissions:
   contents: read
 
 env:
-  TEXINPUTS: .:./examples//:
-  BIBINPUTS: .//:
+  TEXINPUTS: ".:./examples//:"
+  BIBINPUTS: ".//:"
 
 jobs:
   static-validation:
@@ -34,14 +34,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: main.tex
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build root smoke document
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
       - name: Reject INSR warning regressions
         run: python3 tools/check_latex_log.py main.log
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-diagnostics-root-smoke
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
 
   paper-examples:
     name: Paper examples (${{ matrix.document }})
@@ -67,12 +95,40 @@ jobs:
           - tests/fixtures/rct-combination-as-output-target.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
 
   slides-examples:
     name: Slides examples (${{ matrix.document }})
@@ -90,12 +146,40 @@ jobs:
           - tests/fixtures/document-type-slides-overrides-submission.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
 
   manual-examples:
     name: Manual examples (${{ matrix.document }})
@@ -109,12 +193,40 @@ jobs:
           - doc/latex/insr/insr-latex-manual.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
 
   focused-example-matrix:
     name: Focused examples (${{ matrix.document }})
@@ -139,9 +251,37 @@ jobs:
           - examples/thesis/main.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
