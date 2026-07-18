@@ -27,7 +27,7 @@ jobs:
           python3 tools/insr_metadata.py validate
           python3 tools/insr_metadata.py export-all --outdir build/metadata
           python3 tools/insr_release.py prepare --version ci-alpha
-          ./tests/run-tests.sh --static-only
+          bash tests/run-tests.sh --static-only
 
   root-smoke:
     name: Root smoke document
