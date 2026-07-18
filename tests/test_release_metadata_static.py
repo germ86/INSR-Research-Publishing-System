@@ -1,5 +1,6 @@
 import json
 import subprocess
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -47,6 +48,7 @@ class ReleaseMetadataStaticTests(unittest.TestCase):
             self.assertRegex(str(codemeta["datePublished"]), r"^\d{4}-\d{2}-\d{2}$")
 
     def test_release_prepare_creates_complete_runtime_manifest(self):
+        shutil.rmtree(ROOT / "dist" / "insr-test-alpha", ignore_errors=True)
         proc = subprocess.run(
             ["python3", "tools/insr_release.py", "prepare", "--version", "test-alpha"],
             cwd=ROOT,
@@ -78,6 +80,7 @@ class ReleaseMetadataStaticTests(unittest.TestCase):
         ):
             self.assertIn(required, paths)
             self.assertTrue((bundle / required).is_file(), required)
+        shutil.rmtree(bundle, ignore_errors=True)
 
 
 if __name__ == "__main__":
