@@ -16,10 +16,14 @@ python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` is the required pull-request and `main` validation workflow. It runs two ordered gates:
+`.github/workflows/ci.yml` is the required pull-request and `main` validation workflow and the authoritative PDF-compile workflow. The former standalone `.github/workflows/latex.yml` workflow has been removed so there is only one CI definition for LuaLaTeX/PDF validation.
+
+It runs these ordered gates and PDF coverage jobs:
 
 1. **Static validation** checks shell syntax and executes the complete Python/static suite without requiring TeX Live.
-2. **LuaLaTeX build matrix** installs the documented toolchain and runs the compile suite with `--require-tex`, so a missing compiler, `latexmk`, or Biber fails instead of producing a false-positive green check.
+2. **LuaLaTeX build matrix** installs the documented toolchain and runs the strict compile suite, so a missing compiler, `latexmk`, or Biber fails instead of producing a false-positive green check.
+3. **Root smoke, paper, slides, manual, and focused example PDF jobs** compile their explicit matrices in the same workflow using LuaLaTeX, `latexmk`, Biber, and the documented font set.
+4. **Packaging and installed-package gates** validate the CTAN archive and isolated installed-mode behavior after static/l3build checks.
 
 Failed compile jobs upload LaTeX and Biber logs for seven days. Workflow concurrency cancels superseded runs on the same branch or pull request.
 

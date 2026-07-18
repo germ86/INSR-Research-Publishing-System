@@ -125,11 +125,11 @@ class ConfigStaticTests(unittest.TestCase):
 
     def test_texinputs_prefers_root_shims(self):
         latexmkrc = self.read("latexmkrc")
-        workflow = self.read(".github/workflows/latex.yml")
+        workflow = self.read(".github/workflows/ci.yml")
         runner = self.read("tests/run-tests.sh")
         self.assertIn("$ENV{'TEXINPUTS'} = '.:./examples//:'", latexmkrc)
         self.assertNotIn("./tex/latex/insr//", latexmkrc)
-        self.assertIn("TEXINPUTS: .:./examples//:", workflow)
+        self.assertIn('TEXINPUTS: ".:./examples//:"', workflow)
         self.assertNotIn("TEXINPUTS: .//:./tex/latex/insr//", workflow)
         self.assertIn('export TEXINPUTS=".:./examples//:', runner)
         self.assertNotIn("./tex/latex/insr//", runner)
