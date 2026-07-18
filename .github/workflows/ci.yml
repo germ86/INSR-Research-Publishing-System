@@ -1,0 +1,78 @@
+name: INSR validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: insr-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-validation:
+    name: Static validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate shell syntax
+        shell: bash
+        run: |
+          bash -n tests/run-tests.sh
+          bash -n scripts/test.sh
+
+      - name: Run static test suite
+        run: ./scripts/test.sh --static-only
+
+  lualatex-build:
+    name: LuaLaTeX build matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: static-validation
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+
+      - name: Run required compile suite
+        run: ./scripts/test.sh --compile
+
+      - name: Upload failing logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-build-logs
+          path: |
+            **/*.log
+            **/*.blg
+          if-no-files-found: ignore
+          retention-days: 7
