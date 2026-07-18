@@ -1,0 +1,11 @@
+{
+  "package": "insr",
+  "version": "0.1.0",
+  "date": "2026-07-14",
+  "schema_version": "1.0",
+  "repository": "https://github.com/germ86/INSR-Research-Publishing-System",
+  "bugtracker": "https://github.com/germ86/INSR-Research-Publishing-System/issues",
+  "ctan_path": "/macros/luatex/latex/insr",
+  "license": "lppl1.3c",
+  "upload_contact": "TODO: maintainer/uploader contact required before CTAN upload"
+}

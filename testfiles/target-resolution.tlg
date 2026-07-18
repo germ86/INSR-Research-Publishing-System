@@ -1,0 +1,6 @@
+INSR-TEST canonical-config type=position-paper target=paper title=Regression Title
+INSR-TEST legacy-target type=rct-protocol target=paper
+INSR-TEST theme medical palette=biomedical font=inter header=single
+INSR-TEST dependency-loaded accessibility
+INSR-TEST plugin-loaded neuro
+INSR-TEST fontset font=inter

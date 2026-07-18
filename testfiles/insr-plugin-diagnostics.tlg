@@ -1,0 +1,4 @@
+Package insr Error: Plugin 'needs-missing' requires missing dependency 'missing-plugin'.
+Package insr Error: Plugin dependency cycle detected while loading 'cycle-a'.
+Package insr Error: Plugin 'old-core' requires INSR core '999.0.0'; current core is '0.1.0'.
+Package insr Error: Plugin 'conflict-a' conflicts with loaded plugin 'conflict-b'.
