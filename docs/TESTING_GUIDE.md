@@ -14,9 +14,18 @@ python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
 ./tests/run-tests.sh --static-only
 ```
 
+## Continuous integration
+
+`.github/workflows/ci.yml` is the required pull-request and `main` validation workflow. It runs two ordered gates:
+
+1. **Static validation** checks shell syntax and executes the complete Python/static suite without requiring TeX Live.
+2. **LuaLaTeX build matrix** installs the documented toolchain and runs the compile suite with `--require-tex`, so a missing compiler, `latexmk`, or Biber fails instead of producing a false-positive green check.
+
+Failed compile jobs upload LaTeX and Biber logs for seven days. Workflow concurrency cancels superseded runs on the same branch or pull request.
+
 ## Local TeX toolchain
 
-For Debian/Ubuntu-based development containers, install the same LuaLaTeX-first toolchain used by the local compile runner before running full builds:
+For Debian/Ubuntu-based development containers, install the same LuaLaTeX-first toolchain used by the compile runner before running full builds:
 
 ```bash
 sudo apt-get update
@@ -29,13 +38,14 @@ When TeX Live is installed, run:
 
 ```bash
 ./tests/run-tests.sh
-# or
+# or, to require the complete toolchain explicitly
+./tests/run-tests.sh --require-tex
 ./scripts/test.sh --compile
 ```
 
 The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0.
 
-Static-only mode does not require TeX Live and is suitable for lightweight containers.
+Static-only mode does not require TeX Live and is suitable for lightweight containers. The default `./tests/run-tests.sh` remains developer-friendly and skips compilation when the toolchain is unavailable; CI and `./scripts/test.sh --compile` use strict mode and fail when required TeX tools are missing.
 
 ## Publication stabilization checks
 
@@ -51,7 +61,7 @@ python3 -m unittest
 ./tests/run-tests.sh --static-only
 ```
 
-If LuaLaTeX/latexmk are available, run `./tests/run-tests.sh` to compile all official entrypoints listed by the Overleaf doctor.
+If LuaLaTeX/latexmk are available, run `./tests/run-tests.sh --require-tex` to compile all official entrypoints listed by the Overleaf doctor.
 
 ## External-package warning policy
 
@@ -76,7 +86,6 @@ python3 tools/insr_build.py build-all
 ```
 
 The build tool writes temporary active-target configuration, restores the previous file on exit, and reports `latexmk` failures with nonzero exit codes.
-
 
 ## Golden reference and release checks
 
