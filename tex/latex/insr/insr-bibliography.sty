@@ -1,6 +1,9 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insr-bibliography}[2026/07/15 INSR bibliography]
 \RequirePackage{csquotes}
+% BibLaTeX is intentionally loaded globally even when bibliography/resource is
+% empty: public citation commands such as \cite must exist before adapters know
+% whether a target will print a bibliography or register a resource later.
 \RequirePackage[backend=biber,style=apa,sortcites=true]{biblatex}
 \ExplSyntaxOn
 \prg_new_conditional:Npnn \__insr_bibliography_resource_configured: { T, F, TF }
