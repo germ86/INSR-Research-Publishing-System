@@ -45,6 +45,29 @@ class ColorContrastStaticTests(unittest.TestCase):
             4.5,
         )
 
+
+    def test_additional_palette_pack_text_contrast_meets_wcag_aa(self):
+        for palette in (
+            "cortex-blue",
+            "autonomic-teal",
+            "somatic-sage",
+            "translational-plum",
+            "nordic-neuro",
+            "clinical-burgundy",
+            "synapse-amber",
+            "nocturne-neural",
+        ):
+            with self.subTest(palette=palette):
+                colors = parse_html_colors(ROOT / f"palettes/{palette}.tex")
+                self.assertGreaterEqual(
+                    contrast_ratio(colors["INSRText"], colors["INSRBackground"]),
+                    4.5,
+                )
+                self.assertGreaterEqual(
+                    contrast_ratio(colors["INSRTextMuted"], colors["INSRBackground"]),
+                    4.5,
+                )
+
     def test_dark_text_roles_do_not_use_dark_identity_color(self):
         colors = self.read("tex/latex/insr/insr-colors.sty")
         dark_block = colors.split("\\cs_new_protected:Npn \\__insr_apply_dark_semantic_roles:", 1)[1]

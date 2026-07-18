@@ -64,8 +64,7 @@ class PublicationLayerStaticTests(unittest.TestCase):
 
     def test_requirepackage_bootstrap_has_local_package_path(self):
         cls = self.read("insr.cls")
-        self.assertIn("\\def\\input@path", cls)
-        self.assertIn("tex/latex/insr/", cls)
+        self.assertNotIn("\\input@path", cls)
         self.assertIn("\\RequirePackage{insr-adapters}", cls)
         self.assertNotIn("\\input{tex/latex/insr/insr-adapters.sty}", cls)
 

@@ -38,6 +38,44 @@ jobs:
         shell: bash
         run: bash scripts/test.sh --static-only
 
+  l3build-regression:
+    name: l3build regression checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: static-validation
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install l3build toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            texlive-luatex \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            lmodern
+
+      - name: Run l3build check
+        shell: bash
+        run: l3build check
+
+      - name: Upload l3build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: l3build-diagnostics
+          path: |
+            build/**/*.log
+            build/**/*.diff
+            build/**/*.tlg
+            testfiles/*.log
+          if-no-files-found: ignore
+          retention-days: 7
+
   lualatex-build:
     name: LuaLaTeX build matrix
     runs-on: ubuntu-latest
@@ -56,6 +94,7 @@ jobs:
             latexmk \
             texlive-luatex \
             biber \
+            texlive-bibtex-extra \
             texlive-latex-recommended \
             texlive-latex-extra \
             texlive-fonts-recommended \
@@ -63,6 +102,13 @@ jobs:
             fonts-hosny-amiri \
             fonts-noto-core \
             fonts-noto-cjk
+
+      - name: Verify required TeX packages
+        shell: bash
+        run: |
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+          kpsewhich unicode-math.sty >/dev/null
 
       - name: Run required compile suite
         shell: bash
@@ -76,5 +122,110 @@ jobs:
           path: |
             **/*.log
             **/*.blg
+            **/*.bbl
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  ctan-smoke:
+    name: CTAN packaging smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs:
+      - static-validation
+      - l3build-regression
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install packaging toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            biber \
+            texlive-luatex \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-noto-core \
+            unzip
+
+      - name: Build CTAN archive
+        shell: bash
+        run: l3build ctan
+
+      - name: Inspect CTAN archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$(find . -maxdepth 3 -type f -name '*.zip' | sort | head -n 1)"
+          test -n "$archive"
+          unzip -l "$archive" | tee ctan-archive-listing.txt
+          ! grep -E '\.(aux|toc|log|out|fls|fdb_latexmk)( |$)' ctan-archive-listing.txt
+          grep -E '(^|/)LICENSE( |$)' ctan-archive-listing.txt
+          grep -E '(^|/)README\.md( |$)' ctan-archive-listing.txt
+          grep -E 'tex/latex/insr/insr-core\.sty' ctan-archive-listing.txt
+
+      - name: Upload CTAN archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctan-smoke-archive
+          path: |
+            *.zip
+            build/distrib/*.zip
+            ctan-archive-listing.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+  installed-package:
+    name: Isolated installed-package test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - static-validation
+      - l3build-regression
+      - ctan-smoke
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install installed-mode toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            biber \
+            texlive-luatex \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk \
+            unzip
+
+      - name: Run isolated installed-package test
+        shell: bash
+        run: bash scripts/test-installed-package.sh
+
+      - name: Upload installed-mode diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installed-package-diagnostics
+          path: |
+            /tmp/insr-installed-*.log
+            /tmp/insr-installed-l3build-ctan.log
+            build/**/*.log
+            build/**/*.diff
+            build/distrib/**/*.zip
           if-no-files-found: ignore
           retention-days: 7
