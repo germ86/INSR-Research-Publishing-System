@@ -1,12 +1,15 @@
 # Shared latexmk configuration for local, GitHub Actions and Overleaf builds.
 $pdf_mode = 4; # LuaLaTeX
 
-# Let latexmk run the bibliography processor whenever the generated .bcf file
-# requires it.  The previous value 2 only permitted bibliography processing in
-# restricted circumstances and could leave first-build biblatex warnings and an
-# unresolved LastPage reference behind even though a PDF was produced.
-$bibtex_use = 1;
+# In latexmk, value 2 permits bibliography generation on a clean build even when
+# no .bbl file exists yet.  This is required for biblatex/Biber CI builds after
+# latexmk -C.  Value 1 only processes the bibliography when a .bbl is already
+# present and therefore leaves fresh builds with a Biber rerun request.
+$bibtex_use = 2;
 $biber = 'biber %O %B';
+
+# Allow enough convergence passes for Biber, cross-references and LastPage.
+$max_repeat = 6;
 
 # Resolve INSR packages through the canonical root-level shims. Do not prepend
 # tex/latex/insr here: loading implementation paths as package names triggers
