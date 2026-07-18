@@ -43,7 +43,7 @@ When TeX Live is installed, run:
 ./scripts/test.sh --compile
 ```
 
-The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0.
+The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0. If a PDF exists but the build status is failed because references or Biber are unresolved, follow the Overleaf troubleshooting section in [`docs/OVERLEAF_GUIDE.md`](OVERLEAF_GUIDE.md#troubleshooting-pdf-was-generated-but-the-build-failed).
 
 Static-only mode does not require TeX Live and is suitable for lightweight containers. The default `./tests/run-tests.sh` remains developer-friendly and skips compilation when the toolchain is unavailable; CI and `./scripts/test.sh --compile` use strict mode and fail when required TeX tools are missing.
 
