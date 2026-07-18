@@ -75,10 +75,12 @@ Configuration precedence is:
 1. safe internal defaults;
 2. `config/project-config.tex` when `config/load-project=true`;
 3. explicit class options;
-4. profile defaults for values that are still unset;
-5. theme, palette, typography and adapter finalisation.
+4. document-profile defaults for values that were not explicitly set by the project or class options;
+5. theme, palette, typography, page-style, frontmatter and adapter finalisation.
 
 Within a single `\INSRBootstrap{...}` block, keys are processed in order. The checked-in `config/active-target.tex` therefore places `build/preset` last so that it resolves and overrides the compatibility fields atomically.
+
+`document/target`, `design/theme` and `design/palette` are independent dimensions. Theme activation may provide a default palette and fontset, but an explicit `design/palette` or `design/font` is preserved even when the theme is processed later. Document profiles should use `\INSRProfileDefaults{...}` for design defaults so an RCT profile can suggest `design/theme=clinical` without overwriting `design/theme=editorial` or a project-selected palette.
 
 `config/load-project` defaults to `true`. Official examples set `config/load-project=false` in their class options so they do not inherit productive position-paper metadata or content settings from the root project configuration.
 
