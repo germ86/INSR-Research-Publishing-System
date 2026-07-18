@@ -34,12 +34,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: main.tex
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Verify TeX toolchain
+        run: |
+          command -v latexmk
+          command -v lualatex
+          command -v biber
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+      - name: Compile root smoke document
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
       - name: Reject INSR warning regressions
         run: python3 tools/check_latex_log.py main.log
 
@@ -67,12 +87,32 @@ jobs:
           - tests/fixtures/rct-combination-as-output-target.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Verify TeX toolchain
+        run: |
+          command -v latexmk
+          command -v lualatex
+          command -v biber
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+      - name: Compile ${{ matrix.document }}
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
 
   slides-examples:
     name: Slides examples (${{ matrix.document }})
@@ -90,12 +130,32 @@ jobs:
           - tests/fixtures/document-type-slides-overrides-submission.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Verify TeX toolchain
+        run: |
+          command -v latexmk
+          command -v lualatex
+          command -v biber
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+      - name: Compile ${{ matrix.document }}
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
 
   manual-examples:
     name: Manual examples (${{ matrix.document }})
@@ -109,12 +169,32 @@ jobs:
           - doc/latex/insr/insr-latex-manual.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Verify TeX toolchain
+        run: |
+          command -v latexmk
+          command -v lualatex
+          command -v biber
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+      - name: Compile ${{ matrix.document }}
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
 
   focused-example-matrix:
     name: Focused examples (${{ matrix.document }})
@@ -139,9 +219,29 @@ jobs:
           - examples/thesis/main.tex
     steps:
       - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: ${{ matrix.document }}
-          latexmk_use_lualatex: true
-          latexmk_shell_escape: false
-          args: -interaction=nonstopmode -halt-on-error
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Verify TeX toolchain
+        run: |
+          command -v latexmk
+          command -v lualatex
+          command -v biber
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+      - name: Compile ${{ matrix.document }}
+        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
