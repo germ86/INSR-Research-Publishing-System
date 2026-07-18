@@ -50,6 +50,48 @@ python3 tools/check_latex_log.py main.log
 
 The checker rejects INSR package-path mismatches, the known `\showhyphens` compatibility warning, duplicate `pdfauthor` metadata, missing `ngerman` BibLaTeX localisation, and unknown INSR document/output targets.
 
+
+## Troubleshooting: PDF was generated, but the build failed
+
+A visible PDF is not by itself proof of a complete LaTeX build. The decisive signal is the exit code returned by `latexmk`: only exit code `0` means that the build completed successfully. Treat the build as failed or incomplete when the log contains the typical sequence of messages such as:
+
+- `Package biblatex Warning: Please (re)run Biber on the file: main`
+- `LaTeX Warning: There were undefined references`
+- `Output written on main.pdf`
+- followed anyway by `Compilation failed`
+
+In that situation LaTeX may have emitted `main.pdf`, but cross-references, citations, or the bibliography have not converged yet. The preview can therefore contain placeholders, question marks, stale citations, or an incomplete reference list even though a PDF file exists.
+
+The required TeX toolchain for root builds is:
+
+- `lualatex`
+- `latexmk`
+- `biber`
+- `biblatex`
+
+The shared `latexmkrc` configures bibliography convergence for local, CI, and Overleaf-style builds. Check these settings when Biber is not being scheduled correctly:
+
+```perl
+$bibtex_use = 2;
+$biber = 'biber %O %B';
+$max_repeat = 6;
+```
+
+For Overleaf builds:
+
+1. Set the compiler to **LuaLaTeX**.
+2. Use **Biber** as the bibliography tool.
+3. After a GitHub pull, target switch, or resource/bibliography change, run **Recompile from scratch** so stale auxiliary files are removed before the next build.
+
+For local builds, remove old auxiliary files and let `latexmk` drive all required LuaLaTeX and Biber passes instead of manually running `lualatex` once or several times:
+
+```bash
+latexmk -C main.tex
+latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
+```
+
+`latexmk` reads the generated auxiliary files, schedules Biber automatically when the bibliography needs it, and reports success or failure through its process exit code. A direct sequence of individual `lualatex` commands can leave the build incomplete or require manually inserted Biber runs.
+
 ## One-switch build selection
 
 For Overleaf, keep `main.tex` unchanged and edit only the last line inside `config/active-target.tex`:
