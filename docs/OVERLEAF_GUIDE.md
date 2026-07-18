@@ -50,6 +50,30 @@ python3 tools/check_latex_log.py main.log
 
 The checker rejects INSR package-path mismatches, the known `\showhyphens` compatibility warning, duplicate `pdfauthor` metadata, missing `ngerman` BibLaTeX localisation, and unknown INSR document/output targets.
 
+
+## Troubleshooting: PDF was generated, but the build failed
+
+A visible PDF is not by itself proof of a complete LaTeX build. Treat the build as incomplete when the log contains messages such as:
+
+- `LaTeX Warning: There were undefined references`
+- `Package biblatex Warning: Please (re)run Biber`
+
+These warnings usually mean that cross-references, citations, or the bibliography have not been resolved yet. The produced PDF can therefore contain placeholders, question marks, stale citations, or an incomplete reference list even though Overleaf shows a preview.
+
+For Overleaf builds:
+
+1. Set the compiler to **LuaLaTeX**.
+2. Use **Biber** as the bibliography tool.
+3. After a GitHub pull, target switch, or resource/bibliography change, run **Recompile from scratch** so stale auxiliary files are removed before the next build.
+
+For local builds, use `latexmk` instead of manually running `lualatex` once or several times:
+
+```bash
+latexmk -lualatex main.tex
+```
+
+`latexmk` reads the generated auxiliary files and schedules Biber automatically when the bibliography needs it. A direct sequence of individual `lualatex` commands can leave the build incomplete or require manually inserted Biber runs.
+
 ## One-switch build selection
 
 For Overleaf, keep `main.tex` unchanged and edit only the last line inside `config/active-target.tex`:
