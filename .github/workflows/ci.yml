@@ -180,3 +180,52 @@ jobs:
             ctan-archive-listing.txt
           if-no-files-found: warn
           retention-days: 14
+
+  installed-package:
+    name: Isolated installed-package test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - static-validation
+      - l3build-regression
+      - ctan-smoke
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install installed-mode toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            biber \
+            texlive-luatex \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk \
+            unzip
+
+      - name: Run isolated installed-package test
+        shell: bash
+        run: bash scripts/test-installed-package.sh
+
+      - name: Upload installed-mode diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installed-package-diagnostics
+          path: |
+            /tmp/insr-installed-*.log
+            /tmp/insr-installed-l3build-ctan.log
+            build/**/*.log
+            build/**/*.diff
+            build/distrib/**/*.zip
+          if-no-files-found: ignore
+          retention-days: 7

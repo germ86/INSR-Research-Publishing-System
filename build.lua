@@ -30,6 +30,14 @@ sourcefiles = {
 }
 
 installfiles = {
+  "insr.cls",
+  "insr-beamer.cls",
+  "insr-handout.cls",
+  "insr-poster.cls",
+  "insr-paper.cls",
+  "insr-book.cls",
+  "insr-manual.cls",
+  "insr-core.cls",
   "tex/latex/insr/*.sty",
   "tex/latex/insr/*.cls",
   "config/*.tex",
@@ -39,7 +47,8 @@ installfiles = {
   "themes/**/*.tex",
   "typography/**/*.tex",
   "i18n/*.tex",
-  "plugins/*.tex"
+  "plugins/*.tex",
+  "templates/*.tex"
 }
 
 checkfiles = {
@@ -89,6 +98,19 @@ checkengines = {"luatex"}
 testfiledir = "testfiles"
 supportdir = "testfiles/support"
 tagfiles = {"tex/latex/insr/*.sty", "tex/latex/insr/*.cls", "insr.cls"}
+
+tdsdirs = {
+  ["tex/latex/insr"] = "tex/latex/insr",
+  ["config"] = "tex/latex/insr/config",
+  ["framework"] = "tex/latex/insr/framework",
+  ["profiles"] = "tex/latex/insr/profiles",
+  ["palettes"] = "tex/latex/insr/palettes",
+  ["themes"] = "tex/latex/insr/themes",
+  ["typography"] = "tex/latex/insr/typography",
+  ["i18n"] = "tex/latex/insr/i18n",
+  ["plugins"] = "tex/latex/insr/plugins",
+  ["templates"] = "tex/latex/insr/templates"
+}
 
 -- Keep runtime files in their repository-relative tree. Future TDS work can refine
 -- these mappings after the non-.dtx source layout has stabilized.

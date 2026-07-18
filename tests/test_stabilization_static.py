@@ -13,10 +13,23 @@ class StabilizationStaticTests(unittest.TestCase):
         build = self.read("build.lua")
         self.assertIn("Authoritative l3build configuration", build)
         self.assertIn('ctanpkg = "insr"', build)
+        self.assertIn('"insr.cls"', build)
+        self.assertIn('"templates/*.tex"', build)
+        self.assertIn('["config"] = "tex/latex/insr/config"', build)
+        self.assertIn('["templates"] = "tex/latex/insr/templates"', build)
         self.assertIn('testfiledir = "testfiles"', build)
         self.assertIn('uploadconfig = {', build)
         self.assertIn('https://github.com/germ86/INSR-Research-Publishing-System', build)
         self.assertFalse((ROOT / "l3build.lua").exists())
+
+    def test_installed_package_harness_exists(self):
+        script = self.read("scripts/test-installed-package.sh")
+        self.assertIn("TEXMFHOME", script)
+        self.assertIn('kpsewhich "$f"', script)
+        self.assertIn("insr.cls", script)
+        self.assertIn("config/target-registry.tex", script)
+        self.assertIn("unset TEXINPUTS BIBINPUTS", script)
+        self.assertIn("latexmk -lualatex", script)
 
     def test_version_source_controls_secondary_versions(self):
         version = json.loads(self.read("insr-version.json"))
@@ -59,6 +72,7 @@ class StabilizationStaticTests(unittest.TestCase):
         ci = self.read(".github/workflows/ci.yml")
         self.assertIn("l3build check", ci)
         self.assertIn("l3build ctan", ci)
+        self.assertIn("bash scripts/test-installed-package.sh", ci)
         self.assertIn("unzip -l", ci)
         self.assertIn("upload-artifact", ci)
 
