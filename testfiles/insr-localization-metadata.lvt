@@ -1,0 +1,9 @@
+\input{regression-test.tex}
+\START
+\RequirePackage{insr-core}
+\RequirePackage{insr-config}
+\RequirePackage{insr-metadata}
+\INSRConfigure{localization/language=zz-ZZ, metadata/title={Metadata Regression}, metadata/author={Example Author}}
+\typeout{INSR-TEST localization requested=\csname tl_use:N\endcsname\csname g_insr_language_tl\endcsname}
+\typeout{INSR-TEST metadata title=\csname tl_use:N\endcsname\csname g_insr_title_tl\endcsname\space author=\csname tl_use:N\endcsname\csname g_insr_author_tl\endcsname}
+\END

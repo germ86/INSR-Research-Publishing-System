@@ -1,0 +1,7 @@
+% First-party fontset registry. Font files remain optional and resolved by typography presets.
+\insr_fontset_register:nn { libertinus } { main=Libertinus Serif, sans=Libertinus Sans, mono=Libertinus Mono, math=Libertinus Math, fallback=libertinus, scripts=latin, engine=luatex }
+\insr_fontset_register:nn { inter } { main=TeX Gyre Pagella, sans=Inter, mono=Inconsolata, math=TeX Gyre Pagella, fallback=libertinus, scripts=latin, engine=luatex }
+\insr_fontset_register:nn { ibm-plex } { main=IBM Plex Serif, sans=IBM Plex Sans, mono=IBM Plex Mono, math=TeX Gyre Pagella, fallback=libertinus, scripts=latin, engine=luatex }
+\insr_fontset_register:nn { noto } { main=Noto Serif, sans=Noto Sans, mono=Noto Sans Mono, math=TeX Gyre Pagella, fallback=libertinus, scripts=latin|arabic|hebrew|cjk, engine=luatex }
+\insr_fontset_register:nn { noto-multilingual } { main=Noto Serif, sans=Noto Sans, mono=Noto Sans Mono, math=TeX Gyre Pagella, fallback=noto, scripts=latin|arabic|hebrew|cjk, engine=luatex }
+\insr_fontset_register:nn { system } { main=TeX Gyre Pagella, sans=TeX Gyre Heros, mono=Latin Modern Mono, math=TeX Gyre Pagella, fallback=libertinus, scripts=latin, engine=luatex }
