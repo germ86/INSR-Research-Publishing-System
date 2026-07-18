@@ -21,7 +21,7 @@
 \tl_gset:Nn \g_insr_date_tl { \today }
 \tl_gset:Nn \g_insr_author_tl { INSR Research Consortium }
 \tl_gset:Nn \g_insr_institution_tl { Independent translational research program }
-\tl_gset:Nn \g_insr_bibresource_tl { references.bib }
+\tl_gset:Nn \g_insr_bibresource_tl { }
 \tl_gset:Nn \g_insr_keywords_tl { INSR, scientific publishing, LuaLaTeX }
 \tl_gset:Nn \g_insr_publication_type_tl { preprint }
 \tl_gset:Nn \g_insr_publication_status_tl { draft }
@@ -100,7 +100,7 @@
     metadata/date .tl_gset:N = \g_insr_date_tl,
     metadata/author .tl_gset:N = \g_insr_author_tl,
     metadata/institution .tl_gset:N = \g_insr_institution_tl,
-    bibliography/resource .tl_gset:N = \g_insr_bibresource_tl,
+    bibliography/resource .code:n = { \tl_gset:Nn \g_insr_bibresource_tl {#1} },
     metadata/keywords .tl_gset:N = \g_insr_keywords_tl,
     publication/type .tl_gset:N = \g_insr_publication_type_tl,
     publication/status .tl_gset:N = \g_insr_publication_status_tl,

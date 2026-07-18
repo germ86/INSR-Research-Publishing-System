@@ -139,6 +139,18 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertLess(cls.index("config/project-config.tex"), cls.index("\\ProcessOptions"))
         self.assertIn("config/load-project=false", cls)
 
+
+    def test_fresh_root_build_avoids_forced_lastpage_and_biber_reruns(self):
+        config = self.read("tex/latex/insr/insr-config.sty")
+        bibliography = self.read("tex/latex/insr/insr-bibliography.sty")
+        page_style = self.read("tex/latex/insr/insr-page-style.sty")
+        self.assertIn("\\tl_gset:Nn \\g_insr_bibresource_tl { }", config)
+        self.assertIn("bibliography/resource .code:n", config)
+        self.assertIn("\\__insr_bibliography_resource_configured:T", bibliography)
+        self.assertNotIn("\\RequirePackage{lastpage}", page_style)
+        self.assertIn("\\cs_if_exist:cTF { r@LastPage }", page_style)
+        self.assertIn("{ \\thepage }", page_style)
+
     def test_language_and_microtype_configuration_are_available(self):
         project = self.read("config/project-config.tex")
         config = self.read("tex/latex/insr/insr-config.sty")

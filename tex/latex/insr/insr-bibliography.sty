@@ -3,7 +3,21 @@
 \RequirePackage{csquotes}
 \RequirePackage[backend=biber,style=apa,sortcites=true]{biblatex}
 \ExplSyntaxOn
-\cs_new_protected:Npn \__insr_setup_bibliography: { \tl_if_blank:VF \g_insr_bibresource_tl { \exp_args:NV \addbibresource \g_insr_bibresource_tl } }
-\cs_new_protected:Npn \__insr_print_bibliography:n #1 { \tl_if_blank:VF \g_insr_bibresource_tl { \printbibliography[#1] } }
+\prg_new_conditional:Npnn \__insr_bibliography_resource_configured: { T, F, TF }
+  {
+    \tl_if_blank:VTF \g_insr_bibresource_tl
+      { \prg_return_false: }
+      { \prg_return_true: }
+  }
+\cs_new_protected:Npn \__insr_setup_bibliography:
+  {
+    \__insr_bibliography_resource_configured:T
+      { \exp_args:NV \addbibresource \g_insr_bibresource_tl }
+  }
+\cs_new_protected:Npn \__insr_print_bibliography:n #1
+  {
+    \__insr_bibliography_resource_configured:T
+      { \printbibliography[#1] }
+  }
 \ExplSyntaxOff
 \endinput
