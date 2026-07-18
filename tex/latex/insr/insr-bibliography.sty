@@ -9,10 +9,19 @@
       { \prg_return_false: }
       { \prg_return_true: }
   }
+\seq_new:N \g__insr_registered_bibresources_seq
+\cs_generate_variant:Nn \seq_if_in:NnF { NV }
+\cs_generate_variant:Nn \seq_gput_right:Nn { NV }
 \cs_new_protected:Npn \__insr_setup_bibliography:
   {
     \__insr_bibliography_resource_configured:T
-      { \exp_args:NV \addbibresource \g_insr_bibresource_tl }
+      {
+        \seq_if_in:NVF \g__insr_registered_bibresources_seq \g_insr_bibresource_tl
+          {
+            \seq_gput_right:NV \g__insr_registered_bibresources_seq \g_insr_bibresource_tl
+            \exp_args:NV \addbibresource \g_insr_bibresource_tl
+          }
+      }
   }
 \cs_new_protected:Npn \__insr_print_bibliography:n #1
   {

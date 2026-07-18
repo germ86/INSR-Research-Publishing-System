@@ -6,7 +6,7 @@
 \cs_new_protected:Npn \__insr_load_adapter: { \__insr_load_file_with_fallback:nnn { framework/adapters/\tl_use:N\g_insr_adapter_tl.tex } { adapter } { \msg_warning:nnn { insr } { missing-slot } { adapter } } }
 \cs_new_protected:Npn \__insr_assert_adapter_ready: { \bool_gset_true:N \g__insr_adapter_ready_bool \clist_map_inline:nn { make_title:, part:n, chapter:n, section:n, subsection:n, subsubsection:n, bibliography:n } { \cs_if_exist:cF { __insr_adapter_##1 } { \bool_gset_false:N \g__insr_adapter_ready_bool \ClassError{insr}{Mandatory adapter function missing: \c_backslash_str __insr_adapter_##1}{The selected adapter is incomplete.} } } }
 \__insr_define_default_adapters:
-\__insr_setup_bibliography:
+\AtBeginDocument{\__insr_setup_bibliography:}
 \__insr_load_profile:
 \__insr_load_adapter:
 \__insr_assert_adapter_ready:
