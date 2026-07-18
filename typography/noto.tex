@@ -10,4 +10,4 @@
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { hebrew } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}} }
+  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}} }
