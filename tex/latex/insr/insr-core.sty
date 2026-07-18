@@ -130,6 +130,17 @@
 \prg_new_conditional:Npnn \insr_theme_if_exist:n #1 { T, F, TF }
   { \prop_if_in:NnTF \g__insr_theme_registry_prop {#1} { \prg_return_true: } { \prg_return_false: } }
 \cs_new_protected:Npn \insr_fontset_register:nn #1#2 { \prop_gput:Nnn \g__insr_fontset_registry_prop {#1} {#2} }
+\cs_new_protected:Npn \insr_fontset_activate:n #1
+  {
+    \prop_if_in:NnTF \g__insr_fontset_registry_prop {#1}
+      { \tl_gset:Nn \g_insr_font_tl {#1} }
+      {
+        \msg_warning:nnn { insr } { unknown-font } {#1}
+        \tl_gset:Nn \g_insr_font_tl { libertinus }
+      }
+  }
+\prg_new_conditional:Npnn \insr_fontset_if_exist:n #1 { T, F, TF }
+  { \prop_if_in:NnTF \g__insr_fontset_registry_prop {#1} { \prg_return_true: } { \prg_return_false: } }
 \NewDocumentCommand \INSRUsePlugin { m } { \insr_plugin_load:n {#1} }
 \NewDocumentCommand \INSRUseTheme { m } { \insr_theme_activate:n {#1} }
 
