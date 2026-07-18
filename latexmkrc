@@ -1,6 +1,13 @@
 # Shared latexmk configuration for local, GitHub Actions and Overleaf builds.
 $pdf_mode = 4; # LuaLaTeX
-$bibtex_use = 2;
+
+# Let latexmk run the bibliography processor whenever the generated .bcf file
+# requires it.  The previous value 2 only permitted bibliography processing in
+# restricted circumstances and could leave first-build biblatex warnings and an
+# unresolved LastPage reference behind even though a PDF was produced.
+$bibtex_use = 1;
+$biber = 'biber %O %B';
+
 # Resolve INSR packages through the canonical root-level shims. Do not prepend
 # tex/latex/insr here: loading implementation paths as package names triggers
 # LaTeX package-name mismatch warnings in Overleaf and recent TeX Live releases.
