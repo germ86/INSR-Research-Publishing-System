@@ -34,10 +34,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install and verify LuaLaTeX toolchain
-        run: bash scripts/install-tex-toolchain.sh
-      - name: Compile root smoke document
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
       - name: Reject INSR warning regressions
         run: python3 tools/check_latex_log.py main.log
 
@@ -65,10 +67,12 @@ jobs:
           - tests/fixtures/rct-combination-as-output-target.tex
     steps:
       - uses: actions/checkout@v4
-      - name: Install and verify LuaLaTeX toolchain
-        run: bash scripts/install-tex-toolchain.sh
-      - name: Compile ${{ matrix.document }}
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
 
   slides-examples:
     name: Slides examples (${{ matrix.document }})
@@ -86,10 +90,12 @@ jobs:
           - tests/fixtures/document-type-slides-overrides-submission.tex
     steps:
       - uses: actions/checkout@v4
-      - name: Install and verify LuaLaTeX toolchain
-        run: bash scripts/install-tex-toolchain.sh
-      - name: Compile ${{ matrix.document }}
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
 
   manual-examples:
     name: Manual examples (${{ matrix.document }})
@@ -103,10 +109,12 @@ jobs:
           - doc/latex/insr/insr-latex-manual.tex
     steps:
       - uses: actions/checkout@v4
-      - name: Install and verify LuaLaTeX toolchain
-        run: bash scripts/install-tex-toolchain.sh
-      - name: Compile ${{ matrix.document }}
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
 
   focused-example-matrix:
     name: Focused examples (${{ matrix.document }})
@@ -131,7 +139,9 @@ jobs:
           - examples/thesis/main.tex
     steps:
       - uses: actions/checkout@v4
-      - name: Install and verify LuaLaTeX toolchain
-        run: bash scripts/install-tex-toolchain.sh
-      - name: Compile ${{ matrix.document }}
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: ${{ matrix.document }}
+          latexmk_use_lualatex: true
+          latexmk_shell_escape: false
+          args: -interaction=nonstopmode -halt-on-error
