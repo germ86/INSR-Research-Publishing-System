@@ -35,7 +35,8 @@ jobs:
           bash -n scripts/test.sh
 
       - name: Run static test suite
-        run: ./scripts/test.sh --static-only
+        shell: bash
+        run: bash scripts/test.sh --static-only
 
   lualatex-build:
     name: LuaLaTeX build matrix
@@ -64,7 +65,8 @@ jobs:
             fonts-noto-cjk
 
       - name: Run required compile suite
-        run: ./scripts/test.sh --compile
+        shell: bash
+        run: bash scripts/test.sh --compile
 
       - name: Upload failing logs
         if: failure()
