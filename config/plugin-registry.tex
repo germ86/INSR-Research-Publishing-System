@@ -1,6 +1,6 @@
 % First-party plugin registry. Direct package loading remains supported.
-\insr_plugin_register:nn { accessibility } { version=2026/07/17, package=insr-accessibility, targets=paper|slides|poster, provides=accessibility }
-\insr_plugin_register:nn { neuro } { version=2026/07/17, package=insr-neuro, dependencies=accessibility, targets=paper|slides|poster, provides=neuroclinical-macros }
-\insr_plugin_register:nn { rct } { version=2026/07/17, content=rct-protocol, dependencies=accessibility, conflicts=poster, targets=rct-protocol, provides=rct-content }
-\insr_plugin_register:nn { slides } { version=2026/07/17, adapter=slides, targets=slides|handout, provides=presentation-adapter }
-\insr_plugin_register:nn { poster } { version=2026/07/17, adapter=poster, conflicts=rct, targets=poster, provides=poster-adapter }
+\insr_plugin_register:nn { neuro } { version=2026/07/17, package=insr-neuro, targets=paper|slides|poster }
+\insr_plugin_register:nn { accessibility } { version=2026/07/17, package=insr-accessibility, targets=paper|slides|poster }
+\insr_plugin_register:nn { rct } { version=2026/07/17, content=rct-protocol, targets=rct-protocol }
+\insr_plugin_register:nn { slides } { version=2026/07/17, adapter=slides, targets=slides|handout }
+\insr_plugin_register:nn { poster } { version=2026/07/17, adapter=poster, targets=poster }

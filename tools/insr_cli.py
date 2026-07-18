@@ -4,9 +4,8 @@ from __future__ import annotations
 import argparse, json, re, sys
 from pathlib import Path
 from insr_registry import targets_from_registry
-from insr_version import load_version
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA_VERSION = load_version()["schema_version"]
+SCHEMA_VERSION = "1.0"
 ORCID_RE = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$")
 KNOWN_THEMES = {p.stem for p in (ROOT / "themes").glob("*.tex")} | {"academic","clinical","medical","technical","minimal","presentation","accessible-high-contrast"}
 KNOWN_FONTSETS = {"libertinus","inter","ibm-plex","system","noto-multilingual"}
