@@ -28,11 +28,9 @@ Do not replace short requests such as:
 
 with repository-path requests such as:
 
-```tex
-\RequirePackage{tex/latex/insr/insr-core}
-```
+Do not request the implementation file by repository path (for example, do not put the implementation-directory prefix before `insr-core` in `\RequirePackage`).
 
-The latter form causes the warning “You have requested package … but the package provides …”.
+That path-shaped form causes the warning “You have requested package … but the package provides …”.
 
 ## Position-paper content
 

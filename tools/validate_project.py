@@ -172,7 +172,7 @@ for path in ROOT.rglob("*"):
         continue
     if full_path_request.search(text):
         fail(f"Full-path package request would produce package-name warnings: {path.relative_to(ROOT)}")
-    if any(marker in text for marker in ("<<<<<<<", "=======", ">>>>>>>")):
+    if re.search(r"(?m)^(<<<<<<<|=======|>>>>>>>)", text):
         fail(f"Merge conflict marker left in {path.relative_to(ROOT)}")
 
 for name, info in registry["document_types"].items():
