@@ -1,17 +1,15 @@
 \input{regression-test.tex}
 \START
 \RequirePackage{insr-core}
-\ExplSyntaxOn
-\insr_plugin_register:nn { needs-missing } { dependencies=missing-plugin }
-\insr_plugin_register:nn { cycle-a } { dependencies=cycle-b }
-\insr_plugin_register:nn { cycle-b } { dependencies=cycle-a }
-\insr_plugin_register:nn { old-core } { min-core-version=999.0.0 }
-\insr_plugin_register:nn { conflict-a } { conflicts=conflict-b }
-\insr_plugin_register:nn { conflict-b } { }
+\INSRRegisterPlugin{needs-missing}{dependencies=missing-plugin}
+\INSRRegisterPlugin{cycle-a}{dependencies=cycle-b}
+\INSRRegisterPlugin{cycle-b}{dependencies=cycle-a}
+\INSRRegisterPlugin{old-core}{min-core-version=999.0.0}
+\INSRRegisterPlugin{conflict-a}{conflicts=conflict-b}
+\INSRRegisterPlugin{conflict-b}{}
 \INSRUsePlugin{needs-missing}
 \INSRUsePlugin{cycle-a}
 \INSRUsePlugin{old-core}
 \INSRUsePlugin{conflict-b}
 \INSRUsePlugin{conflict-a}
-\ExplSyntaxOff
 \END

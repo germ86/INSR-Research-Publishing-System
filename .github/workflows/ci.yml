@@ -145,10 +145,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
+            biber \
             texlive-luatex \
+            texlive-bibtex-extra \
             texlive-latex-recommended \
             texlive-latex-extra \
             texlive-fonts-recommended \
+            fonts-noto-core \
             unzip
 
       - name: Build CTAN archive

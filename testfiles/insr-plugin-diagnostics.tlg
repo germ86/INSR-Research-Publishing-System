@@ -1,4 +1,37 @@
-Package insr Error: Plugin 'needs-missing' requires missing dependency 'missing-plugin'.
-Package insr Error: Plugin dependency cycle detected while loading 'cycle-a'.
-Package insr Error: Plugin 'old-core' requires INSR core '999.0.0'; current core is '0.1.0'.
-Package insr Error: Plugin 'conflict-a' conflicts with loaded plugin 'conflict-b'.
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+(insr-core.sty
+Package: insr-core ....-..-.. INSR core state and public API
+)
+! Package insr Error: Plugin 'needs-missing' requires missing dependency
+(insr)                'missing-plugin'.
+Type <return> to continue.
+ ...                                              
+l. ...\INSRUsePlugin{needs-missing}
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+! Package insr Error: Plugin dependency cycle detected while loading
+(insr)                'cycle-a'.
+Type <return> to continue.
+ ...                                              
+l. ...\INSRUsePlugin{cycle-a}
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+! Package insr Error: Plugin 'old-core' requires INSR core '999.0.0'; current
+(insr)                core is '0.1.0'.
+Type <return> to continue.
+ ...                                              
+l. ...\INSRUsePlugin{old-core}
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+! Package insr Error: Plugin 'conflict-a' conflicts with loaded plugin
+(insr)                'conflict-b'.
+Type <return> to continue.
+ ...                                              
+l. ...\INSRUsePlugin{conflict-a}
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.

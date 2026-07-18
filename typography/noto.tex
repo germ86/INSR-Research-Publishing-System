@@ -1,7 +1,7 @@
 % INSR typography preset: noto
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\setmainfont{TeX Gyre Pagella}}
-\IfFontExistsTF{Noto Sans}{\setsansfont{Noto Sans}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}}
+\IfFontExistsTF{Noto Sans}{\setsansfont{Noto Sans}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
 \IfFontExistsTF{Noto Sans Mono}{\setmonofont{Noto Sans Mono}}{\setmonofont{Latin Modern Mono}}
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { arabic } }
@@ -10,4 +10,4 @@
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { hebrew } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}} }
+  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}} }

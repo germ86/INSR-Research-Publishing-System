@@ -11,13 +11,12 @@ class StabilizationStaticTests(unittest.TestCase):
 
     def test_l3build_authoritative_config_and_shim(self):
         build = self.read("build.lua")
-        shim = self.read("l3build.lua")
         self.assertIn("Authoritative l3build configuration", build)
         self.assertIn('ctanpkg = "insr"', build)
         self.assertIn('testfiledir = "testfiles"', build)
         self.assertIn('uploadconfig = {', build)
         self.assertIn('https://github.com/germ86/INSR-Research-Publishing-System', build)
-        self.assertEqual(shim.strip(), '-- Compatibility shim: build.lua is the authoritative l3build configuration.\ndofile("build.lua")')
+        self.assertFalse((ROOT / "l3build.lua").exists())
 
     def test_version_source_controls_secondary_versions(self):
         version = json.loads(self.read("insr-version.json"))

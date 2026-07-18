@@ -1,6 +1,6 @@
 # l3build and release guide
 
-`build.lua` is the authoritative l3build configuration. `l3build.lua` exists only as a compatibility shim for tools or developers that invoke the traditional filename directly.
+`build.lua` is the authoritative l3build configuration. No repository-local `l3build.lua` is retained because TeX Live l3build internally looks up a file with that name; a local shim shadows the tool internals and breaks `l3build check`.
 
 ## Source-of-truth policy
 

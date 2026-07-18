@@ -32,3 +32,12 @@ Internal implementation functions use the expl3 `insr` namespace, for example `\
 - The plugin registry currently records metadata and loaded-state diagnostics; dependency/conflict enforcement is staged for a follow-up regression-tested PR.
 - The JSON CLI validates the repository target registry, themes, fontsets, ORCID syntax, unknown top-level fields, and deterministic TeX escaping; full JSON Schema validation is intentionally kept dependency-free for CI portability.
 - Accessibility remains a layered feature set and does not claim PDF/UA conformance.
+
+## Stabilization update
+
+- `build.lua` is now the authoritative l3build configuration; the repository-local `l3build.lua` shim was removed because it shadows TeX Live l3build internals and breaks `l3build check`.
+- Version and release metadata are centralized in `insr-version.json`; Python tooling reads the JSON schema version from this file.
+- CTAN metadata now points to `https://github.com/germ86/INSR-Research-Publishing-System` and the matching issue tracker. CTAN upload remains manual-only until maintainer/uploader contact metadata is finalized.
+- l3build regression fixtures live in `testfiles/` and focus on deterministic log assertions for configuration, target resolution, plugin behavior, theme/fontset state, localization, and metadata.
+- Theme activation now resolves palette, typography/fontset, and header/footer rule state. Direct palette selection remains supported through `design/palette`.
+- Fontsets are registered in `config/fontset-registry.tex`; typography preset files continue to perform engine/font availability fallbacks during LuaLaTeX builds.

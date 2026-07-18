@@ -2,11 +2,8 @@
 \START
 \RequirePackage{insr-core}
 \RequirePackage{insr-config}
-\RequirePackage{insr-localization}
 \RequirePackage{insr-metadata}
-\ExplSyntaxOn
 \INSRConfigure{localization/language=zz-ZZ, metadata/title={Metadata Regression}, metadata/author={Example Author}}
-\typeout{INSR-TEST localization requested=\tl_use:N\g_insr_language_tl}
-\typeout{INSR-TEST metadata title=\tl_use:N\g_insr_title_tl author=\tl_use:N\g_insr_author_tl}
-\ExplSyntaxOff
+\typeout{INSR-TEST localization requested=\csname tl_use:N\endcsname\csname g_insr_language_tl\endcsname}
+\typeout{INSR-TEST metadata title=\csname tl_use:N\endcsname\csname g_insr_title_tl\endcsname\space author=\csname tl_use:N\endcsname\csname g_insr_author_tl\endcsname}
 \END

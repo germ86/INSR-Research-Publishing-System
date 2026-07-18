@@ -1,5 +1,5 @@
 -- Authoritative l3build configuration for the INSR LaTeX package.
--- l3build.lua delegates here for compatibility.
+-- Do not add a repository-local l3build.lua: it shadows the l3build tool internals on TeX Live.
 module = "insr"
 ctanpkg = "insr"
 
@@ -12,6 +12,8 @@ local repository = version_json:match('"repository"%s*:%s*"([^"]+)"') or "https:
 local bugtracker = version_json:match('"bugtracker"%s*:%s*"([^"]+)"') or (repository .. "/issues")
 
 sourcefiles = {
+  "*.sty",
+  "*.cls",
   "tex/latex/insr/*.sty",
   "tex/latex/insr/*.cls",
   "config/*.tex",
@@ -29,8 +31,32 @@ sourcefiles = {
 
 installfiles = {
   "tex/latex/insr/*.sty",
-  "tex/latex/insr/*.cls"
+  "tex/latex/insr/*.cls",
+  "config/*.tex",
+  "framework/**/*.tex",
+  "profiles/**/*.tex",
+  "palettes/**/*.tex",
+  "themes/**/*.tex",
+  "typography/**/*.tex",
+  "i18n/*.tex",
+  "plugins/*.tex"
 }
+
+checkfiles = {
+  "*.sty",
+  "*.cls",
+  "*.tex"
+}
+
+function checkinit_hook()
+  os.execute("cp -R config palettes themes typography i18n plugins framework profiles " .. testdir .. "/")
+  return 0
+end
+
+function docinit_hook()
+  os.execute("cp -R config palettes themes typography i18n plugins framework profiles content templates " .. typesetdir .. "/")
+  return 0
+end
 
 textfiles = {
   "README.md",
