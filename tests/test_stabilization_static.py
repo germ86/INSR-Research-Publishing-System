@@ -53,9 +53,19 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertIn("\\g__insr_theme_palette_prop", core)
         self.assertIn("\\g_insr_layout_header_separator_style_tl", core)
         self.assertIn("\\insr_fontset_activate:n", core)
-        self.assertIn("design/theme .code:n = { \\insr_theme_activate:n", config)
-        self.assertIn("typography/fontset .code:n = { \\insr_fontset_activate:n", config)
+        self.assertIn("design/theme .code:n", config)
+        self.assertIn("\\insr_theme_activate:n", config)
+        self.assertIn("typography/fontset .code:n", config)
+        self.assertIn("\\insr_fontset_activate:n", config)
         self.assertTrue((ROOT / "config/fontset-registry.tex").is_file())
+
+
+    def test_registered_themes_have_runtime_files(self):
+        registry = self.read("config/theme-registry.tex")
+        registered = re.findall(r"\\insr_theme_register:nn \{ ([^}]+) \}", registry)
+        self.assertTrue(registered)
+        for theme in registered:
+            self.assertTrue((ROOT / f"themes/{theme}.tex").is_file(), theme)
 
     def test_required_l3build_regression_files_exist(self):
         required = [

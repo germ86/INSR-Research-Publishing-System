@@ -9,7 +9,7 @@ Core keys:
 - `output/target`: paper, slides, handout, poster, executive-brief, submission-package, web, book, thesis, manual, report, article, letter.
 - `document/target`: compatibility alias for earlier one-dimensional target names. New root builds should use `build/preset`.
 - `document/density`: compact, standard, spacious.
-- `document/build-profile`: development, review, release.
+- `document/build-profile`: `development`, `review`, or `production`. Aliases `dev`, `productive`, `prod`, and `release` are accepted and normalized to the canonical profiles.
 - `design/theme`: insr-default, clinical, research, editorial, technical, minimal, dark, protocol, consortium, conference, documentation, accessible, or a custom theme file.
 - `design/palette`: any file in `palettes/` or `palettes/custom/`.
 - `design/font`: libertinus, stix-two, ibm-plex, inter, source-serif-sans, noto, latin-modern.
@@ -75,10 +75,12 @@ Configuration precedence is:
 1. safe internal defaults;
 2. `config/project-config.tex` when `config/load-project=true`;
 3. explicit class options;
-4. profile defaults for values that are still unset;
-5. theme, palette, typography and adapter finalisation.
+4. document-profile defaults for values that were not explicitly set by the project or class options;
+5. theme, palette, typography, page-style, frontmatter and adapter finalisation.
 
 Within a single `\INSRBootstrap{...}` block, keys are processed in order. The checked-in `config/active-target.tex` therefore places `build/preset` last so that it resolves and overrides the compatibility fields atomically.
+
+`document/target`, `design/theme` and `design/palette` are independent dimensions. Theme activation may provide a default palette and fontset, but an explicit `design/palette` or `design/font` is preserved even when the theme is processed later. Document profiles should use `\INSRProfileDefaults{...}` for design defaults so an RCT profile can suggest `design/theme=clinical` without overwriting `design/theme=editorial` or a project-selected palette.
 
 `config/load-project` defaults to `true`. Official examples set `config/load-project=false` in their class options so they do not inherit productive position-paper metadata or content settings from the root project configuration.
 
@@ -87,6 +89,22 @@ The alias `localization/language = german` is normalized to `ngerman`; `english`
 ## Publication configuration hierarchy
 
 Publication-specific project values are split across `config/metadata-config.tex`, `config/publication-config.tex`, `config/layout-config.tex` and `config/authors-config.tex`; the implementation layer remains `tex/latex/insr/insr-config.sty`.
+
+## Build profiles
+
+Use `document/build-profile` to switch project strictness without changing the document target or design:
+
+```tex
+\INSRConfigure{
+  document/build-profile = production
+}
+```
+
+- `development` keeps compact placeholders visible enough for drafting and emits development diagnostics such as duplicate table-of-contents warnings.
+- `review` renders neutral review placeholder text (`content/placeholders=show`) so reviewers can identify incomplete slots without exposing draft-only prose.
+- `production` fails required placeholder content (`content/placeholders=error`) and is the canonical productive/release mode. `productive`, `prod`, and `release` are compatibility aliases for `production`.
+
+If `content/placeholders` is set after `document/build-profile` in the same configuration block, the explicit placeholder setting wins. Prefer the canonical `production` spelling for CI and release scripts even though the user-facing alias `productive` is supported.
 
 ## Active target, frontmatter, and placeholders
 

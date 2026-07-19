@@ -46,6 +46,9 @@
 \__insr_select_language:
 \ExplSyntaxOff
 \RequirePackage{insr-bibliography}
+\ExplSyntaxOn
+\__insr_load_document_profile:
+\ExplSyntaxOff
 \RequirePackage{insr-typography}
 \RequirePackage{insr-colors}
 \RequirePackage{insr-layout}

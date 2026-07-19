@@ -44,9 +44,8 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("output/target = paper", active)
         self.assertNotIn("document/target", active)
         self.assertNotIn("build/preset", active)
-        self.assertIn("document/type=slides, output/target=journal", project)
-        self.assertNotIn("document/type=position-paper", project)
-        self.assertNotIn("output/target=paper", project)
+        self.assertIn("document/type=position-paper, output/target=paper", project)
+        self.assertNotIn("output/target=journal", project)
         self.assertNotIn("build/preset", project)
 
     def test_rct_combination_is_canonicalized_when_used_as_output_target(self):
@@ -64,6 +63,22 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("outputs = {paper}", fixture)
         self.assertIn("Randomized~controlled~trial~protocol", profile)
 
+    def test_build_profiles_are_normalized_and_set_placeholder_policy(self):
+        config = self.read("tex/latex/insr/insr-config.sty")
+        docs = self.read("docs/CONFIGURATION_REFERENCE.md")
+        build_profile_key = "document/build-profile .code:n = { \\insr_build_profile_set:n {#1} }"
+        self.assertIn(build_profile_key, config)
+        for token in ("{ development }", "{ review }", "{ production }", "{ productive }", "{ prod }", "{ release }"):
+            self.assertIn(token, config)
+        for placeholder_policy in ("compact", "show", "error"):
+            self.assertIn(
+                f"\\tl_gset:Nn \\g_insr_content_placeholders_tl {{ {placeholder_policy} }}",
+                config,
+            )
+        self.assertIn("Unknown~document/build-profile", config)
+        self.assertIn("productive", docs)
+        self.assertIn("production", docs)
+
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
         for token in (
@@ -77,6 +92,35 @@ class ConfigStaticTests(unittest.TestCase):
             resolver.index("\\__insr_apply_document_type_preset_shorthand:"),
             resolver.rindex("\\__insr_resolve_output_target:"),
         )
+
+
+    def test_design_keys_are_independent_after_theme_activation(self):
+        core = self.read("tex/latex/insr/insr-core.sty")
+        config = self.read("tex/latex/insr/insr-config.sty")
+        registry = self.read("config/theme-registry.tex")
+        profile = self.read("profiles/documents/rct-protocol.profile.tex")
+        self.assertIn("design/theme .code:n", config)
+        self.assertIn("g__insr_design_palette_explicit_bool", core)
+        self.assertIn(r"bool_if:NF \g__insr_design_palette_explicit_bool", core)
+        self.assertIn(r"\INSRProfileDefaults", config)
+        self.assertIn(r"\INSRProfileDefaults{design/theme=clinical}", profile)
+        self.assertNotIn("design/theme", profile.replace(r"\INSRProfileDefaults{design/theme=clinical}", ""))
+        for theme in ("editorial", "clinical", "minimal", "technical", "presentation", "protocol", "research", "accessible"):
+            self.assertIn(fr"\insr_theme_register:nn {{ {theme} }}", registry)
+            self.assertTrue((ROOT / f"themes/{theme}.tex").is_file(), theme)
+
+    def test_regression_design_combinations_are_registered(self):
+        registry = self.read("config/target-registry.tex")
+        for combination in (
+            "rct-protocol",
+            "rct-protocol-slides",
+            "rct-protocol-handout",
+            "rct-protocol-poster",
+            "position-paper",
+        ):
+            self.assertIn(fr"\INSRRegisterCombination{{{combination}}}", registry)
+        for palette in ("neuroclinical", "autonomic-teal", "cortex-blue", "somatic-sage", "translational-plum"):
+            self.assertTrue((ROOT / f"palettes/{palette}.tex").is_file(), palette)
 
     def test_publication_date_and_year_are_dynamic(self):
         publication = self.read("config/publication-config.tex")

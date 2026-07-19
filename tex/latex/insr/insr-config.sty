@@ -7,6 +7,9 @@
 \tl_gset:Nn \g_insr_content_source_tl { auto }
 \bool_new:N \g__insr_document_type_explicit_bool
 \bool_new:N \g__insr_output_target_explicit_bool
+\bool_gset_false:N \g__insr_design_theme_explicit_bool
+\bool_gset_false:N \g__insr_design_palette_explicit_bool
+\bool_gset_false:N \g__insr_design_font_explicit_bool
 \tl_gset:Nn \g_insr_density_tl { standard }
 \tl_gset:Nn \g_insr_build_profile_tl { development }
 \tl_gset:Nn \g_insr_theme_tl { clinical }
@@ -74,6 +77,27 @@
 \tl_gset:Nn \g_insr_layout_page_numbering_tl { body-only }
 \tl_gset:Nn \g_insr_content_placeholders_tl { compact }
 \tl_gset:Nn \g_insr_typography_microtype_tl { false }
+\msg_new:nnn { insr } { unknown-build-profile } { Unknown~document/build-profile~'#1';~falling~back~to~development. }
+\cs_new_protected:Npn \__insr_set_development_profile:
+  { \tl_gset:Nn \g_insr_build_profile_tl { development } \tl_gset:Nn \g_insr_content_placeholders_tl { compact } }
+\cs_new_protected:Npn \__insr_set_review_profile:
+  { \tl_gset:Nn \g_insr_build_profile_tl { review } \tl_gset:Nn \g_insr_content_placeholders_tl { show } }
+\cs_new_protected:Npn \__insr_set_production_profile:
+  { \tl_gset:Nn \g_insr_build_profile_tl { production } \tl_gset:Nn \g_insr_content_placeholders_tl { error } }
+\cs_new_protected:Npn \insr_build_profile_set:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { development } { \__insr_set_development_profile: }
+        { dev } { \__insr_set_development_profile: }
+        { review } { \__insr_set_review_profile: }
+        { production } { \__insr_set_production_profile: }
+        { productive } { \__insr_set_production_profile: }
+        { prod } { \__insr_set_production_profile: }
+        { release } { \__insr_set_production_profile: }
+      }
+      { \msg_warning:nnn { insr } { unknown-build-profile } {#1} \__insr_set_development_profile: }
+  }
 \bool_gset_true:N \g_insr_frontmatter_toc_bool
 \bool_gset_false:N \g_insr_frontmatter_abstract_numbered_bool
 \bool_gset_true:N \g_insr_frontmatter_keywords_bool
@@ -84,11 +108,11 @@
     document/type .code:n = { \tl_gset:Nn \g_insr_document_type_tl {#1} \bool_gset_true:N \g__insr_document_type_explicit_bool },
     document/target .code:n = { \__insr_set_legacy_target:n {#1} },
     document/density .tl_gset:N = \g_insr_density_tl,
-    document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
-    design/theme .code:n = { \insr_theme_activate:n {#1} },
-    design/palette .tl_gset:N = \g_insr_palette_tl,
-    design/font .code:n = { \insr_fontset_activate:n {#1} },
-    typography/fontset .code:n = { \insr_fontset_activate:n {#1} },
+    document/build-profile .code:n = { \insr_build_profile_set:n {#1} },
+    design/theme .code:n = { \bool_gset_true:N \g__insr_design_theme_explicit_bool \insr_theme_activate:n {#1} },
+    design/palette .code:n = { \bool_gset_true:N \g__insr_design_palette_explicit_bool \tl_gset:Nn \g_insr_palette_tl {#1} },
+    design/font .code:n = { \bool_gset_true:N \g__insr_design_font_explicit_bool \insr_fontset_activate:n {#1} },
+    typography/fontset .code:n = { \bool_gset_true:N \g__insr_design_font_explicit_bool \insr_fontset_activate:n {#1} },
     typography/microtype .tl_gset:N = \g_insr_typography_microtype_tl,
     design/mode .tl_gset:N = \g_insr_mode_tl,
     accessibility/high-contrast .bool_gset:N = \g_insr_high_contrast_bool,
@@ -163,6 +187,18 @@
 \NewDocumentCommand \INSRConfigure { m } { \ExplSyntaxOn \keys_set:nn { insr } {#1} \ExplSyntaxOff }
 \NewDocumentCommand \INSRBootstrap { m } { \ExplSyntaxOn \keys_set:nn { insr } {#1} \ExplSyntaxOff }
 \NewDocumentCommand \INSRSetup { m } { \msg_warning:nnn { insr } { deprecated-command } { \string\INSRSetup } \INSRConfigure{#1} }
+
+\keys_define:nn { insr/profile-defaults }
+  {
+    design/theme .code:n = { \bool_if:NF \g__insr_design_theme_explicit_bool { \insr_theme_activate:n {#1} } },
+    design/palette .code:n = { \bool_if:NF \g__insr_design_palette_explicit_bool { \tl_gset:Nn \g_insr_palette_tl {#1} } },
+    design/font .code:n = { \bool_if:NF \g__insr_design_font_explicit_bool { \insr_fontset_activate:n {#1} } },
+    typography/fontset .code:n = { \bool_if:NF \g__insr_design_font_explicit_bool { \insr_fontset_activate:n {#1} } },
+    unknown .code:n = { \msg_warning:nnx { insr } { unknown-key } { profile-defaults/\l_keys_key_str } }
+  }
+\NewDocumentCommand \INSRProfileDefaults { m } { \ExplSyntaxOn \keys_set:nn { insr/profile-defaults } {#1} \ExplSyntaxOff }
+\cs_new_protected:Npn \__insr_load_document_profile:
+  { \__insr_load_file_with_fallback:nnn { profiles/documents/\tl_use:N\g_insr_profile_tl.profile.tex } { profile } { \msg_warning:nnn { insr } { missing-slot } { profile } } }
 \tl_new:N \l__insr_register_profile_tl
 \tl_new:N \l__insr_register_source_tl
 \tl_new:N \l__insr_register_template_tl

@@ -78,7 +78,7 @@ Normal spaces in human-readable metadata are supported; `~` is not required for 
 | `insr-neuro.sty` | domain-specific neuro/clinical helper commands |
 | `insr-utils.sty` | dynamic file loading and diagnostics |
 
-Runtime adapters remain small `.tex` modules in `framework/adapters/` and document profiles live in `profiles/documents/`. Adapter files must use the internal `\__insr_adapter_...` namespace and are finalized through `insr-adapters.sty`.
+Runtime adapters remain small `.tex` modules in `framework/adapters/` and document profiles live in `profiles/documents/`. Adapter files must use the internal `\__insr_adapter_...` namespace and are finalized through `insr-adapters.sty`. See `docs/ARCHITECTURE.md` for the concise layer map, bibliography routing rule, and paper/slides/poster examples.
 
 ## Content model
 
@@ -165,6 +165,7 @@ The default neuroclinical design uses restrained navy/teal/cyan accents and sema
 ## Further documentation
 
 - `docs/CONFIGURATION_REFERENCE.md` — configuration keys and defaults.
+- `docs/ARCHITECTURE.md` — file-type responsibilities, adapter layering, and output examples.
 - `docs/OVERLEAF_GUIDE.md` — Overleaf setup and diagnostics.
 - `docs/TESTING_GUIDE.md` — local and CI validation commands.
 - `docs/THEME_DEVELOPER_GUIDE.md` — theme extension notes.
