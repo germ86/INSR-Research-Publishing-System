@@ -16,10 +16,14 @@ python3 -m unittest tests/test_overleaf_doctor.py tests/test_config_static.py
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` is the required pull-request and `main` validation workflow. It runs two ordered gates:
+`.github/workflows/ci.yml` is the required pull-request and `main` validation workflow and the authoritative PDF-compile workflow. The former standalone `.github/workflows/latex.yml` workflow has been removed so there is only one CI definition for LuaLaTeX/PDF validation.
+
+It runs these ordered gates and PDF coverage jobs:
 
 1. **Static validation** checks shell syntax and executes the complete Python/static suite without requiring TeX Live.
-2. **LuaLaTeX build matrix** installs the documented toolchain and runs the compile suite with `--require-tex`, so a missing compiler, `latexmk`, or Biber fails instead of producing a false-positive green check.
+2. **LuaLaTeX build matrix** installs the documented toolchain and runs the strict compile suite, so a missing compiler, `latexmk`, or Biber fails instead of producing a false-positive green check.
+3. **Root smoke, paper, slides, manual, and focused example PDF jobs** compile their explicit matrices in the same workflow using LuaLaTeX, `latexmk`, Biber, and the documented font set.
+4. **Packaging and installed-package gates** validate the CTAN archive and isolated installed-mode behavior after static/l3build checks.
 
 Failed compile jobs upload LaTeX and Biber logs for seven days. Workflow concurrency cancels superseded runs on the same branch or pull request.
 
@@ -43,7 +47,19 @@ When TeX Live is installed, run:
 ./scripts/test.sh --compile
 ```
 
-The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0.
+The compile runner obtains official entrypoints from `tools/overleaf_doctor.py list-entrypoints --plain`, verifies every path exists, cleans each document with `latexmk -C`, and compiles with LuaLaTeX plus `-halt-on-error`. A generated PDF only counts as successful when `latexmk` exits with code 0. If a PDF exists but the build status is failed because references or Biber are unresolved, follow the Overleaf troubleshooting section in [`docs/OVERLEAF_GUIDE.md`](OVERLEAF_GUIDE.md#troubleshooting-pdf-was-generated-but-the-build-failed).
+
+### GitHub bibliography and font failures
+
+A log can show `Output written on main.pdf` and still fail when `latexmk` exits nonzero because BibLaTeX has not converged. Treat `Package biblatex Warning: Please (re)run Biber on the file: main` together with `LaTeX Warning: There were undefined references` as a toolchain/convergence failure: Biber must run and LuaLaTeX must rerun until references settle. The repository `latexmkrc` enables this with `$bibtex_use = 2`, the explicit `biber %O %B` command and enough repeat passes. Root smoke builds without a configured `bibliography/resource` do not load the BibLaTeX backend, so they should not emit a Biber rerun warning merely because the framework bibliography package is present.
+
+Multilingual examples also require usable Arabic/Hebrew fonts. The INSR typography layer falls back from Amiri/Noto language fonts to TeX Gyre/Latin Modern so missing optional fonts do not abort smoke builds before the actual document can be validated.
+
+### GitHub bibliography and font failures
+
+A log can show `Output written on main.pdf` and still fail when `latexmk` exits nonzero because BibLaTeX has not converged. Treat `Package biblatex Warning: Please (re)run Biber on the file: main` together with `LaTeX Warning: There were undefined references` as a toolchain/convergence failure: Biber must run and LuaLaTeX must rerun until references settle. The repository `latexmkrc` enables this with `$bibtex_use = 2`, the explicit `biber %O %B` command and enough repeat passes. Root smoke builds without a configured `bibliography/resource` do not load the BibLaTeX backend, so they should not emit a Biber rerun warning merely because the framework bibliography package is present.
+
+Multilingual examples also require usable Arabic/Hebrew fonts. The INSR typography layer falls back from Amiri/Noto language fonts to TeX Gyre/Latin Modern so missing optional fonts do not abort smoke builds before the actual document can be validated.
 
 ### GitHub bibliography and font failures
 
