@@ -66,15 +66,12 @@ class ConfigStaticTests(unittest.TestCase):
     def test_build_profiles_are_normalized_and_set_placeholder_policy(self):
         config = self.read("tex/latex/insr/insr-config.sty")
         docs = self.read("docs/CONFIGURATION_REFERENCE.md")
-        build_profile_key = "document/build-profile .code:n = { \\insr_build_profile_set:n {#1} }"
-        self.assertIn(build_profile_key, config)
+        self.assertIn(r"document/build-profile .code:n = { \insr_build_profile_set:n {#1} }", config)
         for token in ("{ development }", "{ review }", "{ production }", "{ productive }", "{ prod }", "{ release }"):
             self.assertIn(token, config)
-        for placeholder_policy in ("compact", "show", "error"):
-            self.assertIn(
-                f"\\tl_gset:Nn \\g_insr_content_placeholders_tl {{ {placeholder_policy} }}",
-                config,
-            )
+        self.assertIn(r"\tl_gset:Nn \g_insr_content_placeholders_tl { compact }", config)
+        self.assertIn(r"\tl_gset:Nn \g_insr_content_placeholders_tl { show }", config)
+        self.assertIn(r"\tl_gset:Nn \g_insr_content_placeholders_tl { error }", config)
         self.assertIn("Unknown~document/build-profile", config)
         self.assertIn("productive", docs)
         self.assertIn("production", docs)
@@ -169,11 +166,11 @@ class ConfigStaticTests(unittest.TestCase):
 
     def test_texinputs_prefers_root_shims(self):
         latexmkrc = self.read("latexmkrc")
-        workflow = self.read(".github/workflows/latex.yml")
+        workflow = self.read(".github/workflows/ci.yml")
         runner = self.read("tests/run-tests.sh")
         self.assertIn("$ENV{'TEXINPUTS'} = '.:./examples//:'", latexmkrc)
         self.assertNotIn("./tex/latex/insr//", latexmkrc)
-        self.assertIn("TEXINPUTS: .:./examples//:", workflow)
+        self.assertIn('TEXINPUTS: ".:./examples//:"', workflow)
         self.assertNotIn("TEXINPUTS: .//:./tex/latex/insr//", workflow)
         self.assertIn('export TEXINPUTS=".:./examples//:', runner)
         self.assertNotIn("./tex/latex/insr//", runner)
@@ -194,6 +191,24 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertNotIn("\\RequirePackage{lastpage}", page_style)
         self.assertIn("\\cs_if_exist:cTF { r@LastPage }", page_style)
         self.assertIn("{ \\thepage }", page_style)
+
+    def test_bibliography_printing_stays_adapter_routed(self):
+        adapters = self.read("tex/latex/insr/insr-adapters.sty")
+        bibliography = self.read("tex/latex/insr/insr-bibliography.sty")
+        self.assertIn(
+            "\\NewDocumentCommand \\INSRPrintBibliography { O{} } { \\__insr_adapter_bibliography:n {#1} }",
+            adapters,
+        )
+        self.assertIn("\\__insr_print_bibliography:n", adapters)
+        self.assertIn("\\printbibliography[#1]", bibliography)
+        raw_print_sites = []
+        for search_root in ("content", "examples"):
+            for content_file in (ROOT / search_root).rglob("*.tex"):
+                if "content" not in content_file.parts:
+                    continue
+                if "\\printbibliography" in content_file.read_text(encoding="utf-8"):
+                    raw_print_sites.append(str(content_file.relative_to(ROOT)))
+        self.assertEqual([], raw_print_sites)
 
     def test_language_and_microtype_configuration_are_available(self):
         project = self.read("config/project-config.tex")
