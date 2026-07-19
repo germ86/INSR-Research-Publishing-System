@@ -46,7 +46,7 @@ def expected_shim(package: str) -> str:
 
 
 required = [
-    ".github/workflows/latex.yml",
+    ".github/workflows/ci.yml",
     "insr.cls",
     "main.tex",
     "config/active-target.tex",
