@@ -44,9 +44,8 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("output/target = paper", active)
         self.assertNotIn("document/target", active)
         self.assertNotIn("build/preset", active)
-        self.assertIn("document/type=slides, output/target=journal", project)
-        self.assertNotIn("document/type=position-paper", project)
-        self.assertNotIn("output/target=paper", project)
+        self.assertIn("document/type=position-paper, output/target=paper", project)
+        self.assertNotIn("output/target=journal", project)
         self.assertNotIn("build/preset", project)
 
     def test_rct_combination_is_canonicalized_when_used_as_output_target(self):

@@ -24,9 +24,9 @@
 
 \RequirePackage{fontspec}
 \defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
-\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{TeX Gyre Pagella}}
-\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\setsansfont{TeX Gyre Heros}}
-\IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{}}
+\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{}}
+\IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\IfFontExistsTF{Latin Modern Mono}{\setmonofont{Latin Modern Mono}}{}}
 
 \RequirePackage{polyglossia}
 \setdefaultlanguage{english}

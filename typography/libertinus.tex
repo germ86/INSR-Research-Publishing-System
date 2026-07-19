@@ -1,8 +1,8 @@
 % INSR typography preset: libertinus
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}}
-\IfFontExistsTF{Libertinus Sans}{\setsansfont{Libertinus Sans}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
-\IfFontExistsTF{Libertinus Mono}{\setmonofont[BoldFont={},ItalicFont={},BoldItalicFont={}]{Libertinus Mono}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\__insr_typography_set_main_font:nn { TeX~Gyre~Pagella } { Latin~Modern~Roman }}
+\__insr_typography_set_sans_font:nn { Libertinus~Sans } { TeX~Gyre~Heros }
+\__insr_typography_set_mono_font:nn { Libertinus~Mono } { Latin~Modern~Mono }
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { arabic } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }

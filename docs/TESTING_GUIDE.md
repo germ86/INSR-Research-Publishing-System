@@ -61,6 +61,16 @@ A log can show `Output written on main.pdf` and still fail when `latexmk` exits 
 
 Multilingual examples also require usable Arabic/Hebrew fonts. The INSR typography layer falls back from Amiri/Noto language fonts to TeX Gyre/Latin Modern so missing optional fonts do not abort smoke builds before the actual document can be validated.
 
+### GitHub bibliography and font failures
+
+A log can show `Output written on main.pdf` and still fail when `latexmk` exits nonzero because BibLaTeX has not converged. Treat `Package biblatex Warning: Please (re)run Biber on the file: main` together with `LaTeX Warning: There were undefined references` as a toolchain/convergence failure: Biber must run and LuaLaTeX must rerun until references settle. The repository `latexmkrc` enables this with `$bibtex_use = 2`, the explicit `biber %O %B` command and enough repeat passes. Root smoke builds without a configured `bibliography/resource` do not load the BibLaTeX backend, so they should not emit a Biber rerun warning merely because the framework bibliography package is present.
+
+`tools/check_latex_log.py` also fails generic fatal LaTeX patterns such as package errors, `LaTeX Error`, undefined control sequences, emergency stops and missing output PDFs. Use it on every produced log before treating a generated PDF as successful.
+
+Multilingual examples also require usable Arabic/Hebrew fonts. The INSR typography layer falls back from Amiri/Noto language fonts to TeX Gyre/Latin Modern so missing optional fonts do not abort smoke builds before the actual document can be validated.
+
+Palette mode metadata is tracked in `palettes/manifest.json`; tests compare the active `design/mode` with the active palette background luminance rather than pinning the project to a single palette name.
+
 Static-only mode does not require TeX Live and is suitable for lightweight containers. The default `./tests/run-tests.sh` remains developer-friendly and skips compilation when the toolchain is unavailable; CI and `./scripts/test.sh --compile` use strict mode and fail when required TeX tools are missing.
 
 ## Publication stabilization checks

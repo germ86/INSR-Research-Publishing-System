@@ -1,3 +1,4 @@
+import json
 import re
 import unittest
 from pathlib import Path
@@ -29,10 +30,13 @@ class ColorContrastStaticTests(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
-    def test_active_midnight_palette_uses_dark_mode(self):
+    def test_active_palette_mode_matches_background_luminance(self):
         project = self.read("config/project-config.tex")
-        self.assertIn("design/palette = midnight", project)
-        self.assertIn("design/mode = dark", project)
+        palette = re.search(r"design/palette\s*=\s*([A-Za-z0-9_./-]+)", project).group(1)
+        mode = re.search(r"design/mode\s*=\s*([A-Za-z0-9_-]+)", project).group(1)
+        colors = parse_html_colors(ROOT / f"palettes/{palette}.tex")
+        expected_mode = "dark" if relative_luminance(colors["INSRBackground"]) < 0.25 else "light"
+        self.assertEqual(mode, expected_mode)
 
     def test_midnight_text_contrast_meets_wcag_aa(self):
         colors = parse_html_colors(ROOT / "palettes/midnight.tex")
@@ -45,6 +49,16 @@ class ColorContrastStaticTests(unittest.TestCase):
             4.5,
         )
 
+
+    def test_palette_manifest_matches_palette_files(self):
+        manifest = json.loads((ROOT / "palettes/manifest.json").read_text(encoding="utf-8"))
+        for path in sorted((ROOT / "palettes").glob("*.tex")):
+            with self.subTest(palette=path.stem):
+                self.assertIn(path.stem, manifest)
+                colors = parse_html_colors(path)
+                self.assertEqual(manifest[path.stem]["file"], f"palettes/{path.name}")
+                expected_mode = "dark" if relative_luminance(colors["INSRBackground"]) < 0.25 else "light"
+                self.assertEqual(manifest[path.stem]["mode"], expected_mode)
 
     def test_additional_palette_pack_text_contrast_meets_wcag_aa(self):
         for palette in (
