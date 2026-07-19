@@ -32,6 +32,20 @@ class LatexLogCheckerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("repository path", result.stdout)
 
+    def test_fatal_latex_errors_fail(self):
+        errors = [
+            "! Package fontspec Error: The font \"FreeSerif\" cannot be found.\n",
+            "! LaTeX Error: Invalid operation fp_to_decimal(inf).\n",
+            "! Undefined control sequence.\n",
+            "! Emergency stop.\n",
+            "Fatal error occurred, no output PDF file produced!\n",
+            "No output PDF file produced!\n",
+        ]
+        for error in errors:
+            with self.subTest(error=error):
+                result = self.run_checker(error)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_known_regression_warnings_fail(self):
         warnings = [
             "LaTeX Warning: Command \\showhyphens has changed.\n",
