@@ -73,6 +73,12 @@ python3 -m unittest
 
 If LuaLaTeX/latexmk are available, run `./tests/run-tests.sh --require-tex` to compile all official entrypoints listed by the Overleaf doctor.
 
+## Build-profile smoke checks
+
+The root project defaults to `document/build-profile = development` so incomplete content units can remain visible during drafting. Before a productive/release handoff, switch the project or a smoke fixture to `document/build-profile = production` and keep `content/placeholders` unset or set to `error`; required placeholders must then fail intentionally. The aliases `productive`, `prod`, and `release` normalize to `production`, but release scripts should use the canonical `production` spelling.
+
+For review copies, use `document/build-profile = review`. This keeps the same target/palette/theme resolution while rendering neutral placeholder text for reviewers.
+
 ## External-package warning policy
 
 Warnings from external TeX packages should be fixed when caused by INSR configuration. If a warning is unavoidable and originates solely from an external package or a missing local toolchain, document the package/tool, command, and reason in the release notes instead of suppressing it.

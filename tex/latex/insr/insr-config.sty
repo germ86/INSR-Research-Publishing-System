@@ -77,6 +77,27 @@
 \tl_gset:Nn \g_insr_layout_page_numbering_tl { body-only }
 \tl_gset:Nn \g_insr_content_placeholders_tl { compact }
 \tl_gset:Nn \g_insr_typography_microtype_tl { false }
+\msg_new:nnn { insr } { unknown-build-profile } { Unknown~document/build-profile~'#1';~falling~back~to~development. }
+\cs_new_protected:Npn \__insr_set_development_profile:
+  { \tl_gset:Nn \g_insr_build_profile_tl { development } \tl_gset:Nn \g_insr_content_placeholders_tl { compact } }
+\cs_new_protected:Npn \__insr_set_review_profile:
+  { \tl_gset:Nn \g_insr_build_profile_tl { review } \tl_gset:Nn \g_insr_content_placeholders_tl { show } }
+\cs_new_protected:Npn \__insr_set_production_profile:
+  { \tl_gset:Nn \g_insr_build_profile_tl { production } \tl_gset:Nn \g_insr_content_placeholders_tl { error } }
+\cs_new_protected:Npn \insr_build_profile_set:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { development } { \__insr_set_development_profile: }
+        { dev } { \__insr_set_development_profile: }
+        { review } { \__insr_set_review_profile: }
+        { production } { \__insr_set_production_profile: }
+        { productive } { \__insr_set_production_profile: }
+        { prod } { \__insr_set_production_profile: }
+        { release } { \__insr_set_production_profile: }
+      }
+      { \msg_warning:nnn { insr } { unknown-build-profile } {#1} \__insr_set_development_profile: }
+  }
 \bool_gset_true:N \g_insr_frontmatter_toc_bool
 \bool_gset_false:N \g_insr_frontmatter_abstract_numbered_bool
 \bool_gset_true:N \g_insr_frontmatter_keywords_bool
@@ -87,7 +108,7 @@
     document/type .code:n = { \tl_gset:Nn \g_insr_document_type_tl {#1} \bool_gset_true:N \g__insr_document_type_explicit_bool },
     document/target .code:n = { \__insr_set_legacy_target:n {#1} },
     document/density .tl_gset:N = \g_insr_density_tl,
-    document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
+    document/build-profile .code:n = { \insr_build_profile_set:n {#1} },
     design/theme .code:n = { \bool_gset_true:N \g__insr_design_theme_explicit_bool \insr_theme_activate:n {#1} },
     design/palette .code:n = { \bool_gset_true:N \g__insr_design_palette_explicit_bool \tl_gset:Nn \g_insr_palette_tl {#1} },
     design/font .code:n = { \bool_gset_true:N \g__insr_design_font_explicit_bool \insr_fontset_activate:n {#1} },

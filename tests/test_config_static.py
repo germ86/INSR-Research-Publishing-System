@@ -63,6 +63,19 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("outputs = {paper}", fixture)
         self.assertIn("Randomized~controlled~trial~protocol", profile)
 
+    def test_build_profiles_are_normalized_and_set_placeholder_policy(self):
+        config = self.read("tex/latex/insr/insr-config.sty")
+        docs = self.read("docs/CONFIGURATION_REFERENCE.md")
+        self.assertIn(r"document/build-profile .code:n = { \insr_build_profile_set:n {#1} }", config)
+        for token in ("{ development }", "{ review }", "{ production }", "{ productive }", "{ prod }", "{ release }"):
+            self.assertIn(token, config)
+        self.assertIn(r"\tl_gset:Nn \g_insr_content_placeholders_tl { compact }", config)
+        self.assertIn(r"\tl_gset:Nn \g_insr_content_placeholders_tl { show }", config)
+        self.assertIn(r"\tl_gset:Nn \g_insr_content_placeholders_tl { error }", config)
+        self.assertIn("Unknown~document/build-profile", config)
+        self.assertIn("productive", docs)
+        self.assertIn("production", docs)
+
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
         for token in (
