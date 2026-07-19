@@ -44,9 +44,8 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("output/target = paper", active)
         self.assertNotIn("document/target", active)
         self.assertNotIn("build/preset", active)
-        self.assertIn("document/type=slides, output/target=journal", project)
-        self.assertNotIn("document/type=position-paper", project)
-        self.assertNotIn("output/target=paper", project)
+        self.assertIn("document/type=position-paper, output/target=paper", project)
+        self.assertNotIn("output/target=journal", project)
         self.assertNotIn("build/preset", project)
 
     def test_rct_combination_is_canonicalized_when_used_as_output_target(self):
@@ -77,6 +76,35 @@ class ConfigStaticTests(unittest.TestCase):
             resolver.index("\\__insr_apply_document_type_preset_shorthand:"),
             resolver.rindex("\\__insr_resolve_output_target:"),
         )
+
+
+    def test_design_keys_are_independent_after_theme_activation(self):
+        core = self.read("tex/latex/insr/insr-core.sty")
+        config = self.read("tex/latex/insr/insr-config.sty")
+        registry = self.read("config/theme-registry.tex")
+        profile = self.read("profiles/documents/rct-protocol.profile.tex")
+        self.assertIn("design/theme .code:n", config)
+        self.assertIn("g__insr_design_palette_explicit_bool", core)
+        self.assertIn(r"bool_if:NF \g__insr_design_palette_explicit_bool", core)
+        self.assertIn(r"\INSRProfileDefaults", config)
+        self.assertIn(r"\INSRProfileDefaults{design/theme=clinical}", profile)
+        self.assertNotIn("design/theme", profile.replace(r"\INSRProfileDefaults{design/theme=clinical}", ""))
+        for theme in ("editorial", "clinical", "minimal", "technical", "presentation", "protocol", "research", "accessible"):
+            self.assertIn(fr"\insr_theme_register:nn {{ {theme} }}", registry)
+            self.assertTrue((ROOT / f"themes/{theme}.tex").is_file(), theme)
+
+    def test_regression_design_combinations_are_registered(self):
+        registry = self.read("config/target-registry.tex")
+        for combination in (
+            "rct-protocol",
+            "rct-protocol-slides",
+            "rct-protocol-handout",
+            "rct-protocol-poster",
+            "position-paper",
+        ):
+            self.assertIn(fr"\INSRRegisterCombination{{{combination}}}", registry)
+        for palette in ("neuroclinical", "autonomic-teal", "cortex-blue", "somatic-sage", "translational-plum"):
+            self.assertTrue((ROOT / f"palettes/{palette}.tex").is_file(), palette)
 
     def test_publication_date_and_year_are_dynamic(self):
         publication = self.read("config/publication-config.tex")

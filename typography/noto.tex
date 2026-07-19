@@ -1,13 +1,13 @@
 % INSR typography preset: noto
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}}
-\IfFontExistsTF{Noto Sans}{\setsansfont{Noto Sans}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
-\IfFontExistsTF{Noto Sans Mono}{\setmonofont{Noto Sans Mono}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\__insr_typography_set_main_font:nn { TeX~Gyre~Pagella } { Latin~Modern~Roman }}
+\__insr_typography_set_sans_font:nn { Noto~Sans } { TeX~Gyre~Heros }
+\__insr_typography_set_mono_font:nn { Noto~Sans~Mono } { Latin~Modern~Mono }
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { arabic } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\IfFontExistsTF{Noto Naskh Arabic}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Noto Naskh Arabic}}{\IfFontExistsTF{FreeSerif}{\newfontfamily\insrarabicfont{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrarabicfont{TeX Gyre Pagella}}{\newfontfamily\insrarabicfont{Latin Modern Roman}}}}} }
+  { \__insr_typography_set_arabic_font: }
 \bool_lazy_or:nnT
   { \str_if_eq_p:Vn \g_insr_language_tl { hebrew } }
   { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}} }
+  { \__insr_typography_set_hebrew_font: }

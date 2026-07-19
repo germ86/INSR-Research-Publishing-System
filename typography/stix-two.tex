@@ -1,7 +1,7 @@
 % INSR typography preset: stix-two
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{STIX Two Text}{\setmainfont{STIX Two Text}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}}
-\IfFontExistsTF{STIX Two Text}{\setsansfont{STIX Two Text}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
-\IfFontExistsTF{Latin Modern Mono}{\setmonofont{Latin Modern Mono}}{\setmonofont{Latin Modern Mono}}
-\IfFontExistsTF{Amiri}{\newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\newfontfamily\insrarabicfont{FreeSerif}}
-\IfFontExistsTF{FreeSerif}{\newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}}{\IfFontExistsTF{TeX Gyre Pagella}{\newfontfamily\insrhebrewfont{TeX Gyre Pagella}}{\newfontfamily\insrhebrewfont{Latin Modern Roman}}}
+\IfFontExistsTF{STIX Two Text}{\setmainfont{STIX Two Text}}{\__insr_typography_set_main_font:nn { TeX~Gyre~Pagella } { Latin~Modern~Roman }}
+\__insr_typography_set_sans_font:nn { STIX~Two~Text } { TeX~Gyre~Heros }
+\__insr_typography_set_mono_font:nn { Latin~Modern~Mono } { Latin~Modern~Mono }
+\__insr_typography_set_arabic_font:
+\__insr_typography_set_hebrew_font:

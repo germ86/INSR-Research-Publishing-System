@@ -7,6 +7,24 @@ import re
 from pathlib import Path
 
 FORBIDDEN = {
+    "generic LaTeX package error": re.compile(
+        r"(?:^|\n)! Package [^\n]+ Error:"
+    ),
+    "generic LaTeX error": re.compile(
+        r"(?:^|\n)! LaTeX Error:"
+    ),
+    "undefined control sequence": re.compile(
+        r"(?:^|\n)! Undefined control sequence\."
+    ),
+    "emergency stop": re.compile(
+        r"(?:^|\n)! Emergency stop\."
+    ),
+    "fatal TeX error": re.compile(
+        r"Fatal error occurred"
+    ),
+    "missing output PDF": re.compile(
+        r"No output PDF file produced"
+    ),
     "INSR package requested through a repository path": re.compile(
         r"You have requested package [`'](?:\./)?tex/latex/insr/insr-[^`']+"
     ),
