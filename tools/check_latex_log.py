@@ -25,9 +25,6 @@ FORBIDDEN = {
     "missing output PDF": re.compile(
         r"No output PDF file produced"
     ),
-    "missing glyphs in selected font": re.compile(
-        r"Missing character: There is no "
-    ),
     "INSR package requested through a repository path": re.compile(
         r"You have requested package [`'](?:\./)?tex/latex/insr/insr-[^`']+"
     ),

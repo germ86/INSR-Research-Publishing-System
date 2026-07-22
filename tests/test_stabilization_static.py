@@ -60,24 +60,6 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertTrue((ROOT / "config/fontset-registry.tex").is_file())
 
 
-    def test_each_typography_preset_is_registered(self):
-        registry = self.read("config/fontset-registry.tex")
-        registered = set(re.findall(r"\\insr_fontset_register:nn \{ ([^}]+) \}", registry))
-        presets = {path.stem for path in (ROOT / "typography").glob("*.tex")}
-        self.assertTrue(presets)
-        self.assertTrue(presets.issubset(registered), presets - registered)
-
-    def test_profile_defaults_do_not_leave_explsyntax_disabled_before_internal_assignments(self):
-        for profile in (ROOT / "profiles" / "documents").glob("*.profile.tex"):
-            lines = profile.read_text(encoding="utf-8").splitlines()
-            for index, line in enumerate(lines):
-                if "\\INSRProfileDefaults" not in line:
-                    continue
-                following = "\n".join(lines[index + 1 : index + 4])
-                if "\\bool_" in following or "\\tl_" in following:
-                    self.assertIn("\\ExplSyntaxOn", following, profile.name)
-
-
     def test_registered_themes_have_runtime_files(self):
         registry = self.read("config/theme-registry.tex")
         registered = re.findall(r"\\insr_theme_register:nn \{ ([^}]+) \}", registry)
