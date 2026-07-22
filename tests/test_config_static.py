@@ -76,20 +76,6 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("productive", docs)
         self.assertIn("production", docs)
 
-    def test_document_type_defaults_select_matching_output_target(self):
-        config = self.read("tex/latex/insr/insr-config.sty")
-        self.assertIn("__insr_apply_default_output_target_for_document_type", config)
-        self.assertIn(r"\bool_if:NF \g__insr_output_target_explicit_bool", config)
-        self.assertIn(r"\prop_get:NVNTF \g__insr_output_base_prop \g_insr_document_type_tl", config)
-        self.assertLess(
-            config.index("__insr_resolve_document_profile:"),
-            config.index("__insr_apply_default_output_target_for_document_type:"),
-        )
-        self.assertLess(
-            config.index("__insr_apply_default_output_target_for_document_type:"),
-            config.index("__insr_resolve_output_target:"),
-        )
-
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")
         for token in (

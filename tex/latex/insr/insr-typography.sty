@@ -2,25 +2,6 @@
 \ProvidesPackage{insr-typography}[2026/07/15 INSR typography]
 \ExplSyntaxOn
 
-\cs_new_protected:Npn \__insr_typography_set_main_font:nn #1#2
-  {
-    \IfFontExistsTF {#1}
-      { \setmainfont{#1} }
-      { \setmainfont{#2} }
-  }
-\cs_new_protected:Npn \__insr_typography_set_sans_font:nn #1#2
-  {
-    \IfFontExistsTF {#1}
-      { \setsansfont{#1} }
-      { \setsansfont{#2} }
-  }
-\cs_new_protected:Npn \__insr_typography_set_mono_font:nn #1#2
-  {
-    \IfFontExistsTF {#1}
-      { \setmonofont{#1} }
-      { \setmonofont{#2} }
-  }
-
 \cs_new_protected:Npn \__insr_typography_set_arabic_font:
   {
     \IfFontExistsTF { Amiri }

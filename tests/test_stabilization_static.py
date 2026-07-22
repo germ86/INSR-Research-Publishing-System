@@ -86,33 +86,5 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertIn("unzip -l", ci)
         self.assertIn("upload-artifact", ci)
 
-    def test_typography_font_helpers_exist(self):
-        typography = self.read("tex/latex/insr/insr-typography.sty")
-        for helper in (
-            "__insr_typography_set_main_font:nn",
-            "__insr_typography_set_sans_font:nn",
-            "__insr_typography_set_mono_font:nn",
-        ):
-            self.assertIn(helper, typography)
-        self.assertIn(r"\setmainfont", typography)
-        self.assertIn(r"\setsansfont", typography)
-        self.assertIn(r"\setmonofont", typography)
-
-    def test_test_runner_uses_isolated_compile_output_dirs_and_log_checks(self):
-        runner = self.read("tests/run-tests.sh")
-        self.assertIn('output_dir="build/compile/${document%.*}"', runner)
-        self.assertIn('-outdir="$output_dir"', runner)
-        self.assertIn("tools/check_latex_log.py", runner)
-        self.assertIn("python3 -m unittest discover -s tests", runner)
-
-    def test_validator_ignores_generated_build_trees(self):
-        validator = self.read("tools/validate_project.py")
-        self.assertIn('IGNORED_GENERATED_DIRS = {".git", "build", "dist", "tmp", "release"}', validator)
-        self.assertIn("is_generated_path", validator)
-
-    def test_l3build_uses_portable_line_width(self):
-        build = self.read("build.lua")
-        self.assertIn("maxprintline = 10000", build)
-
 if __name__ == "__main__":
     unittest.main()

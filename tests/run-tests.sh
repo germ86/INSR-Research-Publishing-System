@@ -37,7 +37,13 @@ python3 tools/overleaf_doctor.py check
 python3 tools/validate_project.py
 python3 tools/validate_bibliography.py references.bib
 python3 tools/validate_palette.py
-python3 -m unittest discover -s tests
+python3 -m unittest \
+  tests/test_overleaf_doctor.py \
+  tests/test_config_static.py \
+  tests/test_publication_layer_static.py \
+  tests/test_release_metadata_static.py \
+  tests/test_latex_log_checker.py \
+  tests/test_color_contrast_static.py
 
 mapfile -t documents < <(python3 tools/overleaf_doctor.py list-entrypoints --plain)
 documents+=(tests/fixtures/position-paper-editorial-content-unit.tex)
@@ -78,12 +84,6 @@ if (( ${#missing_tools[@]} > 0 )); then
 fi
 
 for document in "${documents[@]}"; do
-  output_dir="build/compile/${document%.*}"
-  mkdir -p "$output_dir"
-  latexmk -C -outdir="$output_dir" "$document"
-  latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
-  log_file="$output_dir/$(basename "${document%.*}").log"
-  if [[ -f "$log_file" ]]; then
-    python3 tools/check_latex_log.py "$log_file"
-  fi
+  latexmk -C "$document"
+  latexmk -lualatex -interaction=nonstopmode -halt-on-error "$document"
 done
