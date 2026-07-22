@@ -9,13 +9,6 @@ from pathlib import Path
 from insr_registry import load_registry, targets_from_registry, validate_registry
 
 ROOT = Path(__file__).resolve().parents[1]
-IGNORED_GENERATED_DIRS = {".git", "build", "dist", "tmp", "release"}
-
-
-def is_generated_path(path: Path) -> bool:
-    return any(part in IGNORED_GENERATED_DIRS for part in path.relative_to(ROOT).parts)
-
-
 PACKAGE_NAMES = [
     "insr-core",
     "insr-config",
@@ -76,7 +69,7 @@ missing = [path for path in required if not (ROOT / path).is_file()]
 if missing:
     fail(f"Missing required files: {missing}")
 
-class_copies = [str(path.relative_to(ROOT)) for path in ROOT.rglob("insr.cls") if not is_generated_path(path)]
+class_copies = [str(path.relative_to(ROOT)) for path in ROOT.rglob("insr.cls") if ".git" not in path.parts]
 if class_copies != ["insr.cls"]:
     fail(f"Expected exactly one authoritative insr.cls, found: {class_copies}")
 

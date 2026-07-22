@@ -9,11 +9,10 @@
 \cs_set_protected:Npn \__insr_adapter_render_content_unit:
   {
     \begin{frame}{\tl_use:N \l_insr_unit_title_tl}
-    \str_if_eq:VnTF \g_insr_output_target_tl { handout }
-      { \__insr_render_first_available:n { handout,summary,full,key } }
-      { \__insr_render_first_available:n { summary,key,full } }
+    \tl_if_blank:VTF \l_insr_unit_summary_tl
+      { \tl_if_blank:VF \l_insr_unit_key_tl { \textbf{Key~message:}~\tl_use:N \l_insr_unit_key_tl } }
+      { \tl_use:N \l_insr_unit_summary_tl }
     \tl_if_blank:VF \l_insr_unit_key_tl { \par\medskip\alert{\tl_use:N \l_insr_unit_key_tl} }
-    \tl_if_blank:VF \l_insr_unit_notes_tl { \note{\tl_use:N \l_insr_unit_notes_tl} }
     \end{frame}
   }
 \cs_set_protected:Npn \__insr_adapter_bibliography:n #1 { \begin{frame}[allowframebreaks]{References}\__insr_print_bibliography:n {#1}\end{frame} }

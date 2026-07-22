@@ -334,20 +334,6 @@
       { }
   }
 \msg_new:nnn { insr } { unknown-output-target } { Unknown~output/target~'#1'.~Falling~back~to~paper. }
-
-\cs_new_protected:Npn \__insr_apply_default_output_target_for_document_type:
-  {
-    \bool_if:NF \g__insr_output_target_explicit_bool
-      {
-        \prop_get:NVNTF \g__insr_combination_target_prop \g_insr_document_type_tl \l_tmpa_tl
-          { \tl_gset_eq:NN \g_insr_output_target_tl \l_tmpa_tl }
-          {
-            \prop_get:NVNTF \g__insr_output_base_prop \g_insr_document_type_tl \l_tmpa_tl
-              { \tl_gset_eq:NN \g_insr_output_target_tl \g_insr_document_type_tl }
-              { }
-          }
-      }
-  }
 \cs_new_protected:Npn \__insr_resolve_output_target:
   {
     \prop_get:NVNTF \g__insr_output_base_prop \g_insr_output_target_tl \l_tmpa_tl
@@ -383,7 +369,6 @@
     \__insr_apply_document_type_preset_shorthand:
     \__insr_normalize_document_type:
     \__insr_resolve_document_profile:
-    \__insr_apply_default_output_target_for_document_type:
     \__insr_resolve_output_target:
     \__insr_resolve_content_source:
   }
