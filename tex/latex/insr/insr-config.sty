@@ -108,7 +108,7 @@
     document/type .code:n = { \tl_gset:Nn \g_insr_document_type_tl {#1} \bool_gset_true:N \g__insr_document_type_explicit_bool },
     document/target .code:n = { \__insr_set_legacy_target:n {#1} },
     document/density .tl_gset:N = \g_insr_density_tl,
-    document/build-profile .tl_gset:N = \g_insr_build_profile_tl,
+    document/build-profile .code:n = { \insr_build_profile_set:n {#1} },
     design/theme .code:n = { \bool_gset_true:N \g__insr_design_theme_explicit_bool \insr_theme_activate:n {#1} },
     design/palette .code:n = { \bool_gset_true:N \g__insr_design_palette_explicit_bool \tl_gset:Nn \g_insr_palette_tl {#1} },
     design/font .code:n = { \bool_gset_true:N \g__insr_design_font_explicit_bool \insr_fontset_activate:n {#1} },
