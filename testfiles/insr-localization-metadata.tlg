@@ -1,0 +1,12 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+(insr-core.sty
+Package: insr-core ....-..-.. INSR core state and public API
+) (insr-config.sty
+Package: insr-config ....-..-.. INSR configuration and target registry
+(config/theme-registry.tex) (config/plugin-registry.tex) (config/fontset-registry.tex) (config/target-registry.tex)) (config/target-compatibility.tex) (insr-metadata.sty
+Package: insr-metadata ....-..-.. INSR metadata registries
+\l__insr_credit_author_index_int=\count...
+)
+INSR-TEST localization requested=zz-ZZ
+INSR-TEST metadata title=Metadata Regression author=Example Author

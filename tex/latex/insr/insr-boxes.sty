@@ -1,0 +1,29 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-boxes}[2026/07/15 INSR semantic boxes]
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\ExplSyntaxOn
+\cs_new_protected:Npn \insr_semantic_inline:nn #1#2 { \par\noindent\textbf{#1:}~#2\par }
+\NewDocumentCommand \ResearchQuestion { m } { \insr_semantic_inline:nn { Research~question } {#1} }
+\NewDocumentCommand \Hypothesis { m } { \insr_semantic_inline:nn { Hypothesis } {#1} }
+\NewDocumentCommand \Objective { m } { \insr_semantic_inline:nn { Objective } {#1} }
+\NewDocumentCommand \Method { m } { \insr_semantic_inline:nn { Method } {#1} }
+\NewDocumentCommand \Finding { m } { \insr_semantic_inline:nn { Finding } {#1} }
+\NewDocumentCommand \KeyFinding { m } { \begin{tcolorbox}[colback=INSRSurfaceAlt,colframe=INSRResult,title=Key~finding]#1\end{tcolorbox} }
+\NewDocumentCommand \EvidenceStatement { m } { \insr_semantic_inline:nn { Evidence } {#1} }
+\NewDocumentCommand \ClinicalImplication { m } { \insr_semantic_inline:nn { Clinical~implication } {#1} }
+\NewDocumentCommand \TechnicalImplication { m } { \insr_semantic_inline:nn { Technical~implication } {#1} }
+\NewDocumentCommand \Limitation { m } { \insr_semantic_inline:nn { Limitation } {#1} }
+\NewDocumentCommand \FutureWork { m } { \insr_semantic_inline:nn { Future~work } {#1} }
+\NewDocumentCommand \Recommendation { m } { \insr_semantic_inline:nn { Recommendation } {#1} }
+\NewDocumentCommand \SafetyStatement { m } { \begin{tcolorbox}[colback=INSRSurfaceAlt,colframe=INSRSafety,title=Safety]#1\end{tcolorbox} }
+\NewDocumentEnvironment{ResearchNote}{+b}{\begin{tcolorbox}[title=Research~note]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{ClinicalNote}{+b}{\begin{tcolorbox}[title=Clinical~note]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{EvidenceBlock}{+b}{\begin{tcolorbox}[title=Evidence]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{StudyDesignBlock}{+b}{\begin{tcolorbox}[title=Study~design]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{OutcomeBlock}{+b}{\begin{tcolorbox}[title=Outcome]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{LimitationBlock}{+b}{\begin{tcolorbox}[title=Limitation]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{SafetyBox}{+b}{\begin{tcolorbox}[title=Safety]#1\end{tcolorbox}}{}
+\NewDocumentEnvironment{KeyPoint}{+b}{\begin{tcolorbox}[title=Key~point]#1\end{tcolorbox}}{}
+\ExplSyntaxOff
+\endinput

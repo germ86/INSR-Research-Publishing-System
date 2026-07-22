@@ -1,0 +1,55 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-typography}[2026/07/15 INSR typography]
+\ExplSyntaxOn
+
+\cs_new_protected:Npn \__insr_typography_set_main_font:nn #1#2
+  {
+    \IfFontExistsTF {#1}
+      { \setmainfont{#1} }
+      { \setmainfont{#2} }
+  }
+\cs_new_protected:Npn \__insr_typography_set_sans_font:nn #1#2
+  {
+    \IfFontExistsTF {#1}
+      { \setsansfont{#1} }
+      { \setsansfont{#2} }
+  }
+\cs_new_protected:Npn \__insr_typography_set_mono_font:nn #1#2
+  {
+    \IfFontExistsTF {#1}
+      { \setmonofont{#1} }
+      { \setmonofont{#2} }
+  }
+
+\cs_new_protected:Npn \__insr_typography_set_arabic_font:
+  {
+    \IfFontExistsTF { Amiri }
+      { \newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Amiri} }
+      {
+        \IfFontExistsTF { Noto~Naskh~Arabic }
+          { \newfontfamily\insrarabicfont[Script=Arabic,Scale=1.05]{Noto~Naskh~Arabic} }
+          {
+            \IfFontExistsTF { TeX~Gyre~Pagella }
+              { \newfontfamily\insrarabicfont{TeX~Gyre~Pagella} }
+              { \newfontfamily\insrarabicfont{Latin~Modern~Roman} }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_typography_set_hebrew_font:
+  {
+    \IfFontExistsTF { Noto~Sans~Hebrew }
+      { \newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{Noto~Sans~Hebrew} }
+      {
+        \IfFontExistsTF { Noto~Serif~Hebrew }
+          { \newfontfamily\insrhebrewfont[Script=Hebrew,Scale=1.05]{Noto~Serif~Hebrew} }
+          {
+            \IfFontExistsTF { TeX~Gyre~Pagella }
+              { \newfontfamily\insrhebrewfont{TeX~Gyre~Pagella} }
+              { \newfontfamily\insrhebrewfont{Latin~Modern~Roman} }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_load_typography: { \__insr_load_file_with_fallback:nnn { typography/\tl_use:N\g_insr_font_tl.tex } { typography } { \msg_warning:nnx { insr } { unknown-font } { \tl_use:N\g_insr_font_tl } \file_input:n { typography/libertinus.tex } } }
+\__insr_load_typography:
+\ExplSyntaxOff
+\endinput
