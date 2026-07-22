@@ -1,0 +1,82 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-typography}[2026/07/15 INSR typography]
+\ExplSyntaxOn
+
+
+\msg_new:nnn { insr } { font-fallback }
+  { Font~'#1'~is~not~available;~using~'#2'~for~#3. }
+\msg_new:nnn { insr } { font-final-fallback }
+  { Font~'#1'~and~fallback~'#2'~are~not~available;~using~safe~TeX~Live~fallback~'#3'~for~#4. }
+
+\cs_new_protected:Npn \__insr_typography_set_role_font:nnnnn #1#2#3#4#5
+  {
+    \IfFontExistsTF {#2}
+      { #1 {#2} }
+      {
+        \IfFontExistsTF {#3}
+          { \msg_warning:nnxxx { insr } { font-fallback } {#2} {#3} {#5} #1 {#3} }
+          {
+            \IfFontExistsTF {#4}
+              { \msg_warning:nnxxxx { insr } { font-final-fallback } {#2} {#3} {#4} {#5} #1 {#4} }
+              { \IfFontExistsTF { Latin~Modern~Roman } { #1 { Latin~Modern~Roman } } { \msg_error:nnnn { insr } { font-fallback } {#2} {#5} } }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_typography_set_main_font:nn #1#2
+  { \__insr_typography_set_role_font:nnnnn \setmainfont {#1} {#2} { Latin~Modern~Roman } { body~serif } }
+\cs_new_protected:Npn \__insr_typography_set_sans_font:nn #1#2
+  { \__insr_typography_set_role_font:nnnnn \setsansfont {#1} {#2} { Latin~Modern~Sans } { body~sans } }
+\cs_new_protected:Npn \__insr_typography_set_mono_font:nn #1#2
+  { \__insr_typography_set_role_font:nnnnn \setmonofont {#1} {#2} { Latin~Modern~Mono } { mono } }
+
+\cs_new_protected:Npn \__insr_typography_set_arabic_font:
+  {
+    \IfFontExistsTF { Amiri }
+      { \__insr_typography_define_script_font:nnn { arabic } { Arabic } { Amiri } }
+      {
+        \IfFontExistsTF { Noto~Naskh~Arabic }
+          { \__insr_typography_define_script_font:nnn { arabic } { Arabic } { Noto~Naskh~Arabic } }
+          {
+            \IfFontExistsTF { TeX~Gyre~Pagella }
+              { \__insr_typography_define_script_font:nnn { arabic } { Arabic } { TeX~Gyre~Pagella } }
+              { \__insr_typography_define_script_font:nnn { arabic } { Arabic } { Latin~Modern~Roman } }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_typography_set_hebrew_font:
+  {
+    \IfFontExistsTF { FreeSerif }
+      { \__insr_typography_define_script_font:nnn { hebrew } { Hebrew } { FreeSerif } }
+      {
+        \IfFontExistsTF { Noto~Sans~Hebrew }
+          { \__insr_typography_define_script_font:nnn { hebrew } { Hebrew } { Noto~Sans~Hebrew } }
+          {
+            \IfFontExistsTF { Noto~Serif~Hebrew }
+              { \__insr_typography_define_script_font:nnn { hebrew } { Hebrew } { Noto~Serif~Hebrew } }
+              {
+                \IfFontExistsTF { TeX~Gyre~Pagella }
+                  { \__insr_typography_define_script_font:nnn { hebrew } { Hebrew } { TeX~Gyre~Pagella } }
+                  { \__insr_typography_define_script_font:nnn { hebrew } { Hebrew } { Latin~Modern~Roman } }
+              }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_typography_define_script_font:nnn #1#2#3
+  {
+    \str_case:nn {#1}
+      {
+        { arabic } { \newfontfamily\insrarabicfont[Script=#2,Scale=1.05]{#3} }
+        { hebrew } { \newfontfamily\insrhebrewfont[Script=#2,Scale=1.05]{#3} }
+      }
+    \cs_if_exist:NT \babelfont
+      {
+        \babelfont[#1]{rm}[Script=#2,Scale=1.05]{#3}
+        \babelfont[#1]{sf}[Script=#2,Scale=1.05]{#3}
+        \babelfont[#1]{tt}[Script=#2,Scale=1.05]{#3}
+        \ExplSyntaxOn
+      }
+  }
+\cs_new_protected:Npn \__insr_load_typography: { \__insr_load_file_with_fallback:nnn { typography/\tl_use:N\g_insr_font_tl.tex } { typography } { \msg_warning:nnx { insr } { unknown-font } { \tl_use:N\g_insr_font_tl } \file_input:n { typography/libertinus.tex } } }
+\__insr_load_typography:
+\ExplSyntaxOff
+\endinput

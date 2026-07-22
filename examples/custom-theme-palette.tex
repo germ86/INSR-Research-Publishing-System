@@ -1,4 +1,6 @@
-\documentclass{../insr}
-\INSRSetup{document-type=paper,title={Custom Theme and Palette}}
-\input{../themes/custom-palette.tex}
-\begin{document}\INSRBeginDocument\INSRMakeTitle\INSRKeyMessage{This document overrides semantic palette colors through a theme file.}\end{document}
+\documentclass[config/load-project=false, metadata/author={INSR Example Author}, metadata/institution={INSR Example Institution}, document/type=paper,design/theme=custom-example,design/palette=forest,metadata/title={Custom Theme and Palette}]{insr}
+\begin{document}
+\INSRMakeTitle
+\INSRSection{Demonstration}
+This example selects a custom theme and palette through v4 class options.
+\end{document}
