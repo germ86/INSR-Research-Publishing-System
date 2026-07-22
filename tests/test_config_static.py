@@ -40,13 +40,13 @@ class ConfigStaticTests(unittest.TestCase):
     def test_active_build_uses_one_pre_class_selector(self):
         active = self.read("config/active-target.tex")
         project = self.read("config/project-config.tex")
-        self.assertIn("document/type = position-paper", active)
-        self.assertIn("output/target = paper", active)
+        self.assertIn("build/preset = position-paper", active)
         self.assertNotIn("document/target", active)
-        self.assertNotIn("build/preset", active)
+        self.assertNotIn("document/type", active)
+        self.assertNotIn("output/target", active)
         self.assertIn("document/type=position-paper, output/target=paper", project)
         self.assertNotIn("output/target=journal", project)
-        self.assertNotIn("build/preset", project)
+        self.assertIn("build/preset", self.read("docs/CONFIGURATION_REFERENCE.md"))
 
     def test_rct_combination_is_canonicalized_when_used_as_output_target(self):
         registry = self.read("config/target-registry.tex")
@@ -75,6 +75,34 @@ class ConfigStaticTests(unittest.TestCase):
         self.assertIn("Unknown~document/build-profile", config)
         self.assertIn("productive", docs)
         self.assertIn("production", docs)
+
+    def test_document_type_defaults_select_matching_output_target(self):
+        config = self.read("tex/latex/insr/insr-config.sty")
+        self.assertIn("__insr_apply_default_output_target_for_document_type", config)
+        self.assertIn(r"\bool_if:NF \g__insr_output_target_explicit_bool", config)
+        self.assertIn(r"\prop_get:NVNTF \g__insr_output_base_prop \g_insr_document_type_tl", config)
+        self.assertLess(
+            config.index("__insr_resolve_document_profile:"),
+            config.index("__insr_apply_default_output_target_for_document_type:"),
+        )
+        self.assertLess(
+            config.index("__insr_apply_default_output_target_for_document_type:"),
+            config.index("__insr_resolve_output_target:"),
+        )
+
+    def test_template_token_is_connected_to_renderer(self):
+        content = self.read("tex/latex/insr/insr-content.sty")
+        self.assertIn("framework/templates/", content)
+        self.assertIn(r"\g_insr_template_tl", content)
+        self.assertIn(r"\file_input:V \l__insr_runtime_file_tl", content)
+
+    def test_protocol_manifests_contain_required_method_sections(self):
+        rct = self.read("content/rct-protocol/manifest.tex")
+        clinical = self.read("content/clinical-protocol/manifest.tex")
+        for token in ("Protocol Identification", "Trial Registration", "Sample-size Calculation", "Randomization and Allocation Concealment", "SPIRIT Checklist", "TIDieR Appendix"):
+            self.assertIn(token, rct)
+        for token in ("Scope and Indications", "Contraindications", "Baseline Assessment", "Stop and Hold Criteria", "Training, Competency and Supervision", "Implementation Outcomes"):
+            self.assertIn(token, clinical)
 
     def test_build_preset_and_slide_shorthand_are_resolved(self):
         resolver = self.read("tex/latex/insr/insr-config.sty")

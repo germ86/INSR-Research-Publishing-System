@@ -95,6 +95,8 @@ typesetfiles = {"main.tex", "doc/latex/insr/insr-latex-manual.tex"}
 typesetexe = "lualatex"
 unpackexe = "luatex"
 checkengines = {"luatex"}
+-- Normalize diagnostic wrapping across TeX Live versions for portable .tlg comparisons.
+maxprintline = 10000
 testfiledir = "testfiles"
 supportdir = "testfiles/support"
 tagfiles = {"tex/latex/insr/*.sty", "tex/latex/insr/*.cls", "insr.cls"}

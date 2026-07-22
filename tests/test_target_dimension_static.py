@@ -8,10 +8,11 @@ class TargetDimensionStaticTests(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
-    def test_bootstrap_uses_separate_document_type_and_output_target(self):
+    def test_bootstrap_uses_canonical_build_preset(self):
         active = self.read("config/active-target.tex")
-        self.assertIn("document/type = position-paper", active)
-        self.assertIn("output/target = paper", active)
+        self.assertIn("build/preset = position-paper", active)
+        self.assertNotIn("document/type", active)
+        self.assertNotIn("output/target", active)
         self.assertNotIn("document/target=position-paper", active)
 
     def test_resolver_is_registry_driven(self):
@@ -42,6 +43,26 @@ class TargetDimensionStaticTests(unittest.TestCase):
             "clinical-protocol-handout",
         ):
             self.assertIn(f"\\INSRRegisterCombination{{{combination}}}", registry)
+
+    def test_document_types_have_registered_default_output_combinations(self):
+        registry = self.read("config/target-registry.tex")
+        expected = {
+            "manual": "target=manual",
+            "report": "target=report",
+            "book": "target=book",
+            "monograph": "target=book",
+            "thesis": "target=thesis",
+            "letter": "target=letter",
+            "technical-documentation": "target=report",
+            "developer-documentation": "target=report",
+            "systematic-review": "target=report",
+            "narrative-review": "target=report",
+            "grant-proposal": "target=report",
+            "protocol": "target=report",
+        }
+        for name, target in expected.items():
+            self.assertIn(f"\\INSRRegisterCombination{{{name}}}", registry)
+            self.assertIn(target, registry)
 
 
 if __name__ == "__main__":

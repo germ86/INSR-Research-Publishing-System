@@ -128,6 +128,14 @@ def bootstrap_values() -> dict[str, str]:
     return values
 
 
+
+def active_selection(values: dict[str, str]) -> tuple[str, str, str]:
+    preset = values.get("build/preset", "")
+    if preset and preset in TARGETS:
+        info = TARGETS[preset]
+        return preset, info["type"], info["target"]
+    return preset, values.get("document/type", ""), values.get("output/target", "")
+
 def config_value(name: str) -> str:
     for relative in (
         "config/project-config.tex",
@@ -159,16 +167,19 @@ def collect_problems() -> list[str]:
         problems.append("main.tex is not the canonical minimal INSR root document")
 
     active = bootstrap_values()
-    if "document/type" not in active:
-        problems.append("config/active-target.tex must set document/type")
-    if "output/target" not in active:
-        problems.append("config/active-target.tex must set output/target")
+    preset, doc_type, output_target = active_selection(active)
+    if "build/preset" not in active:
+        problems.append("config/active-target.tex must set canonical build/preset")
     if "document/target" in active:
         problems.append("config/active-target.tex uses deprecated document/target")
-    if active.get("document/type") and active["document/type"] not in SUPPORTED_DOCUMENT_TYPES:
-        problems.append(f"unknown active document type: {active['document/type']}")
-    if active.get("output/target") and active["output/target"] not in _REGISTRY["output_targets"]:
-        problems.append(f"unknown active output target: {active['output/target']}")
+    if "document/type" in active or "output/target" in active:
+        problems.append("config/active-target.tex should use build/preset instead of document/type plus output/target")
+    if preset and preset not in TARGETS:
+        problems.append(f"unknown active build preset: {preset}")
+    if doc_type and doc_type not in SUPPORTED_DOCUMENT_TYPES:
+        problems.append(f"unknown active document type: {doc_type}")
+    if output_target and output_target not in _REGISTRY["output_targets"]:
+        problems.append(f"unknown active output target: {output_target}")
 
     for item in flattened_entrypoints():
         problems.extend(check_entry(ROOT / item))
@@ -293,14 +304,16 @@ def report(_: argparse.Namespace) -> int:
     out = ROOT / "build/overleaf-report.md"
     out.parent.mkdir(exist_ok=True)
     active = bootstrap_values()
+    preset, doc_type, output_target = active_selection(active)
     problems = collect_problems()
     lines = [
         "# INSR Overleaf Report",
         "",
         "- Recommended main document: `main.tex`",
         "- Compiler: LuaLaTeX",
-        f"- Current document type: `{active.get('document/type', '')}`",
-        f"- Current output target: `{active.get('output/target', '')}`",
+        f"- Current build preset: `{preset}`",
+        f"- Current document type: `{doc_type}`",
+        f"- Current output target: `{output_target}`",
         f"- Theme: `{config_value('design/theme')}`",
         f"- Palette: `{config_value('design/palette')}`",
         f"- Typography: `{config_value('design/font')}`",
@@ -319,7 +332,7 @@ def report(_: argparse.Namespace) -> int:
             "",
             "1. Set Main document to `main.tex`.",
             "2. Set compiler to LuaLaTeX.",
-            "3. Change `document/type` and `output/target` only in `config/active-target.tex`.",
+            "3. Change `build/preset` in `config/active-target.tex`; keep detail keys for advanced compatibility builds.",
             "4. Use Recompile from scratch after changing the base class or target.",
         ]
     )

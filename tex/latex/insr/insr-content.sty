@@ -25,6 +25,14 @@
   { id .tl_set:N = \l_insr_unit_id_tl, title .tl_set:N = \l_insr_unit_title_tl, outputs .tl_set:N = \l_insr_unit_outputs_tl, role .tl_set:N = \l_insr_unit_role_tl, numbered .tl_set:N = \l_insr_unit_numbered_tl, toc .tl_set:N = \l_insr_unit_toc_tl, required .tl_set:N = \l_insr_unit_required_tl, placeholder .bool_set:N = \l__insr_unit_placeholder_bool, unknown .code:n = { \msg_warning:nnn { insr } { unknown-key } { content-unit/#1 } } }
 \cs_new_protected:Npn \__insr_template_render:
   {
+    \tl_if_blank:VF \g_insr_template_tl
+      {
+        \str_if_eq:VnF \g_insr_template_tl { auto }
+          {
+            \tl_set:Nx \l__insr_runtime_file_tl { framework/templates/\tl_use:N \g_insr_template_tl.tex }
+            \file_if_exist:VTF \l__insr_runtime_file_tl { \file_input:V \l__insr_runtime_file_tl } { }
+          }
+      }
     \tl_set:Nx \l__insr_runtime_file_tl { content/\tl_use:N \g_insr_content_source_tl/manifest.tex }
     \file_if_exist:VTF \l__insr_runtime_file_tl
       { \file_input:V \l__insr_runtime_file_tl }
@@ -82,8 +90,59 @@
   }
 \cs_new_protected:Npn \__insr_render_unit_body:
   {
-    \bool_if:NTF \l__insr_unit_placeholder_bool { \__insr_render_placeholder: }
-      { \__insr_legacy_placeholder_full:TF { \msg_warning:nnx { insr } { legacy-placeholder } { \tl_use:N\l_insr_unit_id_tl } \__insr_render_placeholder: } { \tl_if_blank:VTF \l_insr_unit_full_tl { \tl_if_blank:VTF \l_insr_unit_summary_tl { \__insr_render_placeholder: } { \tl_use:N \l_insr_unit_summary_tl } } { \tl_use:N \l_insr_unit_full_tl } } }
+    \bool_if:NTF \l__insr_unit_placeholder_bool
+      { \__insr_render_placeholder: }
+      {
+        \__insr_legacy_placeholder_full:TF
+          { \msg_warning:nnx { insr } { legacy-placeholder } { \tl_use:N\l_insr_unit_id_tl } \__insr_render_placeholder: }
+          { \__insr_render_unit_body_for_target: }
+      }
+  }
+\cs_new_protected:Npn \__insr_render_unit_body_for_target:
+  {
+    \str_case:VnF \g_insr_output_target_tl
+      {
+        { handout } { \__insr_render_first_available:n { handout,summary,full,key } }
+        { poster } { \__insr_render_first_available:n { poster,summary,key,full } }
+        { executive-brief } { \__insr_render_first_available:n { executive,summary,full,key } }
+        { manual } { \__insr_render_first_available:n { clinical,safety,full,summary,key } }
+      }
+      {
+        \str_case:VnF \g_insr_document_type_tl
+          {
+            { clinical-protocol } { \__insr_render_first_available:n { clinical,safety,methods,full,summary,key } }
+            { rct-protocol } { \__insr_render_first_available:n { methods,limitations,full,summary,key } }
+            { systematic-review } { \__insr_render_first_available:n { methods,limitations,full,summary,key } }
+            { narrative-review } { \__insr_render_first_available:n { limitations,full,summary,key } }
+          }
+          { \__insr_render_first_available:n { full,summary,key } }
+      }
+  }
+\cs_new_protected:Npn \__insr_render_first_available:n #1
+  {
+    \bool_set_false:N \l_tmpa_bool
+    \clist_map_inline:nn {#1}
+      {
+        \bool_if:NF \l_tmpa_bool
+          {
+            \tl_clear:N \l_tmpa_tl
+            \str_case:nn {##1}
+              {
+                { full } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_full_tl }
+                { summary } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_summary_tl }
+                { key } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_key_tl }
+                { handout } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_handout_tl }
+                { poster } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_poster_tl }
+                { executive } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_executive_tl }
+                { clinical } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_clinical_tl }
+                { safety } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_safety_tl }
+                { methods } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_methods_tl }
+                { limitations } { \tl_set_eq:NN \l_tmpa_tl \l_insr_unit_limitations_tl }
+              }
+            \tl_if_blank:VF \l_tmpa_tl { \tl_use:N \l_tmpa_tl \bool_set_true:N \l_tmpa_bool }
+          }
+      }
+    \bool_if:NF \l_tmpa_bool { \__insr_render_placeholder: }
   }
 \cs_new_protected:Npn \__insr_heading_star_toc:n #1 { \section*{#1}\addcontentsline{toc}{section}{#1} }
 \cs_new_protected:Npn \__insr_render_content_unit_block:

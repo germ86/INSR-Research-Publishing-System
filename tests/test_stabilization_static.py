@@ -86,5 +86,60 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertIn("unzip -l", ci)
         self.assertIn("upload-artifact", ci)
 
+    def test_multi_output_content_fields_have_runtime_fallbacks(self):
+        content = self.read("tex/latex/insr/insr-content.sty")
+        for token in ("handout,summary,full,key", "poster,summary,key,full", "executive,summary,full,key", "clinical,safety,full,summary,key", "methods,limitations,full,summary,key"):
+            self.assertIn(token, content)
+        self.assertIn("__insr_render_first_available:n", content)
+        slides = self.read("framework/adapters/slides.tex")
+        poster = self.read("framework/adapters/poster.tex")
+        self.assertIn("handout,summary,full,key", slides)
+        self.assertIn(r"\note", slides)
+        self.assertIn("poster,summary,key,full", poster)
+
+    def test_typography_font_helpers_exist(self):
+        typography = self.read("tex/latex/insr/insr-typography.sty")
+        for helper in (
+            "__insr_typography_set_main_font:nn",
+            "__insr_typography_set_sans_font:nn",
+            "__insr_typography_set_mono_font:nn",
+        ):
+            self.assertIn(helper, typography)
+        self.assertIn(r"\setmainfont", typography)
+        self.assertIn(r"\setsansfont", typography)
+        self.assertIn(r"\setmonofont", typography)
+
+    def test_test_runner_uses_isolated_compile_output_dirs_and_log_checks(self):
+        runner = self.read("tests/run-tests.sh")
+        self.assertIn('output_dir="build/compile/${document%.*}"', runner)
+        self.assertIn('-outdir="$output_dir"', runner)
+        self.assertIn("tools/check_latex_log.py", runner)
+        self.assertIn("python3 -m unittest discover -s tests", runner)
+
+    def test_validator_ignores_generated_build_trees(self):
+        validator = self.read("tools/validate_project.py")
+        self.assertIn('IGNORED_GENERATED_DIRS = {".git", "build", "dist", "tmp", "release", "test-output", ".l3build", "__pycache__"}', validator)
+        self.assertIn("is_generated_path", validator)
+
+    def test_l3build_uses_portable_line_width(self):
+        build = self.read("build.lua")
+        self.assertIn("maxprintline = 10000", build)
+
+    def test_integrity_tool_exists_and_reports_runtime_status(self):
+        tool = self.read("tools/insr_integrity.py")
+        self.assertIn("Registry-to-runtime integrity audit", tool)
+        self.assertIn("supported", tool)
+        self.assertIn("incomplete", tool)
+        self.assertIn("broken", tool)
+        self.assertIn("framework", tool)
+        self.assertIn("templates", tool)
+        self.assertIn("content_fields_by_adapter", tool)
+
+    def test_canonical_active_target_uses_build_preset(self):
+        active = self.read("config/active-target.tex")
+        self.assertIn("build/preset = position-paper", active)
+        self.assertNotIn("document/type", active)
+        self.assertNotIn("output/target", active)
+
 if __name__ == "__main__":
     unittest.main()

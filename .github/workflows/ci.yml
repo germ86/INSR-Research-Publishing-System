@@ -157,9 +157,11 @@ jobs:
             fonts-noto-core \
             fonts-noto-cjk
       - name: Build root smoke document
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
+        run: |
+          mkdir -p build/ci/root
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir=build/ci/root main.tex
       - name: Reject INSR warning regressions
-        run: python3 tools/check_latex_log.py main.log
+        run: python3 tools/check_latex_log.py build/ci/root/main.log
       - name: Upload failing LaTeX diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
@@ -220,7 +222,13 @@ jobs:
             fonts-noto-core \
             fonts-noto-cjk
       - name: Build PDF
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
       - name: Upload failing LaTeX diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
@@ -273,7 +281,13 @@ jobs:
             fonts-noto-core \
             fonts-noto-cjk
       - name: Build PDF
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
       - name: Upload failing LaTeX diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
@@ -322,7 +336,13 @@ jobs:
             fonts-noto-core \
             fonts-noto-cjk
       - name: Build PDF
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
       - name: Upload failing LaTeX diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
@@ -382,7 +402,13 @@ jobs:
             fonts-noto-core \
             fonts-noto-cjk
       - name: Build PDF
-        run: latexmk -lualatex -interaction=nonstopmode -halt-on-error "${{ matrix.document }}"
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
       - name: Upload failing LaTeX diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

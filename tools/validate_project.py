@@ -9,6 +9,13 @@ from pathlib import Path
 from insr_registry import load_registry, targets_from_registry, validate_registry
 
 ROOT = Path(__file__).resolve().parents[1]
+IGNORED_GENERATED_DIRS = {".git", "build", "dist", "tmp", "release", "test-output", ".l3build", "__pycache__"}
+
+
+def is_generated_path(path: Path) -> bool:
+    return any(part in IGNORED_GENERATED_DIRS for part in path.relative_to(ROOT).parts)
+
+
 PACKAGE_NAMES = [
     "insr-core",
     "insr-config",
@@ -64,12 +71,13 @@ required = [
     "tools/insr_build.py",
     "tools/overleaf_doctor.py",
     "tools/check_latex_log.py",
+    "tools/insr_integrity.py",
 ]
 missing = [path for path in required if not (ROOT / path).is_file()]
 if missing:
     fail(f"Missing required files: {missing}")
 
-class_copies = [str(path.relative_to(ROOT)) for path in ROOT.rglob("insr.cls") if ".git" not in path.parts]
+class_copies = [str(path.relative_to(ROOT)) for path in ROOT.rglob("insr.cls") if not is_generated_path(path)]
 if class_copies != ["insr.cls"]:
     fail(f"Expected exactly one authoritative insr.cls, found: {class_copies}")
 
@@ -78,11 +86,12 @@ if read("main.tex") != expected_main:
     fail("main.tex must remain the stable minimal INSR entry document")
 
 active = read("config/active-target.tex")
-for token in ("\\INSRBootstrap", "document/type", "output/target"):
+for token in ("\\INSRBootstrap", "build/preset", "position-paper"):
     if token not in active:
-        fail(f"Missing active target bootstrap token: {token}")
-if "document/target" in active:
-    fail("config/active-target.tex must not use deprecated document/target")
+        fail(f"Missing active build preset bootstrap token: {token}")
+for deprecated in ("document/target", "document/type", "output/target"):
+    if deprecated in active:
+        fail(f"config/active-target.tex must use build/preset, not {deprecated}")
 
 project = read("config/project-config.tex")
 for token in (
@@ -250,5 +259,6 @@ if "babelprovide[import,main]{ngerman}" not in localization:
 
 subprocess.run(["python3", "tools/insr_registry.py"], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 subprocess.run(["python3", "tools/overleaf_doctor.py", "check"], cwd=ROOT, check=True)
+subprocess.run(["python3", "tools/insr_integrity.py"], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 
 print("project validation passed")

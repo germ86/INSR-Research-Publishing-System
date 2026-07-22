@@ -1,7 +1,7 @@
 % INSR typography preset: source-serif-sans
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Source Serif Pro}{\setmainfont{Source Serif Pro}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{\setmainfont{Latin Modern Roman}}}
-\IfFontExistsTF{Source Sans Pro}{\setsansfont{Source Sans Pro}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{\setsansfont{Latin Modern Sans}}}
-\IfFontExistsTF{Source Code Pro}{\setmonofont{Source Code Pro}}{\setmonofont{Latin Modern Mono}}
+\__insr_typography_set_main_font:nn { Source~Serif~Pro } { TeX~Gyre~Pagella }
+\__insr_typography_set_sans_font:nn { Source~Sans~Pro } { TeX~Gyre~Heros }
+\__insr_typography_set_mono_font:nn { Source~Code~Pro } { Latin~Modern~Mono }
 \__insr_typography_set_arabic_font:
 \__insr_typography_set_hebrew_font:
