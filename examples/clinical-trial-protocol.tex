@@ -1,3 +1,7 @@
-\documentclass{../insr}
-\INSRSetup{document-type=protocol,title={Clinical Trial Protocol},registration={DRKS/TBD},ethics={Ethics approval pending.}}
-\begin{document}\INSRBeginDocument\INSRMakeTitle\INSRSection{Protocol Synopsis}\INSRClinicalStop{Pause exposure when hard-stop criteria are met.}\INSRDeclarations\end{document}
+\documentclass[config/load-project=false, metadata/author={INSR Example Author}, metadata/institution={INSR Example Institution}, document/type=clinical-trial-protocol,metadata/title={Clinical Trial Protocol}]{insr}
+\begin{document}
+\INSRMakeTitle
+\INSRSection{Protocol Synopsis}
+\INSRClinicalStop{Pause exposure when hard-stop criteria are met.}
+\INSRDeclarations
+\end{document}

@@ -1,0 +1,5 @@
+\input{framework/adapters/common-document.tex}
+\ExplSyntaxOn
+\cs_set_protected:Npn \__insr_adapter_make_title: { \__insr_frontmatter_render_manual: }
+\cs_set_protected:Npn \__insr_adapter_chapter:n #1 { \chapter{#1} }
+\ExplSyntaxOff
