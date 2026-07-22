@@ -1,0 +1,25 @@
+% Poster adapter uses Beamer primitives but keeps poster-specific content and bibliography frames.
+\input{framework/adapters/slides.tex}
+\setbeamersize{text margin left=1cm,text margin right=1cm}
+\ExplSyntaxOn
+\cs_set_protected:Npn \__insr_adapter_render_content_unit:
+  {
+    \begin{frame}[t]{\tl_use:N \l_insr_unit_title_tl}
+    \begin{columns}[t,onlytextwidth]
+      \begin{column}{0.48\textwidth}
+        \textbf{Summary}\par\__insr_render_first_available:n { poster,summary,key,full }
+      \end{column}
+      \begin{column}{0.48\textwidth}
+        \tl_if_blank:VF \l_insr_unit_key_tl { \textbf{Key~message}\par\alert{\tl_use:N \l_insr_unit_key_tl} }
+      \end{column}
+    \end{columns}
+    \end{frame}
+  }
+\cs_set_protected:Npn \__insr_adapter_bibliography:n #1
+  {
+    \begin{frame}[t,allowframebreaks]{Poster~References}
+    \footnotesize
+    \__insr_print_bibliography:n {#1}
+    \end{frame}
+  }
+\ExplSyntaxOff

@@ -1,0 +1,22 @@
+% INSR theme: consortium
+\ExplSyntaxOn
+\str_if_eq:VnTF \g_insr_base_class_tl { beamer }
+  {
+    \usetheme{default}
+    \usefonttheme{professionalfonts}
+    \setbeamertemplate{navigation symbols}{}
+    \setbeamercolor{frametitle}{fg=white,bg=INSRPrimary}
+    \setbeamercolor{title}{fg=INSRPrimary}
+    \setbeamercolor{structure}{fg=INSRSecondary}
+    \setbeamercolor{block title}{fg=white,bg=INSRSecondary}
+    \setbeamercolor{block body}{fg=INSRText,bg=INSRSurfaceAlt}
+    \setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.82\paperwidth,ht=2.5ex,dp=1ex,leftskip=1em]{author in head/foot}\insertshorttitle\end{beamercolorbox}\begin{beamercolorbox}[wd=.18\paperwidth,ht=2.5ex,dp=1ex,center]{date in head/foot}\insertframenumber/\inserttotalframenumber\end{beamercolorbox}}}
+  }
+  { }
+\ExplSyntaxOff
+
+% Theme-level separator colors; values derive from active palette semantics.
+\colorlet{INSRHeaderSeparator}{INSRHeaderAccent}
+\colorlet{INSRFooterSeparator}{INSRFooterAccent}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}

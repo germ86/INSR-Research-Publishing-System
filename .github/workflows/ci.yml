@@ -1,0 +1,529 @@
+name: INSR validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TEXINPUTS: ".:./examples//:"
+  BIBINPUTS: ".//:"
+
+concurrency:
+  group: insr-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-validation:
+    name: Static validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate shell syntax
+        shell: bash
+        run: |
+          bash -n tests/run-tests.sh
+          bash -n scripts/test.sh
+
+      - name: Run static test suite
+        shell: bash
+        run: bash scripts/test.sh --static-only
+
+  l3build-regression:
+    name: l3build regression checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: static-validation
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install l3build toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            texlive-luatex \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            lmodern
+
+      - name: Run l3build check
+        shell: bash
+        run: l3build check
+
+      - name: Upload l3build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: l3build-diagnostics
+          path: |
+            build/**/*.log
+            build/**/*.diff
+            build/**/*.tlg
+            testfiles/*.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  lualatex-build:
+    name: LuaLaTeX build matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: static-validation
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+
+      - name: Verify required TeX packages
+        shell: bash
+        run: |
+          kpsewhich biblatex.sty >/dev/null
+          kpsewhich fontspec.sty >/dev/null
+          kpsewhich unicode-math.sty >/dev/null
+
+      - name: Run required compile suite
+        shell: bash
+        run: bash scripts/test.sh --compile
+
+      - name: Upload failing logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-build-logs
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  root-smoke:
+    name: Root smoke document
+    runs-on: ubuntu-latest
+    needs: static-validation
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build root smoke document
+        run: |
+          mkdir -p build/ci/root
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir=build/ci/root main.tex
+      - name: Reject INSR warning regressions
+        run: python3 tools/check_latex_log.py build/ci/root/main.log
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-diagnostics-root-smoke
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  paper-examples:
+    name: Paper examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    needs: static-validation
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/minimal-paper/main.tex
+          - examples/paper-demo.tex
+          - examples/minimal-english-paper.tex
+          - examples/position-paper/main.tex
+          - examples/arabic-rtl-paper.tex
+          - examples/multi-institution-consortium-paper.tex
+          - examples/publication-minimal/main.tex
+          - examples/publication-journal-article/main.tex
+          - examples/publication-position-paper/main.tex
+          - examples/publication-blind-review/main.tex
+          - examples/publication-zenodo-preprint/main.tex
+          - examples/publication-multi-author/main.tex
+          - examples/publication-funded-research/main.tex
+          - examples/reference-publication/paper.tex
+          - tests/fixtures/rct-combination-as-output-target.tex
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  slides-examples:
+    name: Slides examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    needs: static-validation
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/minimal-slides/main.tex
+          - examples/beamer-demo.tex
+          - examples/german-scientific-presentation.tex
+          - examples/hebrew-rtl-slides.tex
+          - examples/reference-publication/slides.tex
+          - examples/reference-publication/handout.tex
+          - tests/fixtures/document-type-slides-overrides-submission.tex
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  manual-examples:
+    name: Manual examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    needs: static-validation
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/clinical-manual/main.tex
+          - examples/manual-demo.tex
+          - doc/latex/insr/insr-latex-manual.tex
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  focused-example-matrix:
+    name: Focused examples (${{ matrix.document }})
+    runs-on: ubuntu-latest
+    needs: static-validation
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        document:
+          - examples/clinical-protocol/main.tex
+          - examples/rct-protocol/main.tex
+          - examples/clinical-trial-protocol.tex
+          - examples/systematic-review/main.tex
+          - examples/conference-poster/main.tex
+          - examples/reference-publication/poster.tex
+          - examples/technical-documentation/main.tex
+          - examples/theme-gallery/main.tex
+          - examples/custom-theme/main.tex
+          - examples/custom-palette/main.tex
+          - examples/custom-theme-palette.tex
+          - examples/mixed-german-arabic-report.tex
+          - examples/grant-proposal/main.tex
+          - examples/thesis/main.tex
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LuaLaTeX toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            texlive-luatex \
+            biber \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk
+      - name: Build PDF
+        run: |
+          document="${{ matrix.document }}"
+          output_dir="build/ci/${document%.*}"
+          mkdir -p "$output_dir"
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -outdir="$output_dir" "$document"
+          log_file="$output_dir/$(basename "${document%.*}").log"
+          python3 tools/check_latex_log.py "$log_file"
+      - name: Upload failing LaTeX diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-diagnostics-${{ github.job }}-${{ strategy.job-index }}
+          path: |
+            **/*.log
+            **/*.blg
+            **/*.bbl
+            **/*.bcf
+            **/*.run.xml
+            **/*.fls
+            **/*.fdb_latexmk
+          if-no-files-found: ignore
+          retention-days: 7
+
+
+  ctan-smoke:
+    name: CTAN packaging smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs:
+      - static-validation
+      - l3build-regression
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install packaging toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            biber \
+            texlive-luatex \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-noto-core \
+            unzip
+
+      - name: Build CTAN archive
+        shell: bash
+        run: l3build ctan
+
+      - name: Inspect CTAN archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$(find . -maxdepth 3 -type f -name '*.zip' | sort | head -n 1)"
+          test -n "$archive"
+          unzip -l "$archive" | tee ctan-archive-listing.txt
+          ! grep -E '\.(aux|toc|log|out|fls|fdb_latexmk)( |$)' ctan-archive-listing.txt
+          grep -E '(^|/)LICENSE( |$)' ctan-archive-listing.txt
+          grep -E '(^|/)README\.md( |$)' ctan-archive-listing.txt
+          grep -E 'tex/latex/insr/insr-core\.sty' ctan-archive-listing.txt
+
+      - name: Upload CTAN archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctan-smoke-archive
+          path: |
+            *.zip
+            build/distrib/*.zip
+            ctan-archive-listing.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+  installed-package:
+    name: Isolated installed-package test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - static-validation
+      - l3build-regression
+      - ctan-smoke
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install installed-mode toolchain
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk \
+            biber \
+            texlive-luatex \
+            texlive-bibtex-extra \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            fonts-freefont-otf \
+            fonts-hosny-amiri \
+            fonts-noto-core \
+            fonts-noto-cjk \
+            unzip
+
+      - name: Run isolated installed-package test
+        shell: bash
+        run: bash scripts/test-installed-package.sh
+
+      - name: Upload installed-mode diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installed-package-diagnostics
+          path: |
+            /tmp/insr-installed-*.log
+            /tmp/insr-installed-l3build-ctan.log
+            build/**/*.log
+            build/**/*.diff
+            build/distrib/**/*.zip
+          if-no-files-found: ignore
+          retention-days: 7
