@@ -1,0 +1,41 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-layout}[2026/07/15 INSR layout]
+\RequirePackage{graphicx}
+\RequirePackage{booktabs,tabularx,longtable,array}
+\RequirePackage{amsmath,amssymb,mathtools}
+\ExplSyntaxOn
+\str_if_eq:VnT \g_insr_typography_microtype_tl { true } { \RequirePackage{microtype} }
+\ExplSyntaxOff
+\RequirePackage{hyperref}
+\RequirePackage{bookmark}
+\RequirePackage{tikz}
+\ExplSyntaxOn
+\prop_new:N \g__insr_acronym_short_prop
+\prop_new:N \g__insr_acronym_long_prop
+\ProvideDocumentCommand \newacronym { m m m }
+  {
+    \prop_gput:Nnn \g__insr_acronym_short_prop {#1} {#2}
+    \prop_gput:Nnn \g__insr_acronym_long_prop {#1} {#3}
+  }
+\ProvideDocumentCommand \gls { m }
+  { \prop_item:Nn \g__insr_acronym_short_prop {#1} }
+\str_if_eq:VnF \g_insr_base_class_tl { beamer }
+  { \RequirePackage[a4paper,margin=2.7cm]{geometry} }
+\cs_new_protected:Npn \__insr_load_theme:
+  {
+    \__insr_load_file_with_fallback:nnn
+      { themes/\tl_use:N\g_insr_theme_tl.tex }
+      { theme }
+      {
+        \msg_warning:nnx { insr } { unknown-theme } { \tl_use:N\g_insr_theme_tl }
+        \file_input:n { themes/insr-default.tex }
+      }
+  }
+\__insr_load_theme:
+\__insr_setup_pdf_metadata:
+\ExplSyntaxOff
+\newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
+\newacronym{cdss}{CDSS}{Clinical Decision Support System}
+\newacronym{hrv}{HRV}{heart-rate variability}
+\newacronym{eda}{EDA}{electrodermal activity}
+\endinput

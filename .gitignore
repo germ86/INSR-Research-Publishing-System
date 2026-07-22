@@ -18,3 +18,8 @@
 *.xdy
 _minted-*/
 build/tikz/
+__pycache__/
+*.py[cod]
+
+# Generated validation and compile directories
+/build/
