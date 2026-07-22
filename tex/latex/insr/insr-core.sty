@@ -1,0 +1,50 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-core}[2026/07/15 INSR core state and public API]
+\ExplSyntaxOn
+\msg_new:nnn { insr } { missing-config } { Missing~config/project-config.tex;~using~safe~defaults. }
+\msg_new:nnn { insr } { unknown-document-type } { Unknown~document/type~'#1'.~Falling~back~to~paper. }
+\msg_new:nnn { insr } { unknown-palette } { Unknown~palette~'#1'.~Falling~back~to~neuroclinical. }
+\msg_new:nnn { insr } { unknown-theme } { Unknown~theme~'#1'.~Falling~back~to~insr-default. }
+\msg_new:nnn { insr } { unknown-font } { Unknown~font~preset~'#1'.~Falling~back~to~libertinus. }
+\msg_new:nnn { insr } { unknown-key } { Unknown~configuration~key~'#1'.~Ignoring~it. }
+\msg_new:nnn { insr } { missing-slot } { Template~slot~'#1'~is~empty~or~unavailable. }
+\msg_new:nnn { insr } { deprecated-command } { Command~'#1'~is~deprecated;~use~the~v4~configuration~or~registry~API. }
+\tl_new:N \g_insr_document_type_tl
+\tl_new:N \g_insr_base_class_tl
+\tl_new:N \g_insr_adapter_tl
+\tl_new:N \g_insr_profile_tl
+\tl_new:N \g_insr_template_tl
+\tl_new:N \g_insr_density_tl
+\tl_new:N \g_insr_build_profile_tl
+\tl_new:N \g_insr_theme_tl
+\tl_new:N \g_insr_palette_tl
+\tl_new:N \g_insr_font_tl
+\tl_new:N \g_insr_mode_tl
+\tl_new:N \g_insr_language_tl
+\tl_new:N \g_insr_direction_tl
+\tl_new:N \g_insr_title_tl
+\tl_new:N \g_insr_subtitle_tl
+\tl_new:N \g_insr_short_title_tl
+\tl_new:N \g_insr_date_tl
+\tl_new:N \g_insr_author_tl
+\tl_new:N \g_insr_institution_tl
+\tl_new:N \g_insr_bibresource_tl
+\tl_new:N \g_insr_keywords_tl
+\tl_new:N \g_insr_content_placeholders_tl
+\bool_new:N \g_insr_high_contrast_bool
+\bool_new:N \g_insr_load_project_config_bool
+\bool_new:N \g__insr_adapter_ready_bool
+\tl_new:N \l__insr_runtime_file_tl
+\tl_new:N \l__insr_pdf_title_tl
+\tl_new:N \l__insr_pdf_author_tl
+\tl_new:N \l__insr_pdf_keywords_tl
+\cs_generate_variant:Nn \file_if_exist:nTF { V }
+\cs_generate_variant:Nn \file_input:n { V }
+\cs_generate_variant:Nn \tl_if_blank:nTF { V }
+\cs_generate_variant:Nn \tl_if_blank:nF { V }
+\cs_generate_variant:Nn \clist_if_in:nnTF { VV }
+\DeclareRobustCommand{\INSRMakeTitle}{\ifcsname __insr_adapter_make_title:\endcsname\csname __insr_adapter_make_title:\endcsname\else\ClassError{insr}{Mandatory adapter title renderer missing}{The selected adapter did not define \string\__insr_adapter_make_title:.}\fi}
+\DeclareRobustCommand{\INSRRenderDocument}{\ifcsname __insr_template_render:\endcsname\csname __insr_template_render:\endcsname\else\ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}\par\noindent INSR template renderer unavailable.\par\fi}
+\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
+\ExplSyntaxOff
+\endinput

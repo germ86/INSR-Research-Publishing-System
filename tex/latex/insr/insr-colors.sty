@@ -1,0 +1,9 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-colors}[2026/07/15 INSR colors and palettes]
+\RequirePackage{xcolor}
+\ExplSyntaxOn
+\cs_new_protected:Npn \__insr_load_palette: { \__insr_load_file_with_fallback:nnn { palettes/\tl_use:N\g_insr_palette_tl.tex } { palette } { \msg_warning:nnx { insr } { unknown-palette } { \tl_use:N\g_insr_palette_tl } \file_input:n { palettes/neuroclinical.tex } } }
+\__insr_load_palette:
+\bool_if:NT \g_insr_high_contrast_bool { \file_input:n { palettes/high-contrast.tex } }
+\ExplSyntaxOff
+\endinput

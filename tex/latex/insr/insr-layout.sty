@@ -1,0 +1,31 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-layout}[2026/07/15 INSR layout]
+\RequirePackage{graphicx}
+\RequirePackage{booktabs,tabularx,longtable,array}
+\RequirePackage{amsmath,amssymb,mathtools}
+\RequirePackage{microtype}
+\RequirePackage{hyperref}
+\RequirePackage[acronym,shortcuts]{glossaries-extra}
+\RequirePackage{tikz}
+\ExplSyntaxOn
+\str_if_eq:VnF \g_insr_base_class_tl { beamer }
+  { \RequirePackage[a4paper,margin=2.7cm]{geometry} }
+\cs_new_protected:Npn \__insr_load_theme:
+  {
+    \__insr_load_file_with_fallback:nnn
+      { themes/\tl_use:N\g_insr_theme_tl.tex }
+      { theme }
+      {
+        \msg_warning:nnx { insr } { unknown-theme } { \tl_use:N\g_insr_theme_tl }
+        \file_input:n { themes/insr-default.tex }
+      }
+  }
+\__insr_load_theme:
+\__insr_select_language:
+\__insr_setup_pdf_metadata:
+\ExplSyntaxOff
+\newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}
+\newacronym{cdss}{CDSS}{Clinical Decision Support System}
+\newacronym{hrv}{HRV}{heart-rate variability}
+\newacronym{eda}{EDA}{electrodermal activity}
+\endinput
