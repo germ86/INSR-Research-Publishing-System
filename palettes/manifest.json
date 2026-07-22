@@ -1,0 +1,176 @@
+{
+  "academic-blue": {
+    "background": "F8FAFC",
+    "file": "palettes/academic-blue.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "autonomic-teal": {
+    "background": "F0FDFA",
+    "file": "palettes/autonomic-teal.tex",
+    "mode": "light",
+    "text": "134E4A"
+  },
+  "biomedical": {
+    "background": "FFFFFF",
+    "file": "palettes/biomedical.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "calm-trauma": {
+    "background": "F7F9F9",
+    "file": "palettes/calm-trauma.tex",
+    "mode": "light",
+    "text": "293241"
+  },
+  "clinical": {
+    "background": "F7FAFC",
+    "file": "palettes/clinical.tex",
+    "mode": "light",
+    "text": "263238"
+  },
+  "clinical-burgundy": {
+    "background": "FFF8F8",
+    "file": "palettes/clinical-burgundy.tex",
+    "mode": "light",
+    "text": "2B1D21"
+  },
+  "colourblind-safe": {
+    "background": "F8FAFC",
+    "file": "palettes/colourblind-safe.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "cortex-blue": {
+    "background": "F7FAFC",
+    "file": "palettes/cortex-blue.tex",
+    "mode": "light",
+    "text": "1A202C"
+  },
+  "digital-health": {
+    "background": "F8FAFC",
+    "file": "palettes/digital-health.tex",
+    "mode": "light",
+    "text": "172033"
+  },
+  "editorial": {
+    "background": "FBF7EF",
+    "file": "palettes/editorial.tex",
+    "mode": "light",
+    "text": "2B2B2B"
+  },
+  "forest": {
+    "background": "F7FAF5",
+    "file": "palettes/forest.tex",
+    "mode": "light",
+    "text": "25312B"
+  },
+  "graphite": {
+    "background": "F9FAFB",
+    "file": "palettes/graphite.tex",
+    "mode": "light",
+    "text": "111827"
+  },
+  "high-contrast": {
+    "background": "FFFFFF",
+    "file": "palettes/high-contrast.tex",
+    "mode": "light",
+    "text": "000000"
+  },
+  "light-minimal": {
+    "background": "FFFFFF",
+    "file": "palettes/light-minimal.tex",
+    "mode": "light",
+    "text": "0F172A"
+  },
+  "midnight": {
+    "background": "111827",
+    "file": "palettes/midnight.tex",
+    "mode": "dark",
+    "text": "F8FAFC"
+  },
+  "monochrome": {
+    "background": "FFFFFF",
+    "file": "palettes/monochrome.tex",
+    "mode": "light",
+    "text": "000000"
+  },
+  "neuroclinical": {
+    "background": "F8FAFC",
+    "file": "palettes/neuroclinical.tex",
+    "mode": "light",
+    "text": "2D3748"
+  },
+  "neurodiversity": {
+    "background": "FBFCFE",
+    "file": "palettes/neurodiversity.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "nocturne-neural": {
+    "background": "0F172A",
+    "file": "palettes/nocturne-neural.tex",
+    "mode": "dark",
+    "text": "F8FAFC"
+  },
+  "nordic-neuro": {
+    "background": "ECEFF4",
+    "file": "palettes/nordic-neuro.tex",
+    "mode": "light",
+    "text": "2E3440"
+  },
+  "ocean": {
+    "background": "F2FAFC",
+    "file": "palettes/ocean.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "print": {
+    "background": "FFFFFF",
+    "file": "palettes/print.tex",
+    "mode": "light",
+    "text": "000000"
+  },
+  "public-health": {
+    "background": "F7FBFF",
+    "file": "palettes/public-health.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "research": {
+    "background": "F8FAFC",
+    "file": "palettes/research.tex",
+    "mode": "light",
+    "text": "1F2937"
+  },
+  "slate": {
+    "background": "F8FAFC",
+    "file": "palettes/slate.tex",
+    "mode": "light",
+    "text": "111827"
+  },
+  "somatic-sage": {
+    "background": "F7FAF5",
+    "file": "palettes/somatic-sage.tex",
+    "mode": "light",
+    "text": "1F2933"
+  },
+  "synapse-amber": {
+    "background": "FFFBEB",
+    "file": "palettes/synapse-amber.tex",
+    "mode": "light",
+    "text": "2F2415"
+  },
+  "translational-plum": {
+    "background": "FBF7FD",
+    "file": "palettes/translational-plum.tex",
+    "mode": "light",
+    "text": "2D2333"
+  },
+  "warm-clinical": {
+    "background": "FBF8F2",
+    "file": "palettes/warm-clinical.tex",
+    "mode": "light",
+    "text": "2D3748"
+  }
+}

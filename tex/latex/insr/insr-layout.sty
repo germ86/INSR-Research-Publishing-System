@@ -3,11 +3,22 @@
 \RequirePackage{graphicx}
 \RequirePackage{booktabs,tabularx,longtable,array}
 \RequirePackage{amsmath,amssymb,mathtools}
-\RequirePackage{microtype}
+\ExplSyntaxOn
+\str_if_eq:VnT \g_insr_typography_microtype_tl { true } { \RequirePackage{microtype} }
+\ExplSyntaxOff
 \RequirePackage{hyperref}
-\RequirePackage[acronym,shortcuts]{glossaries-extra}
+\RequirePackage{bookmark}
 \RequirePackage{tikz}
 \ExplSyntaxOn
+\prop_new:N \g__insr_acronym_short_prop
+\prop_new:N \g__insr_acronym_long_prop
+\ProvideDocumentCommand \newacronym { m m m }
+  {
+    \prop_gput:Nnn \g__insr_acronym_short_prop {#1} {#2}
+    \prop_gput:Nnn \g__insr_acronym_long_prop {#1} {#3}
+  }
+\ProvideDocumentCommand \gls { m }
+  { \prop_item:Nn \g__insr_acronym_short_prop {#1} }
 \str_if_eq:VnF \g_insr_base_class_tl { beamer }
   { \RequirePackage[a4paper,margin=2.7cm]{geometry} }
 \cs_new_protected:Npn \__insr_load_theme:
@@ -21,7 +32,6 @@
       }
   }
 \__insr_load_theme:
-\__insr_select_language:
 \__insr_setup_pdf_metadata:
 \ExplSyntaxOff
 \newacronym{insr}{INSR}{Integrative Neuro-Somatic Recalibration}

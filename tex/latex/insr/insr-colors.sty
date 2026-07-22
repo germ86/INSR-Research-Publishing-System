@@ -1,9 +1,105 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-colors}[2026/07/15 INSR colors and palettes]
+\ProvidesPackage{insr-colors}[2026/07/17 INSR colors, palettes and contrast-safe semantic roles]
 \RequirePackage{xcolor}
 \ExplSyntaxOn
-\cs_new_protected:Npn \__insr_load_palette: { \__insr_load_file_with_fallback:nnn { palettes/\tl_use:N\g_insr_palette_tl.tex } { palette } { \msg_warning:nnx { insr } { unknown-palette } { \tl_use:N\g_insr_palette_tl } \file_input:n { palettes/neuroclinical.tex } } }
+\msg_new:nnn { insr } { unknown-design-mode }
+  { Unknown~design/mode~'#1'.~Using~light~semantic~colour~roles. }
+
+\cs_new_protected:Npn \__insr_load_palette:
+  {
+    \__insr_load_file_with_fallback:nnn
+      { palettes/\tl_use:N\g_insr_palette_tl.tex }
+      { palette }
+      {
+        \msg_warning:nnx { insr } { unknown-palette } { \tl_use:N\g_insr_palette_tl }
+        \file_input:n { palettes/neuroclinical.tex }
+      }
+  }
+
+\cs_new_protected:Npn \__insr_apply_print_palette:
+  {
+    \colorlet{INSRPrimary}{black}
+    \colorlet{INSRSecondary}{black!75}
+    \colorlet{INSRAccent}{black!55}
+    \colorlet{INSRBackground}{white}
+    \colorlet{INSRSurface}{white}
+    \colorlet{INSRSurfaceAlt}{black!5}
+    \colorlet{INSRText}{black}
+    \colorlet{INSRTextMuted}{black!70}
+    \colorlet{INSRRule}{black!35}
+    \colorlet{INSRLink}{black}
+  }
+
+\cs_new_protected:Npn \__insr_apply_light_semantic_roles:
+  {
+    \colorlet{INSRHeading}{INSRPrimary}
+    \colorlet{INSRHeaderBackground}{INSRSurfaceAlt}
+    \colorlet{INSRHeaderText}{INSRPrimary}
+    \colorlet{INSRHeaderAccent}{INSRSecondary}
+    \colorlet{INSRHeaderSeparator}{INSRRule}
+    \colorlet{INSRFooterBackground}{INSRSurfaceAlt}
+    \colorlet{INSRFooterText}{INSRTextMuted}
+    \colorlet{INSRFooterAccent}{INSRSecondary}
+    \colorlet{INSRFooterSeparator}{INSRRule}
+    \colorlet{INSRTOCHeading}{INSRPrimary}
+    \colorlet{INSRTOCSection}{INSRPrimary}
+    \colorlet{INSRTOCSubsection}{INSRSecondary}
+    \colorlet{INSRTOCCurrent}{INSRAccent}
+    \colorlet{INSRTOCNumber}{INSRSecondary}
+    \colorlet{INSRTOCPageNumber}{INSRTextMuted}
+    \colorlet{INSRTOCLink}{INSRLink}
+    \colorlet{INSRTOCLeader}{INSRRule}
+  }
+
+\cs_new_protected:Npn \__insr_apply_dark_semantic_roles:
+  {
+    % Text-bearing roles must derive from palette text colours rather than the
+    % identity colour. A dark primary on a dark background is valid branding,
+    % but it is not a readable heading or contents colour.
+    \colorlet{INSRHeading}{INSRText}
+    \colorlet{INSRHeaderBackground}{INSRSurface}
+    \colorlet{INSRHeaderText}{INSRText}
+    \colorlet{INSRHeaderAccent}{INSRAccent}
+    \colorlet{INSRHeaderSeparator}{INSRRule}
+    \colorlet{INSRFooterBackground}{INSRSurface}
+    \colorlet{INSRFooterText}{INSRTextMuted}
+    \colorlet{INSRFooterAccent}{INSRAccent}
+    \colorlet{INSRFooterSeparator}{INSRRule}
+    \colorlet{INSRTOCHeading}{INSRText}
+    \colorlet{INSRTOCSection}{INSRText}
+    \colorlet{INSRTOCSubsection}{INSRTextMuted}
+    \colorlet{INSRTOCCurrent}{INSRAccent}
+    \colorlet{INSRTOCNumber}{INSRAccent}
+    \colorlet{INSRTOCPageNumber}{INSRTextMuted}
+    \colorlet{INSRTOCLink}{INSRLink}
+    \colorlet{INSRTOCLeader}{INSRRule}
+  }
+
+\cs_new_protected:Npn \__insr_apply_semantic_color_roles:
+  {
+    \str_case:VnF \g_insr_mode_tl
+      {
+        { light } { \__insr_apply_light_semantic_roles: }
+        { dark }  { \__insr_apply_dark_semantic_roles: }
+        { print }
+          {
+            \__insr_apply_print_palette:
+            \__insr_apply_light_semantic_roles:
+          }
+      }
+      {
+        \msg_warning:nnx { insr } { unknown-design-mode } { \tl_use:N\g_insr_mode_tl }
+        \__insr_apply_light_semantic_roles:
+      }
+  }
+
 \__insr_load_palette:
-\bool_if:NT \g_insr_high_contrast_bool { \file_input:n { palettes/high-contrast.tex } }
+% Accessibility overrides must be loaded before semantic aliases are copied;
+% otherwise \colorlet would retain colours from the pre-override palette.
+\bool_if:NT \g_insr_high_contrast_bool
+  { \file_input:n { palettes/high-contrast.tex } }
+\__insr_apply_semantic_color_roles:
+\pagecolor{INSRBackground}
+\color{INSRText}
 \ExplSyntaxOff
 \endinput

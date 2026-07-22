@@ -24,15 +24,15 @@
 
 \RequirePackage{fontspec}
 \defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
-\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\setmainfont{TeX Gyre Pagella}}
-\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\setsansfont{TeX Gyre Heros}}
-\IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\setmonofont{Latin Modern Mono}}
+\IfFontExistsTF{Libertinus Serif}{\setmainfont{Libertinus Serif}}{\IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{}}
+\IfFontExistsTF{Fira Sans}{\setsansfont{Fira Sans}}{\IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{}}
+\IfFontExistsTF{Fira Code}{\setmonofont{Fira Code}}{\IfFontExistsTF{Latin Modern Mono}{\setmonofont{Latin Modern Mono}}{}}
 
 \RequirePackage{polyglossia}
 \setdefaultlanguage{english}
 \setotherlanguages{german,arabic,hebrew,french,spanish}
-\newfontfamily\arabicfont[Script=Arabic,Scale=1.05]{Amiri}
-\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{FreeSerif}
+\IfFontExistsTF{Amiri}{\newfontfamily\arabicfont[Script=Arabic,Scale=1.05]{Amiri}}{\IfFontExistsTF{Noto Naskh Arabic}{\newfontfamily\arabicfont[Script=Arabic,Scale=1.05]{Noto Naskh Arabic}}{\newfontfamily\arabicfont{TeX Gyre Pagella}}}
+\IfFontExistsTF{Noto Sans Hebrew}{\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{Noto Sans Hebrew}}{\IfFontExistsTF{Noto Serif Hebrew}{\newfontfamily\hebrewfont[Script=Hebrew,Scale=1.05]{Noto Serif Hebrew}}{\newfontfamily\hebrewfont{TeX Gyre Pagella}}}
 \ifinsr@rtl\setdefaultlanguage{arabic}\fi
 
 \RequirePackage{xcolor}

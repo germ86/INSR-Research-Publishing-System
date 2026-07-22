@@ -1,8 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{insr-core}[2026/07/15 INSR core state and public API]
+\ProvidesPackage{insr-core}[2026/07/17 INSR core state and public API]
 \ExplSyntaxOn
 \msg_new:nnn { insr } { missing-config } { Missing~config/project-config.tex;~using~safe~defaults. }
-\msg_new:nnn { insr } { unknown-document-type } { Unknown~document/type~'#1'.~Falling~back~to~paper. }
+\msg_new:nnn { insr } { unknown-document-type } { Unknown~document/type~'#1'.~Falling~back~to~position-paper. }
 \msg_new:nnn { insr } { unknown-palette } { Unknown~palette~'#1'.~Falling~back~to~neuroclinical. }
 \msg_new:nnn { insr } { unknown-theme } { Unknown~theme~'#1'.~Falling~back~to~insr-default. }
 \msg_new:nnn { insr } { unknown-font } { Unknown~font~preset~'#1'.~Falling~back~to~libertinus. }
@@ -30,9 +30,67 @@
 \tl_new:N \g_insr_institution_tl
 \tl_new:N \g_insr_bibresource_tl
 \tl_new:N \g_insr_keywords_tl
+\tl_new:N \g_insr_publication_type_tl
+\tl_new:N \g_insr_publication_status_tl
+\tl_new:N \g_insr_publication_version_tl
+\tl_new:N \g_insr_publication_revision_tl
+\tl_new:N \g_insr_publication_date_tl
+\tl_new:N \g_insr_publication_year_tl
+\tl_new:N \g_insr_publication_revision_date_tl
+\tl_new:N \g_insr_publication_doi_tl
+\tl_new:N \g_insr_publication_url_tl
+\tl_new:N \g_insr_publication_repository_tl
+\tl_new:N \g_insr_publication_license_tl
+\tl_new:N \g_insr_publication_copyright_tl
+\tl_new:N \g_insr_publication_publisher_tl
+\tl_new:N \g_insr_publication_git_revision_tl
+\tl_new:N \g_insr_layout_header_separator_style_tl
+\tl_new:N \g_insr_layout_footer_separator_style_tl
+\tl_new:N \g_insr_layout_header_separator_thickness_tl
+\tl_new:N \g_insr_layout_footer_separator_thickness_tl
+\tl_new:N \g_insr_layout_header_separator_spacing_tl
+\tl_new:N \g_insr_layout_footer_separator_spacing_tl
+\tl_new:N \g_insr_layout_separator_opacity_tl
+\tl_new:N \g_insr_layout_logo_tl
+\tl_new:N \g_insr_publication_profile_tl
+\tl_new:N \g_insr_publication_review_tl
+\tl_new:N \g_insr_citation_tl
+\tl_new:N \g_insr_abstract_word_count_tl
+\tl_new:N \g_insr_document_word_count_tl
+\tl_new:N \g_insr_funding_statement_tl
+\tl_new:N \g_insr_conflict_statement_tl
+\tl_new:N \g_insr_ethics_statement_tl
+\tl_new:N \g_insr_graphical_abstract_tl
+\tl_new:N \g_insr_highlights_tl
+\tl_new:N \g_insr_key_messages_tl
+\tl_new:N \g_insr_clinical_significance_tl
+\tl_new:N \g_insr_abbreviations_tl
+\tl_new:N \g_insr_author_contributions_tl
+\tl_new:N \g_insr_data_availability_tl
+\tl_new:N \g_insr_code_availability_tl
+\tl_new:N \g_insr_layout_header_left_tl
+\tl_new:N \g_insr_layout_header_center_tl
+\tl_new:N \g_insr_layout_header_right_tl
+\tl_new:N \g_insr_layout_footer_left_tl
+\tl_new:N \g_insr_layout_footer_center_tl
+\tl_new:N \g_insr_layout_footer_right_tl
+\tl_new:N \g_insr_citation_mode_tl
+\tl_new:N \g_insr_suggested_citation_tl
+\tl_new:N \g_insr_output_target_tl
+\tl_new:N \g_insr_content_source_tl
 \tl_new:N \g_insr_content_placeholders_tl
+\tl_new:N \g_insr_typography_microtype_tl
+\tl_new:N \g_insr_layout_page_numbering_tl
+\bool_new:N \g_insr_frontmatter_toc_bool
+\bool_new:N \g_insr_frontmatter_abstract_numbered_bool
+\bool_new:N \g_insr_frontmatter_keywords_bool
+\bool_new:N \g_insr_layout_header_bool
+\bool_new:N \g_insr_layout_footer_bool
 \bool_new:N \g_insr_high_contrast_bool
 \bool_new:N \g_insr_load_project_config_bool
+\bool_new:N \g__insr_design_theme_explicit_bool
+\bool_new:N \g__insr_design_palette_explicit_bool
+\bool_new:N \g__insr_design_font_explicit_bool
 \bool_new:N \g__insr_adapter_ready_bool
 \tl_new:N \l__insr_runtime_file_tl
 \tl_new:N \l__insr_pdf_title_tl
@@ -43,8 +101,174 @@
 \cs_generate_variant:Nn \tl_if_blank:nTF { V }
 \cs_generate_variant:Nn \tl_if_blank:nF { V }
 \cs_generate_variant:Nn \clist_if_in:nnTF { VV }
+\cs_generate_variant:Nn \prop_get:NnNTF { NVNTF }
+\cs_generate_variant:Nn \prop_if_in:NnTF { NVTF }
+
+
+\tl_const:Nn \c_insr_core_version_tl { 0.1.0 }
+\seq_new:N \g__insr_plugin_loaded_seq
+\seq_new:N \g__insr_plugin_loading_seq
+\prop_new:N \g__insr_plugin_registry_prop
+\prop_new:N \g__insr_plugin_dependencies_prop
+\prop_new:N \g__insr_plugin_optional_dependencies_prop
+\prop_new:N \g__insr_plugin_conflicts_prop
+\prop_new:N \g__insr_plugin_min_core_prop
+\prop_new:N \g__insr_plugin_init_prop
+\prop_new:N \g__insr_theme_registry_prop
+\prop_new:N \g__insr_theme_palette_prop
+\prop_new:N \g__insr_theme_fontset_prop
+\prop_new:N \g__insr_theme_header_rule_prop
+\prop_new:N \g__insr_theme_footer_rule_prop
+\prop_new:N \g__insr_fontset_registry_prop
+\prop_new:N \g__insr_fontset_fallback_prop
+\msg_new:nnn { insr } { plugin-duplicate } { Plugin~'#1'~is~already~loaded;~skipping. }
+\msg_new:nnn { insr } { plugin-unknown } { Plugin~'#1'~is~not~registered~or~available. }
+\msg_new:nnn { insr } { plugin-missing-dependency } { Plugin~'#1'~requires~missing~dependency~'#2'. }
+\msg_new:nnn { insr } { plugin-conflict } { Plugin~'#1'~conflicts~with~loaded~plugin~'#2'. }
+\msg_new:nnn { insr } { plugin-cycle } { Plugin~dependency~cycle~detected~while~loading~'#1'. }
+\msg_new:nnn { insr } { plugin-core-version } { Plugin~'#1'~requires~INSR~core~'#2';~current~core~is~'\tl_use:N\c_insr_core_version_tl'. }
+\msg_new:nnn { insr } { unknown-fontset } { Unknown~fontset~'#1'.~Using~fallback~'#2'. }
+\tl_new:N \l__insr_plugin_version_tl
+\tl_new:N \l__insr_plugin_min_core_tl
+\clist_new:N \l__insr_plugin_dependencies_clist
+\clist_new:N \l__insr_plugin_optional_dependencies_clist
+\clist_new:N \l__insr_plugin_conflicts_clist
+\tl_new:N \l__insr_plugin_init_tl
+\tl_new:N \l__insr_theme_palette_tl
+\tl_new:N \l__insr_theme_fontset_tl
+\tl_new:N \l__insr_theme_header_rule_tl
+\tl_new:N \l__insr_theme_footer_rule_tl
+\tl_new:N \l__insr_fontset_fallback_tl
+\keys_define:nn { insr/plugin }
+  {
+    version .tl_set:N = \l__insr_plugin_version_tl,
+    min-core-version .tl_set:N = \l__insr_plugin_min_core_tl,
+    dependencies .clist_set:N = \l__insr_plugin_dependencies_clist,
+    optional-dependencies .clist_set:N = \l__insr_plugin_optional_dependencies_clist,
+    conflicts .clist_set:N = \l__insr_plugin_conflicts_clist,
+    init .tl_set:N = \l__insr_plugin_init_tl,
+    package .code:n = {}, content .code:n = {}, adapter .code:n = {}, targets .code:n = {}, provides .code:n = {}
+  }
+\keys_define:nn { insr/theme }
+  { palette .tl_set:N = \l__insr_theme_palette_tl, typography .tl_set:N = \l__insr_theme_fontset_tl, fontset .tl_set:N = \l__insr_theme_fontset_tl, header-rule .tl_set:N = \l__insr_theme_header_rule_tl, footer-rule .tl_set:N = \l__insr_theme_footer_rule_tl, contrast .code:n = {} }
+\keys_define:nn { insr/fontset }
+  { fallback .tl_set:N = \l__insr_fontset_fallback_tl, main .code:n = {}, sans .code:n = {}, mono .code:n = {}, math .code:n = {}, scripts .code:n = {}, engine .code:n = {} }
+\cs_new_protected:Npn \insr_plugin_register:nn #1#2
+  {
+    \tl_clear:N \l__insr_plugin_version_tl \tl_clear:N \l__insr_plugin_min_core_tl \tl_clear:N \l__insr_plugin_init_tl
+    \clist_clear:N \l__insr_plugin_dependencies_clist \clist_clear:N \l__insr_plugin_optional_dependencies_clist \clist_clear:N \l__insr_plugin_conflicts_clist
+    \keys_set:nn { insr/plugin } {#2}
+    \prop_gput:Nnn \g__insr_plugin_registry_prop {#1} {#2}
+    \prop_gput:NnV \g__insr_plugin_dependencies_prop {#1} \l__insr_plugin_dependencies_clist
+    \prop_gput:NnV \g__insr_plugin_optional_dependencies_prop {#1} \l__insr_plugin_optional_dependencies_clist
+    \prop_gput:NnV \g__insr_plugin_conflicts_prop {#1} \l__insr_plugin_conflicts_clist
+    \prop_gput:NnV \g__insr_plugin_min_core_prop {#1} \l__insr_plugin_min_core_tl
+    \prop_gput:NnV \g__insr_plugin_init_prop {#1} \l__insr_plugin_init_tl
+  }
+\cs_new_protected:Npn \__insr_plugin_check_core:n #1
+  {
+    \prop_get:NnNT \g__insr_plugin_min_core_prop {#1} \l_tmpa_tl
+      { \tl_if_blank:VF \l_tmpa_tl { \tl_if_eq:NNF \l_tmpa_tl \c_insr_core_version_tl { \msg_error:nnxx { insr } { plugin-core-version } {#1} {\tl_use:N \l_tmpa_tl} } } }
+  }
+\cs_new_protected:Npn \__insr_plugin_check_conflicts:n #1
+  {
+    \prop_get:NnNT \g__insr_plugin_conflicts_prop {#1} \l_tmpa_tl
+      { \exp_args:NV \clist_map_inline:nn \l_tmpa_tl { \seq_if_in:NnT \g__insr_plugin_loaded_seq {##1} { \msg_error:nnnn { insr } { plugin-conflict } {#1} {##1} } } }
+  }
+\cs_new_protected:Npn \__insr_plugin_load_dependencies:n #1
+  {
+    \prop_get:NnNT \g__insr_plugin_dependencies_prop {#1} \l_tmpa_tl
+      {
+        \exp_args:NV \clist_map_inline:nn \l_tmpa_tl
+          {
+            \prop_if_in:NnTF \g__insr_plugin_registry_prop {##1}
+              { \insr_plugin_load:n {##1} }
+              { \msg_error:nnnn { insr } { plugin-missing-dependency } {#1} {##1} }
+          }
+      }
+  }
+\cs_new_protected:Npn \__insr_plugin_run_init:n #1
+  { \prop_get:NnNT \g__insr_plugin_init_prop {#1} \l_tmpa_tl { \tl_if_blank:VF \l_tmpa_tl { \use:c { \tl_use:N \l_tmpa_tl } } } }
+\cs_new_protected:Npn \insr_plugin_load:n #1
+  {
+    \seq_if_in:NnTF \g__insr_plugin_loaded_seq {#1}
+      { \msg_warning:nnn { insr } { plugin-duplicate } {#1} }
+      {
+        \seq_if_in:NnTF \g__insr_plugin_loading_seq {#1}
+          { \msg_error:nnn { insr } { plugin-cycle } {#1} }
+          {
+            \prop_if_in:NnTF \g__insr_plugin_registry_prop {#1}
+              {
+                \seq_gput_right:Nn \g__insr_plugin_loading_seq {#1}
+                \__insr_plugin_check_core:n {#1}
+                \__insr_plugin_check_conflicts:n {#1}
+                \__insr_plugin_load_dependencies:n {#1}
+                \seq_gremove_all:Nn \g__insr_plugin_loading_seq {#1}
+                \seq_gput_right:Nn \g__insr_plugin_loaded_seq {#1}
+                \__insr_plugin_run_init:n {#1}
+              }
+              {
+                \file_if_exist:nTF { plugins/#1.tex }
+                  { \file_input:n { plugins/#1.tex } \seq_gput_right:Nn \g__insr_plugin_loaded_seq {#1} }
+                  { \msg_warning:nnn { insr } { plugin-unknown } {#1} }
+              }
+          }
+      }
+  }
+\prg_new_conditional:Npnn \insr_plugin_if_loaded:n #1 { T, F, TF }
+  { \seq_if_in:NnTF \g__insr_plugin_loaded_seq {#1} { \prg_return_true: } { \prg_return_false: } }
+\cs_new_protected:Npn \insr_theme_register:nn #1#2
+  {
+    \tl_clear:N \l__insr_theme_palette_tl \tl_clear:N \l__insr_theme_fontset_tl \tl_clear:N \l__insr_theme_header_rule_tl \tl_clear:N \l__insr_theme_footer_rule_tl
+    \keys_set:nn { insr/theme } {#2}
+    \prop_gput:Nnn \g__insr_theme_registry_prop {#1} {#2}
+    \prop_gput:NnV \g__insr_theme_palette_prop {#1} \l__insr_theme_palette_tl
+    \prop_gput:NnV \g__insr_theme_fontset_prop {#1} \l__insr_theme_fontset_tl
+    \prop_gput:NnV \g__insr_theme_header_rule_prop {#1} \l__insr_theme_header_rule_tl
+    \prop_gput:NnV \g__insr_theme_footer_rule_prop {#1} \l__insr_theme_footer_rule_tl
+  }
+\cs_new_protected:Npn \insr_theme_activate:n #1
+  {
+    \prop_if_in:NnTF \g__insr_theme_registry_prop {#1}
+      {
+        \tl_gset:Nn \g_insr_theme_tl {#1}
+        \bool_if:NF \g__insr_design_palette_explicit_bool
+          { \prop_get:NnNT \g__insr_theme_palette_prop {#1} \l_tmpa_tl { \tl_if_blank:VF \l_tmpa_tl { \tl_gset_eq:NN \g_insr_palette_tl \l_tmpa_tl } } }
+        \bool_if:NF \g__insr_design_font_explicit_bool
+          { \prop_get:NnNT \g__insr_theme_fontset_prop {#1} \l_tmpa_tl { \tl_if_blank:VF \l_tmpa_tl { \tl_gset_eq:NN \g_insr_font_tl \l_tmpa_tl } } }
+        \prop_get:NnNT \g__insr_theme_header_rule_prop {#1} \l_tmpa_tl { \tl_if_blank:VF \l_tmpa_tl { \tl_gset_eq:NN \g_insr_layout_header_separator_style_tl \l_tmpa_tl } }
+        \prop_get:NnNT \g__insr_theme_footer_rule_prop {#1} \l_tmpa_tl { \tl_if_blank:VF \l_tmpa_tl { \tl_gset_eq:NN \g_insr_layout_footer_separator_style_tl \l_tmpa_tl } }
+      }
+      { \msg_warning:nnn { insr } { unknown-theme } {#1} }
+  }
+\prg_new_conditional:Npnn \insr_theme_if_exist:n #1 { T, F, TF }
+  { \prop_if_in:NnTF \g__insr_theme_registry_prop {#1} { \prg_return_true: } { \prg_return_false: } }
+\cs_new_protected:Npn \insr_fontset_register:nn #1#2
+  {
+    \tl_clear:N \l__insr_fontset_fallback_tl
+    \keys_set:nn { insr/fontset } {#2}
+    \prop_gput:Nnn \g__insr_fontset_registry_prop {#1} {#2}
+    \prop_gput:NnV \g__insr_fontset_fallback_prop {#1} \l__insr_fontset_fallback_tl
+  }
+\cs_new_protected:Npn \insr_fontset_activate:n #1
+  {
+    \prop_if_in:NnTF \g__insr_fontset_registry_prop {#1}
+      { \tl_gset:Nn \g_insr_font_tl {#1} }
+      {
+        \prop_get:NnNTF \g__insr_fontset_fallback_prop {#1} \l_tmpa_tl
+          { \msg_warning:nnxx { insr } { unknown-fontset } {#1} {\tl_use:N \l_tmpa_tl} \tl_gset_eq:NN \g_insr_font_tl \l_tmpa_tl }
+          { \msg_warning:nnnn { insr } { unknown-fontset } {#1} {libertinus} \tl_gset:Nn \g_insr_font_tl { libertinus } }
+      }
+  }
+\NewDocumentCommand \INSRRegisterPlugin { m m } { \insr_plugin_register:nn {#1} {#2} }
+\NewDocumentCommand \INSRUsePlugin { m } { \insr_plugin_load:n {#1} }
+\NewDocumentCommand \INSRPluginIfLoadedTF { m m m } { \insr_plugin_if_loaded:nTF {#1} {#2} {#3} }
+\NewDocumentCommand \INSRUseFontset { m } { \insr_fontset_activate:n {#1} }
+\NewDocumentCommand \INSRUseTheme { m } { \insr_theme_activate:n {#1} }
+
 \DeclareRobustCommand{\INSRMakeTitle}{\ifcsname __insr_adapter_make_title:\endcsname\csname __insr_adapter_make_title:\endcsname\else\ClassError{insr}{Mandatory adapter title renderer missing}{The selected adapter did not define \string\__insr_adapter_make_title:.}\fi}
 \DeclareRobustCommand{\INSRRenderDocument}{\ifcsname __insr_template_render:\endcsname\csname __insr_template_render:\endcsname\else\ClassWarning{insr}{INSRRenderDocument called before template finalisation; using emergency renderer}\par\noindent INSR template renderer unavailable.\par\fi}
-\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
+\DeclareRobustCommand{\INSRSelectTarget}[1]{\msg_warning:nnn { insr } { deprecated-command } { \string\INSRSelectTarget } \__insr_set_legacy_target:n {#1}}
+\DeclareRobustCommand{\INSRPublicAPIBanner}{\typeout{INSR v4 public API exports: \\INSRBootstrap, \\INSRSelectTarget, \\INSRMakeTitle, \\INSRRenderDocument, \\INSRShowResolvedConfiguration}}
 \ExplSyntaxOff
 \endinput

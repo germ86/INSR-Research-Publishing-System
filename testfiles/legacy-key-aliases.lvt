@@ -1,0 +1,21 @@
+\input{regression-test.tex}
+\START
+\RequirePackage{insr-core}
+\RequirePackage{insr-config}
+\INSRConfigure{build/preset=position-paper, metadata/title={Regression Title}, localization/language=zz-ZZ}
+\csname insr_resolve_document_type:\endcsname
+\typeout{INSR-TEST canonical-config type=\csname tl_use:N\endcsname\csname g_insr_document_type_tl\endcsname\space target=\csname tl_use:N\endcsname\csname g_insr_output_target_tl\endcsname\space title=\csname tl_use:N\endcsname\csname g_insr_title_tl\endcsname}
+\INSRSelectTarget{rct-protocol}
+\csname insr_resolve_document_type:\endcsname
+\typeout{INSR-TEST legacy-target type=\csname tl_use:N\endcsname\csname g_insr_document_type_tl\endcsname\space target=\csname tl_use:N\endcsname\csname g_insr_output_target_tl\endcsname}
+\INSRConfigure{build/preset=does-not-exist}
+\INSRUseTheme{medical}
+\typeout{INSR-TEST theme medical palette=\csname tl_use:N\endcsname\csname g_insr_palette_tl\endcsname\space font=\csname tl_use:N\endcsname\csname g_insr_font_tl\endcsname\space header=\csname tl_use:N\endcsname\csname g_insr_layout_header_separator_style_tl\endcsname}
+\INSRUseTheme{does-not-exist}
+\INSRUsePlugin{neuro}
+\INSRPluginIfLoadedTF{accessibility}{\typeout{INSR-TEST dependency-loaded accessibility}}{\typeout{INSR-TEST dependency-missing accessibility}}
+\INSRPluginIfLoadedTF{neuro}{\typeout{INSR-TEST plugin-loaded neuro}}{\typeout{INSR-TEST plugin-missing neuro}}
+\INSRUsePlugin{neuro}
+\INSRUseFontset{inter}
+\typeout{INSR-TEST fontset font=\csname tl_use:N\endcsname\csname g_insr_font_tl\endcsname}
+\END
