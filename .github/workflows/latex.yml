@@ -3,14 +3,18 @@ name: Build LaTeX
 on:
   push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
   build:
-    name: compatibility-gate
     runs-on: ubuntu-latest
     steps:
-      - name: Delegate to authoritative CI
-        run: |
-          echo "The full INSR validation matrix lives in .github/workflows/ci.yml."
-          echo "This compatibility workflow preserves the historical Build LaTeX status without duplicating the TeX matrix."
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: |
+            main.tex
+            examples/paper-demo.tex
+            examples/beamer-demo.tex
+            examples/manual-demo.tex
+          latexmk_use_lualatex: true
+          extra_system_packages: py3-pygments

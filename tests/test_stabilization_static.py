@@ -107,8 +107,9 @@ class StabilizationStaticTests(unittest.TestCase):
     def test_legacy_latex_workflow_status_is_preserved(self):
         workflow = self.read(".github/workflows/latex.yml")
         self.assertIn("name: Build LaTeX", workflow)
-        self.assertIn("compatibility workflow", workflow)
-        self.assertIn(".github/workflows/ci.yml", workflow)
+        self.assertIn("xu-cheng/latex-action@v3", workflow)
+        self.assertIn("examples/paper-demo.tex", workflow)
+        self.assertIn("latexmk_use_lualatex: true", workflow)
 
     def test_multi_output_content_fields_have_runtime_fallbacks(self):
         content = self.read("tex/latex/insr/insr-content.sty")
