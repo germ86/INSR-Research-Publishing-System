@@ -29,6 +29,20 @@
 \cs_new_protected:Npn \__insr_typography_set_mono_font:nn #1#2
   { \__insr_typography_set_role_font:nnnnn \setmonofont {#1} {#2} { Latin~Modern~Mono } { mono } }
 
+% Typography preset files may be read while packages such as babel/fontspec adjust
+% category-code state. Expose stable public wrappers so presets do not depend on
+% private expl3 command-token parsing after a previous font setup call.
+\cs_new_protected:Npn \INSRSetMainFont #1#2
+  { \__insr_typography_set_main_font:nn {#1} {#2} }
+\cs_new_protected:Npn \INSRSetSansFont #1#2
+  { \__insr_typography_set_sans_font:nn {#1} {#2} }
+\cs_new_protected:Npn \INSRSetMonoFont #1#2
+  { \__insr_typography_set_mono_font:nn {#1} {#2} }
+\cs_new_protected:Npn \INSRSetArabicFont
+  { \__insr_typography_set_arabic_font: }
+\cs_new_protected:Npn \INSRSetHebrewFont
+  { \__insr_typography_set_hebrew_font: }
+
 \cs_new_protected:Npn \__insr_typography_set_arabic_font:
   {
     \IfFontExistsTF { Amiri }
