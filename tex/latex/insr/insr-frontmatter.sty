@@ -1,0 +1,77 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{insr-frontmatter}[2026/07/16 INSR publication front matter]
+\ExplSyntaxOn
+\cs_new:Npn \__insr_review_blind_p:
+  { \bool_lazy_or_p:nn { \str_if_eq_p:Vn \g_insr_publication_review_tl { blind } } { \str_if_eq_p:Vn \g_insr_publication_review_tl { double-blind } } }
+\cs_new:Npn \__insr_blank_p:n #1 { \tl_if_blank_p:e { \tl_trim_spaces:n {#1} } }
+\prg_new_conditional:Npnn \__insr_if_blank:n #1 { T, F, TF } { \tl_if_blank:eTF { \tl_trim_spaces:n {#1} } { \prg_return_true: } { \prg_return_false: } }
+\cs_new:Npn \__insr_doi_valid_p: { \bool_lazy_and_p:nn { ! \tl_if_blank_p:V \g_insr_publication_doi_tl } { ! \str_if_eq_p:Vn \g_insr_publication_doi_tl { pending } } }
+\cs_new:Npn \__insr_doi_label:
+  { \tl_if_blank:VTF \g_insr_publication_doi_tl { } { DOI:~\str_case:VnF \g_insr_publication_doi_tl { {pending}{Pending} {to~be~assigned}{Pending} } { \tl_use:N \g_insr_publication_doi_tl } } }
+\cs_new:Npn \__insr_running_title:
+  { \tl_if_blank:VTF \g_insr_short_title_tl { \tl_range:Nnn \g_insr_title_tl {1} {70} } { \tl_use:N \g_insr_short_title_tl } }
+\NewDocumentCommand \INSRRunningTitle {} { \__insr_running_title: }
+\NewDocumentCommand \INSRDOILabel {} { \__insr_doi_label: }
+\cs_new_protected:Npn \__insr_frontmatter_line:nn #1#2 { \par\noindent\textbf{#1:}~#2 }
+\cs_new_protected:Npn \__insr_frontmatter_optional:nn #1#2 { \par\medskip\noindent\textbf{#1}\par #2\par }
+\cs_new_protected:Npn \__insr_metadata_row:nn #1#2 { #1 & #2 \\ }
+\cs_new_protected:Npn \__insr_frontmatter_line_if_tl:Nn #1#2 { \tl_if_blank:VF #1 { \__insr_frontmatter_line:nn {#2} {\tl_use:N #1} } }
+\cs_new_protected:Npn \__insr_frontmatter_optional_if_tl:Nn #1#2 { \tl_if_blank:VF #1 { \__insr_frontmatter_optional:nn {#2} {\tl_use:N #1} } }
+\cs_new_protected:Npn \__insr_metadata_row_if_tl:Nn #1#2 { \tl_if_blank:VF #1 { \__insr_metadata_row:nn {#2} {\tl_use:N #1} } }
+\cs_new_protected:Npn \__insr_frontmatter_author_contributions:
+  {
+    \tl_if_blank:VTF \g_insr_author_contributions_tl
+      { \insr_credit_has_valid:T { \__insr_frontmatter_optional:nn {Author~contributions} {\insr_credit_block:} } }
+      { \__insr_frontmatter_optional:nn {Author~contributions} {\tl_use:N \g_insr_author_contributions_tl} }
+  }
+\cs_new_protected:Npn \__insr_metadata_panel:
+  {
+    \par\medskip\noindent\begingroup\small\setlength{\tabcolsep}{.6em}
+    \begin{tabularx}{\linewidth}{@{}>{\bfseries\color{INSRTextMuted}}lX@{}}
+      \__insr_metadata_row_if_tl:Nn \g_insr_publication_version_tl {Version}
+      \__insr_metadata_row_if_tl:Nn \g_insr_publication_status_tl {Status}
+      \__insr_metadata_row_if_tl:Nn \g_insr_publication_date_tl {Published}
+      \tl_if_blank:VF \g_insr_publication_doi_tl { \__insr_metadata_row:nn {DOI} {\str_case:VnF \g_insr_publication_doi_tl { {pending}{Pending} {to~be~assigned}{Pending} } {\tl_use:N\g_insr_publication_doi_tl}} }
+      \tl_if_blank:VF \g_insr_publication_repository_tl { \__insr_metadata_row:nn {Repository} {\url{\tl_use:N\g_insr_publication_repository_tl}} }
+      \__insr_metadata_row_if_tl:Nn \g_insr_publication_license_tl {License}
+    \end{tabularx}\endgroup\par
+    \__insr_frontmatter_line:nn {Suggested~citation} {\insr_suggested_citation:}
+  }
+\cs_new_protected:Npn \__insr_frontmatter_render_scientific:n #1
+  {
+    \hypersetup{pageanchor=false}
+    \begin{titlepage}
+      \INSRPageStyleTitle
+      \centering
+      {\sffamily\bfseries\Large\MakeUppercase{\tl_use:N\g_insr_publication_type_tl}\par}
+      \vspace{1.2cm}
+      {\Huge\bfseries \tl_use:N\g_insr_title_tl\par}
+      \tl_if_blank:VF \g_insr_subtitle_tl {\vspace{.45cm}{\Large \tl_use:N\g_insr_subtitle_tl\par}}
+      \vspace{.8cm}
+      \bool_if:nTF { \__insr_review_blind_p: }
+        {{\large Anonymous~manuscript\par}\vspace{.35cm}{\small Author, affiliation, funding and competing-interest metadata suppressed for review.\par}}
+        {{\large \insr_author_title_block:\par}\vspace{.25cm}{\small \insr_affiliation_title_block:\par}}
+      \vfill
+      \begin{minipage}{.88\textwidth}
+        \__insr_metadata_panel:
+        \bool_if:nF { \__insr_review_blind_p: }
+          { \__insr_frontmatter_author_contributions: \__insr_frontmatter_line_if_tl:Nn \g_insr_funding_statement_tl {Funding} \__insr_frontmatter_line_if_tl:Nn \g_insr_conflict_statement_tl {Conflict~of~interest} }
+        \__insr_frontmatter_line_if_tl:Nn \g_insr_ethics_statement_tl {Ethics}
+      \end{minipage}
+    \end{titlepage}
+    \str_case:Vn \g_insr_layout_page_numbering_tl { {body-only}{\setcounter{page}{1}} {frontmatter-roman}{\pagenumbering{roman}\setcounter{page}{1}} }
+    \hypersetup{pageanchor=true}
+    \INSRPageStyleMain
+    \__insr_frontmatter_optional_if_tl:Nn \g_insr_highlights_tl {Highlights}
+    \__insr_frontmatter_optional_if_tl:Nn \g_insr_key_messages_tl {Key~messages}
+    \__insr_frontmatter_optional_if_tl:Nn \g_insr_data_availability_tl {Data~availability}
+    \__insr_frontmatter_optional_if_tl:Nn \g_insr_code_availability_tl {Code~availability}
+    \bool_if:NT \g_insr_frontmatter_toc_bool { \INSRTableOfContents }
+  }
+\cs_new_protected:Npn \__insr_frontmatter_render_paper: { \__insr_frontmatter_render_scientific:n {Paper} }
+\cs_new_protected:Npn \__insr_frontmatter_render_report: { \__insr_frontmatter_render_scientific:n {Report} }
+\cs_new_protected:Npn \__insr_frontmatter_render_book: { \frontmatter \__insr_frontmatter_render_scientific:n {Book} \mainmatter }
+\cs_new_protected:Npn \__insr_frontmatter_render_manual: { \__insr_frontmatter_render_scientific:n {Manual} }
+\cs_new_protected:Npn \__insr_frontmatter_render_thesis: { \frontmatter \__insr_frontmatter_render_scientific:n {Thesis} \mainmatter }
+\ExplSyntaxOff
+\endinput

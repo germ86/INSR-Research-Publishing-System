@@ -1,16 +1,8 @@
-\documentclass[blindreview]{insr-paper}
-\addbibresource{../references.bib}
-\title{Blind-Review INSR Paper Demo}
-\INSRAddAuthor[1]{Named Author}{Named Institution}
+\documentclass[config/load-project=false, document/type=paper,metadata/title={Blind Review INSR Paper Demo},metadata/author={Named Author},metadata/institution={Named Institution}]{insr}
 \begin{document}
-\maketitle
-\begin{INSRStructuredAbstract}
-\item[Background] C-PTSD research requires state-sensitive designs.
-\item[Methods] This template demonstrates blind-review author masking.
-\item[Conclusion] The class supports journal-oriented submissions.
-\end{INSRStructuredAbstract}
-\section{Example}
-Acronyms such as \gls{hrv}, \gls{rmssd}, and \gls{eda} are managed centrally.
-\printglossary[type=\acronymtype]
-\printbibliography
+\INSRMakeTitle
+\INSRAbstract{C-PTSD research requires state-sensitive designs. This template demonstrates v4 paper output.}
+\INSRSection{Example}
+Acronyms such as \gls{hrv} and \gls{eda} are managed centrally.
+\INSRPrintBibliography
 \end{document}

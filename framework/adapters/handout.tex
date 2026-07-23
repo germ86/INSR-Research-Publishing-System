@@ -1,0 +1,18 @@
+% Handout adapter: Beamer handout output with handout-first content fallbacks.
+\input{framework/adapters/slides.tex}
+\ExplSyntaxOn
+\cs_set_protected:Npn \__insr_adapter_render_content_unit:
+  {
+    \begin{frame}{\tl_use:N \l_insr_unit_title_tl}
+    \__insr_render_first_available:n { handout,summary,full,key }
+    \tl_if_blank:VF \l_insr_unit_key_tl { \par\medskip\textbf{Key~message:}~\tl_use:N \l_insr_unit_key_tl }
+    \end{frame}
+  }
+\cs_set_protected:Npn \__insr_adapter_bibliography:n #1
+  {
+    \begin{frame}[allowframebreaks]{Handout~References}
+    \footnotesize
+    \__insr_print_bibliography:n {#1}
+    \end{frame}
+  }
+\ExplSyntaxOff
