@@ -1,3 +1,4 @@
+import importlib
 import re
 import unittest
 from pathlib import Path
@@ -30,11 +31,24 @@ class AdapterRuntimeStaticTests(unittest.TestCase):
         self.assertEqual(adapters["submission-package"], "submission-package")
         self.assertEqual(adapters["web"], "web")
 
+        registry = self.read("config/target-registry.tex")
+        self.assertIn(r"\INSRRegisterOutputTarget{handout}{base=beamer, adapter=handout, class-options=handout}", registry)
+        self.assertIn(r"\INSRRegisterOutputTarget{executive-brief}{base=scrartcl, adapter=executive-brief}", registry)
+        self.assertIn(r"\INSRRegisterOutputTarget{submission-package}{base=scrartcl, adapter=submission-package}", registry)
+        self.assertIn(r"\INSRRegisterOutputTarget{web}{base=scrartcl, adapter=web}", registry)
+
     def test_integrity_reports_specialized_target_fallbacks_without_inherited_noise(self):
         import sys
         tools = ROOT / "tools"
         sys.path.insert(0, str(tools))
         import insr_integrity
+        insr_integrity = importlib.reload(insr_integrity)
+
+        integrity_source = self.read("tools/insr_integrity.py")
+        self.assertIn('"handout": ["handout", "summary", "full", "key"]', integrity_source)
+        self.assertIn('"executive-brief": ["executive", "summary", "full", "key"]', integrity_source)
+        self.assertIn("_adapter_declared_fallbacks", integrity_source)
+        self.assertIn('noise = {"notes", "internal_comments"}', integrity_source)
 
         self.assertEqual(insr_integrity.adapter_fields("handout", "handout"), ["full", "handout", "key", "summary"])
         self.assertNotIn("notes", insr_integrity.adapter_fields("handout", "handout"))
@@ -52,6 +66,7 @@ class AdapterRuntimeStaticTests(unittest.TestCase):
             with self.subTest(adapter=adapter):
                 text = self.read(f"framework/adapters/{adapter}.tex")
                 self.assertIn(fallback, text)
+                self.assertIn(f"% fallbacks: {fallback}", text)
                 self.assertIn("__insr_adapter_render_content_unit", text)
 
 

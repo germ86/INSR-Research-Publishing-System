@@ -90,7 +90,46 @@ def _adapter_runtime_text(adapter_name: str, seen: set[str] | None = None) -> st
     return "\n".join(chunks)
 
 
+def _adapter_declared_fallbacks(adapter_name: str) -> list[str]:
+    path = ROOT / "framework" / "adapters" / f"{adapter_name}.tex"
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"(?mi)^\s*%\s*fallbacks\s*:\s*([a-z0-9_,\-\s]+)$", text)
+    if not match:
+        return []
+    return [field.strip() for field in match.group(1).split(",") if field.strip()]
+
+
+def _clean_fields(fields: list[str], explicit_fields: list[str] | None = None) -> list[str]:
+    explicit = set(explicit_fields or [])
+    noise = {"notes", "internal_comments"}
+    clean: list[str] = []
+    for field in fields:
+        if field in noise and field not in explicit:
+            continue
+        if field and field not in clean:
+            clean.append(field)
+    return clean
+
+
 def adapter_fields(adapter_name: str, output_target: str | None = None) -> list[str]:
+    # Specialized output targets can include generic adapters, but their runtime
+    # field set is defined by the target-specific fallback chain. Keep these
+    # checks ahead of adapter text scanning so inherited helpers (for example
+    # slide speaker notes) do not leak into handout/integrity reports.
+    target_fallbacks = {
+        "handout": ["handout", "summary", "full", "key"],
+        "poster": ["poster", "summary", "key", "full"],
+        "executive-brief": ["executive", "summary", "full", "key"],
+        "submission-package": ["full", "summary", "key"],
+        "web": ["summary", "full", "key"],
+    }
+    if output_target in target_fallbacks:
+        declared = _adapter_declared_fallbacks(adapter_name)
+        fields = declared or target_fallbacks[output_target]
+        return sorted(_clean_fields(fields, declared))
+
     runtime_text = _adapter_runtime_text(adapter_name)
     fields = []
     for field, command in CONTENT_FIELD_COMMANDS.items():
@@ -118,7 +157,7 @@ def adapter_fields(adapter_name: str, output_target: str | None = None) -> list[
     }
     if "__insr_render_content_unit_block" in runtime_text and output_target in block_fallbacks:
         fields.extend(block_fallbacks[output_target])
-    return sorted(set(fields))
+    return sorted(dict.fromkeys(fields))
 
 
 def build_report() -> dict[str, Any]:

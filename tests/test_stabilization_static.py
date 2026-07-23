@@ -107,9 +107,11 @@ class StabilizationStaticTests(unittest.TestCase):
     def test_legacy_latex_workflow_status_is_preserved(self):
         workflow = self.read(".github/workflows/latex.yml")
         self.assertIn("name: Build LaTeX", workflow)
-        self.assertIn("xu-cheng/latex-action@v3", workflow)
-        self.assertIn("examples/paper-demo.tex", workflow)
-        self.assertIn("latexmk_use_lualatex: true", workflow)
+        self.assertIn(".github/workflows/ci.yml", workflow)
+        self.assertIn("historical Build LaTeX status", workflow)
+        self.assertNotIn("xu-cheng/latex-action", workflow)
+        self.assertNotIn("root_file:", workflow)
+        self.assertNotIn("latexmk_use_lualatex", workflow)
 
     def test_multi_output_content_fields_have_runtime_fallbacks(self):
         content = self.read("tex/latex/insr/insr-content.sty")
@@ -117,10 +119,14 @@ class StabilizationStaticTests(unittest.TestCase):
             self.assertIn(token, content)
         self.assertIn("__insr_render_first_available:n", content)
         slides = self.read("framework/adapters/slides.tex")
+        handout = self.read("framework/adapters/handout.tex")
         poster = self.read("framework/adapters/poster.tex")
-        self.assertIn("handout,summary,full,key", slides)
+        executive = self.read("framework/adapters/executive-brief.tex")
+        self.assertIn("summary,key,full", slides)
         self.assertIn(r"\note", slides)
+        self.assertIn("handout,summary,full,key", handout)
         self.assertIn("poster,summary,key,full", poster)
+        self.assertIn("executive,summary,full,key", executive)
 
     def test_typography_font_helpers_exist(self):
         typography = self.read("tex/latex/insr/insr-typography.sty")
@@ -128,11 +134,22 @@ class StabilizationStaticTests(unittest.TestCase):
             "__insr_typography_set_main_font:nn",
             "__insr_typography_set_sans_font:nn",
             "__insr_typography_set_mono_font:nn",
+            "INSRSetMainFont",
+            "INSRSetSansFont",
+            "INSRSetMonoFont",
+            "INSRSetArabicFont",
+            "INSRSetHebrewFont",
         ):
             self.assertIn(helper, typography)
         self.assertIn(r"\setmainfont", typography)
         self.assertIn(r"\setsansfont", typography)
         self.assertIn(r"\setmonofont", typography)
+
+    def test_typography_presets_use_public_font_wrappers(self):
+        for preset in (ROOT / "typography").glob("*.tex"):
+            text = preset.read_text(encoding="utf-8")
+            self.assertNotIn("\\__insr_typography_set_", text, preset.name)
+            self.assertNotIn("\\bool_lazy_or:nnT", text, preset.name)
 
     def test_test_runner_uses_isolated_compile_output_dirs_and_log_checks(self):
         runner = self.read("tests/run-tests.sh")
