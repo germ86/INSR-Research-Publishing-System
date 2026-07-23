@@ -1,0 +1,24 @@
+\documentclass[
+  config/load-project=false,
+  document/type=slides,
+  design/theme=editorial,
+  design/palette=neuroclinical,
+  design/font=libertinus,
+  localization/language=english,
+  metadata/title={INSR Slides Regression}
+]{insr}
+
+\begin{document}
+\INSRMakeTitle
+
+\begin{INSRContentUnit}[
+  id=test-slide-unit,
+  title={Test Slide Unit},
+  outputs={slides}
+]
+\INSRFullText{Long-form text should not be the primary slide representation.}
+\INSRSummary{Short slide summary.}
+\INSRKeyMessage{Key slide message.}
+\end{INSRContentUnit}
+
+\end{document}

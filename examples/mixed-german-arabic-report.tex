@@ -1,3 +1,6 @@
-\documentclass{../insr}
-\INSRSetup{document-type=report,language=ngerman,title={Gemischtsprachiger Bericht}}
-\begin{document}\INSRBeginDocument\INSRMakeTitle\INSRSection{Kontext}Deutscher Text mit arabischem Einschub: \INSRMixed{arabic}{مرحبا بكم}.\end{document}
+\documentclass[config/load-project=false, metadata/author={INSR Example Author}, metadata/institution={INSR Example Institution}, document/type=report,localization/language=ngerman,metadata/title={Gemischtsprachiger Bericht}]{insr}
+\begin{document}
+\INSRMakeTitle
+\INSRChapter{Einleitung}
+Deutscher Berichtstext mit arabischem Einschub: \INSRRTL{نص عربي قصير}.
+\end{document}

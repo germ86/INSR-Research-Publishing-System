@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://insr.example/schema/insr-project.schema.json",
+  "title": "INSR project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "project": {"type":"object","additionalProperties":false,"properties":{"title":{"type":"string"},"language":{"type":"string"}}},
+    "build": {"type":"object","additionalProperties":false,"properties":{"preset":{"type":"string"}}},
+    "design": {"type":"object","additionalProperties":false,"properties":{"theme":{"type":"string"}}},
+    "typography": {"type":"object","additionalProperties":false,"properties":{"fontset":{"type":"string"}}},
+    "metadata": {"type":"object","additionalProperties":true,"properties":{"authors":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string"},"orcid":{"type":"string","pattern":"^\\d{4}-\\d{4}-\\d{4}-\\d{3}[0-9X]$"},"affiliations":{"type":"array","items":{"type":"string"}}}}}}}
+  }
+}

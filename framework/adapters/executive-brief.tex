@@ -1,0 +1,12 @@
+% Executive brief adapter: concise article-style rendering with executive-first fallbacks.
+\input{framework/adapters/common-document.tex}
+\ExplSyntaxOn
+\cs_set_protected:Npn \__insr_adapter_make_title: { \__insr_frontmatter_render_paper: }
+\cs_set_protected:Npn \__insr_adapter_chapter:n #1 { \section{#1} }
+\cs_set_protected:Npn \__insr_adapter_render_content_unit:
+  {
+    \INSRSection{\tl_use:N \l_insr_unit_title_tl}
+    \__insr_render_first_available:n { executive,summary,full,key }
+    \tl_if_blank:VF \l_insr_unit_key_tl { \par\medskip\noindent\textbf{Key~message:}~\tl_use:N \l_insr_unit_key_tl\par }
+  }
+\ExplSyntaxOff
