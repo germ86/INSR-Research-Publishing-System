@@ -3,18 +3,18 @@ name: Build LaTeX
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: xu-cheng/latex-action@v3
-        with:
-          root_file: |
-            main.tex
-            examples/paper-demo.tex
-            examples/beamer-demo.tex
-            examples/manual-demo.tex
-          latexmk_use_lualatex: true
-          extra_system_packages: py3-pygments
+      - name: Delegate to INSR validation workflow
+        shell: bash
+        run: |
+          echo "The authoritative LuaLaTeX, l3build, CTAN smoke and installed-package checks live in .github/workflows/ci.yml."
+          echo "This compatibility workflow preserves the historical Build LaTeX status while avoiding a second, divergent LaTeX toolchain."
+          echo "Use the INSR validation workflow for merge-blocking diagnostics."
