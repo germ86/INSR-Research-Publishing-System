@@ -73,7 +73,6 @@
         \babelfont[#1]{rm}[Script=#2,Scale=1.05]{#3}
         \babelfont[#1]{sf}[Script=#2,Scale=1.05]{#3}
         \babelfont[#1]{tt}[Script=#2,Scale=1.05]{#3}
-        \ExplSyntaxOn
       }
   }
 \cs_new_protected:Npn \__insr_load_typography: { \__insr_load_file_with_fallback:nnn { typography/\tl_use:N\g_insr_font_tl.tex } { typography } { \msg_warning:nnx { insr } { unknown-font } { \tl_use:N\g_insr_font_tl } \file_input:n { typography/libertinus.tex } } }
