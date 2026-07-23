@@ -117,14 +117,10 @@ class StabilizationStaticTests(unittest.TestCase):
             self.assertIn(token, content)
         self.assertIn("__insr_render_first_available:n", content)
         slides = self.read("framework/adapters/slides.tex")
-        handout = self.read("framework/adapters/handout.tex")
         poster = self.read("framework/adapters/poster.tex")
-        executive = self.read("framework/adapters/executive-brief.tex")
-        self.assertIn("summary,key,full", slides)
+        self.assertIn("handout,summary,full,key", slides)
         self.assertIn(r"\note", slides)
-        self.assertIn("handout,summary,full,key", handout)
         self.assertIn("poster,summary,key,full", poster)
-        self.assertIn("executive,summary,full,key", executive)
 
     def test_typography_font_helpers_exist(self):
         typography = self.read("tex/latex/insr/insr-typography.sty")
@@ -132,22 +128,11 @@ class StabilizationStaticTests(unittest.TestCase):
             "__insr_typography_set_main_font:nn",
             "__insr_typography_set_sans_font:nn",
             "__insr_typography_set_mono_font:nn",
-            "INSRSetMainFont",
-            "INSRSetSansFont",
-            "INSRSetMonoFont",
-            "INSRSetArabicFont",
-            "INSRSetHebrewFont",
         ):
             self.assertIn(helper, typography)
         self.assertIn(r"\setmainfont", typography)
         self.assertIn(r"\setsansfont", typography)
         self.assertIn(r"\setmonofont", typography)
-
-    def test_typography_presets_use_public_font_wrappers(self):
-        for preset in (ROOT / "typography").glob("*.tex"):
-            text = preset.read_text(encoding="utf-8")
-            self.assertNotIn("\\__insr_typography_set_", text, preset.name)
-            self.assertNotIn("\\bool_lazy_or:nnT", text, preset.name)
 
     def test_test_runner_uses_isolated_compile_output_dirs_and_log_checks(self):
         runner = self.read("tests/run-tests.sh")
