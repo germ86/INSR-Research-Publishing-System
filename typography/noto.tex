@@ -1,13 +1,7 @@
 % INSR typography preset: noto
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\__insr_typography_set_main_font:nn { TeX~Gyre~Pagella } { Latin~Modern~Roman }}
-\__insr_typography_set_sans_font:nn { Noto~Sans } { TeX~Gyre~Heros }
-\__insr_typography_set_mono_font:nn { Noto~Sans~Mono } { Latin~Modern~Mono }
-\bool_lazy_or:nnT
-  { \str_if_eq_p:Vn \g_insr_language_tl { arabic } }
-  { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \__insr_typography_set_arabic_font: }
-\bool_lazy_or:nnT
-  { \str_if_eq_p:Vn \g_insr_language_tl { hebrew } }
-  { \str_if_eq_p:Vn \g_insr_direction_tl { rtl } }
-  { \__insr_typography_set_hebrew_font: }
+\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{\INSRSetMainFont { TeX~Gyre~Pagella } { Latin~Modern~Roman }}
+\INSRSetSansFont { Noto~Sans } { TeX~Gyre~Heros }
+\INSRSetMonoFont { Noto~Sans~Mono } { Latin~Modern~Mono }
+\INSRSetArabicFont
+\INSRSetHebrewFont
