@@ -1,0 +1,16 @@
+name: Build LaTeX
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: compatibility-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delegate to authoritative CI
+        run: |
+          echo "The full INSR validation matrix lives in .github/workflows/ci.yml."
+          echo "This compatibility workflow preserves the historical Build LaTeX status without duplicating the TeX matrix."

@@ -104,6 +104,12 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertIn("unzip -l", ci)
         self.assertIn("upload-artifact", ci)
 
+    def test_legacy_latex_workflow_status_is_preserved(self):
+        workflow = self.read(".github/workflows/latex.yml")
+        self.assertIn("name: Build LaTeX", workflow)
+        self.assertIn("compatibility workflow", workflow)
+        self.assertIn(".github/workflows/ci.yml", workflow)
+
     def test_multi_output_content_fields_have_runtime_fallbacks(self):
         content = self.read("tex/latex/insr/insr-content.sty")
         for token in ("handout,summary,full,key", "poster,summary,key,full", "executive,summary,full,key", "clinical,safety,full,summary,key", "methods,limitations,full,summary,key"):
