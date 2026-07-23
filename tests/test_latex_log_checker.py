@@ -40,6 +40,7 @@ class LatexLogCheckerTests(unittest.TestCase):
             "! Emergency stop.\n",
             "Fatal error occurred, no output PDF file produced!\n",
             "No output PDF file produced!\n",
+            "Missing character: There is no ש (U+05E9) in font LatinModernSans!\n",
         ]
         for error in errors:
             with self.subTest(error=error):

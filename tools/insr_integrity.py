@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
 from insr_registry import load_registry, targets_from_registry, validate_registry
+import check_latex_log
+import insr_build
 
 ROOT = Path(__file__).resolve().parents[1]
 STATUS_ORDER = {"supported": 0, "experimental": 1, "incomplete": 2, "legacy": 3, "broken": 4}
@@ -74,16 +75,49 @@ def max_status(a: str, b: str) -> str:
     return a if STATUS_ORDER[a] >= STATUS_ORDER[b] else b
 
 
-def adapter_fields(adapter_name: str) -> list[str]:
+def _adapter_runtime_text(adapter_name: str, seen: set[str] | None = None) -> str:
+    seen = seen or set()
+    if adapter_name in seen:
+        return ""
+    seen.add(adapter_name)
     path = ROOT / "framework" / "adapters" / f"{adapter_name}.tex"
-    text = path.read_text(encoding="utf-8") if path.exists() else ""
-    content = (ROOT / "tex" / "latex" / "insr" / "insr-content.sty").read_text(encoding="utf-8")
-    combined = text + "\n" + content
+    if not path.exists():
+        return ""
+    text = path.read_text(encoding="utf-8")
+    chunks = [text]
+    for included in re.findall(r"\\input\{framework/adapters/([^}]+)\.tex\}", text):
+        chunks.append(_adapter_runtime_text(included, seen))
+    return "\n".join(chunks)
+
+
+def adapter_fields(adapter_name: str, output_target: str | None = None) -> list[str]:
+    runtime_text = _adapter_runtime_text(adapter_name)
     fields = []
     for field, command in CONTENT_FIELD_COMMANDS.items():
-        tl_name = f"l_insr_unit_{field if field != 'key' else 'key'}_tl"
-        if command in combined or field in combined or tl_name in combined:
+        tl_name = f"l_insr_unit_{field}_tl"
+        if command in runtime_text or tl_name in runtime_text:
             fields.append(field)
+            continue
+        if re.search(rf"(?<![A-Za-z]){re.escape(field)}(?![A-Za-z])", runtime_text):
+            fields.append(field)
+
+    # Block adapters delegate the field decision to insr-content.sty. Report the
+    # runtime fallback chain for the concrete output target instead of attributing
+    # every content API field to every adapter.
+    block_fallbacks = {
+        "paper": ["full", "summary", "key"],
+        "article": ["full", "summary", "key"],
+        "report": ["full", "summary", "key"],
+        "book": ["full", "summary", "key"],
+        "thesis": ["full", "summary", "key"],
+        "manual": ["clinical", "safety", "full", "summary", "key"],
+        "executive-brief": ["executive", "summary", "full", "key"],
+        "submission-package": ["full", "summary", "key"],
+        "web": ["full", "summary", "key"],
+        "letter": ["full", "summary", "key"],
+    }
+    if "__insr_render_content_unit_block" in runtime_text and output_target in block_fallbacks:
+        fields.extend(block_fallbacks[output_target])
     return sorted(set(fields))
 
 
@@ -114,7 +148,7 @@ def build_report() -> dict[str, Any]:
         reasons = docs[info["type"]]["reasons"] + outputs[info["target"]]["reasons"]
         combos[name] = {**info, "status": status, "reasons": reasons}
 
-    fields_by_adapter = {name: adapter_fields(info.get("adapter", "")) for name, info in registry["output_targets"].items()}
+    fields_by_adapter = {name: adapter_fields(info.get("adapter", ""), name) for name, info in registry["output_targets"].items()}
     return {
         "summary": {
             "document_type_count": len(registry["document_types"]),
@@ -154,13 +188,16 @@ def compile_combinations(report: dict[str, Any], names: list[str] | None) -> int
     names = names or sorted(report["combinations"])
     rc = 0
     for name in names:
-        proc = subprocess.run([sys.executable, "tools/insr_build.py", "build", name], cwd=ROOT)
-        rc = proc.returncode or rc
-        if proc.returncode == 0:
-            log = ROOT / "build" / name / "main.log"
-            if log.exists():
-                check = subprocess.run([sys.executable, "tools/check_latex_log.py", str(log)], cwd=ROOT)
-                rc = check.returncode or rc
+        build_rc = insr_build.build(name)
+        rc = build_rc or rc
+        if build_rc == 0:
+            log = insr_build.log_path_for(name)
+            problems = check_latex_log.check(log)
+            if problems:
+                print("INSR LaTeX log validation failed")
+                for problem in problems:
+                    print(f"- {problem}")
+                rc = 1
     return rc
 
 

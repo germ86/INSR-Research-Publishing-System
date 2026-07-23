@@ -3,66 +3,108 @@
 from __future__ import annotations
 
 import argparse
-import os
+import hashlib
+import re
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
 from insr_registry import load_registry, targets_from_registry
 from overleaf_doctor import ROOT, check_source, check_target
 
-ACTIVE = ROOT / "config" / "active-target.tex"
+CONFIG_HASH_PATHS = (ROOT / "config", ROOT / "main.tex")
 
 
-def _atomic_write(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
-    with os.fdopen(fd, "w", encoding="utf-8") as handle:
-        handle.write(text)
-    os.replace(tmp_name, path)
+def _safe_name(name: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "-", name).strip("-") or "default"
 
 
-def write_active(combination: str) -> str | None:
-    targets = targets_from_registry()
-    if combination not in targets:
+def compile_root(combination: str) -> Path:
+    return ROOT / "build" / "compile" / _safe_name(combination)
+
+
+def driver_path_for(combination: str) -> Path:
+    return compile_root(combination) / "driver.tex"
+
+
+def output_dir_for(combination: str) -> Path:
+    return compile_root(combination) / "out"
+
+
+def log_path_for(combination: str) -> Path:
+    return output_dir_for(combination) / "driver.log"
+
+
+def build_log_path_for(combination: str) -> Path:
+    return compile_root(combination) / "build.log"
+
+
+def _tracked_config_files() -> list[Path]:
+    paths: list[Path] = []
+    try:
+        proc = subprocess.run(
+            ["git", "ls-files", "config", "main.tex"],
+            cwd=ROOT,
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        paths = [ROOT / line.strip() for line in proc.stdout.splitlines() if line.strip()]
+    except (OSError, subprocess.CalledProcessError):
+        for root in CONFIG_HASH_PATHS:
+            if root.is_file():
+                paths.append(root)
+            elif root.is_dir():
+                paths.extend(path for path in root.rglob("*") if path.is_file())
+    return sorted(set(paths))
+
+
+def versioned_config_hashes() -> dict[str, str]:
+    hashes: dict[str, str] = {}
+    for path in _tracked_config_files():
+        if not path.exists():
+            hashes[str(path.relative_to(ROOT))] = "<missing>"
+            continue
+        hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return hashes
+
+
+def assert_versioned_config_unchanged(before: dict[str, str]) -> None:
+    after = versioned_config_hashes()
+    if before != after:
+        changed = sorted(set(before) | set(after))
+        delta = [name for name in changed if before.get(name) != after.get(name)]
+        raise RuntimeError("versioned configuration mutated during build: " + ", ".join(delta))
+
+
+def write_driver(combination: str) -> Path:
+    if combination not in targets_from_registry():
         raise KeyError(combination)
-    info = targets[combination]
-    old = ACTIVE.read_text(encoding="utf-8") if ACTIVE.exists() else None
-    text = (
-        "% Temporary document/output selection written by tools/insr_build.py\n"
-        "\\INSRBootstrap{\n"
-        f"  document/type = {info['type']},\n"
-        f"  output/target = {info['target']}\n"
-        "}\n"
+    root = compile_root(combination)
+    root.mkdir(parents=True, exist_ok=True)
+    driver = driver_path_for(combination)
+    driver.write_text(
+        "% Generated, ignored INSR build driver. Do not edit or commit.\n"
+        f"\\documentclass[config/load-project=false,build/preset={combination}]{{insr}}\n"
+        "\\begin{document}\n"
+        "\\INSRMakeTitle\n"
+        "\\INSRRenderDocument\n"
+        "\\end{document}\n",
+        encoding="utf-8",
     )
-    _atomic_write(ACTIVE, text)
-    return old
-
-
-def restore_active(old: str | None) -> None:
-    if old is None:
-        ACTIVE.unlink(missing_ok=True)
-    else:
-        _atomic_write(ACTIVE, old)
-
-
-def _clean_root_aux() -> None:
-    for suffix in [
-        "aux", "toc", "out", "bcf", "bbl", "blg", "run.xml", "fdb_latexmk",
-        "fls", "log", "nav", "snm", "synctex.gz", "vrb",
-    ]:
-        (ROOT / f"main.{suffix}").unlink(missing_ok=True)
+    return driver
 
 
 def run_latexmk(combination: str) -> int:
-    _clean_root_aux()
-    outdir = ROOT / "build" / combination
+    root = compile_root(combination)
+    outdir = output_dir_for(combination)
     if outdir.exists():
         shutil.rmtree(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
+    driver = write_driver(combination)
     if shutil.which("latexmk") is None:
-        (outdir / "build.log").write_text("latexmk not found; build not executed\n", encoding="utf-8")
+        build_log_path_for(combination).write_text("latexmk not found; build not executed\n", encoding="utf-8")
         print("latexmk not found")
         return 127
     cmd = [
@@ -72,10 +114,10 @@ def run_latexmk(combination: str) -> int:
         "-file-line-error",
         "-halt-on-error",
         f"-outdir={outdir}",
-        "main.tex",
+        str(driver),
     ]
     proc = subprocess.run(cmd, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    (outdir / "build.log").write_text(proc.stdout, encoding="utf-8")
+    build_log_path_for(combination).write_text(proc.stdout, encoding="utf-8")
     return proc.returncode
 
 
@@ -84,11 +126,11 @@ def build(combination: str) -> int:
     if combination not in targets:
         print(f"unknown registered combination: {combination}")
         return 1
-    old = write_active(combination)
+    before = versioned_config_hashes()
     try:
         return run_latexmk(combination)
     finally:
-        restore_active(old)
+        assert_versioned_config_unchanged(before)
 
 
 def validate(combination: str | None = None) -> int:

@@ -60,6 +60,24 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertTrue((ROOT / "config/fontset-registry.tex").is_file())
 
 
+    def test_each_typography_preset_is_registered(self):
+        registry = self.read("config/fontset-registry.tex")
+        registered = set(re.findall(r"\\insr_fontset_register:nn \{ ([^}]+) \}", registry))
+        presets = {path.stem for path in (ROOT / "typography").glob("*.tex")}
+        self.assertTrue(presets)
+        self.assertTrue(presets.issubset(registered), presets - registered)
+
+    def test_public_configuration_commands_preserve_explsyntax_state(self):
+        config = self.read("tex/latex/insr/insr-config.sty")
+        for command in ("INSRConfigure", "INSRBootstrap", "INSRProfileDefaults"):
+            match = re.search(rf"\\NewDocumentCommand \\{command} [^\n]+", config)
+            self.assertIsNotNone(match, command)
+            body = match.group(0)
+            self.assertIn("\\keys_set:nn", body)
+            self.assertNotIn("\\ExplSyntaxOn", body)
+            self.assertNotIn("\\ExplSyntaxOff", body)
+
+
     def test_registered_themes_have_runtime_files(self):
         registry = self.read("config/theme-registry.tex")
         registered = re.findall(r"\\insr_theme_register:nn \{ ([^}]+) \}", registry)
@@ -85,6 +103,13 @@ class StabilizationStaticTests(unittest.TestCase):
         self.assertIn("bash scripts/test-installed-package.sh", ci)
         self.assertIn("unzip -l", ci)
         self.assertIn("upload-artifact", ci)
+
+    def test_legacy_latex_workflow_status_is_preserved(self):
+        workflow = self.read(".github/workflows/latex.yml")
+        self.assertIn("name: Build LaTeX", workflow)
+        self.assertIn("xu-cheng/latex-action@v3", workflow)
+        self.assertIn("examples/paper-demo.tex", workflow)
+        self.assertIn("latexmk_use_lualatex: true", workflow)
 
     def test_multi_output_content_fields_have_runtime_fallbacks(self):
         content = self.read("tex/latex/insr/insr-content.sty")
