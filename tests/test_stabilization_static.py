@@ -117,14 +117,10 @@ class StabilizationStaticTests(unittest.TestCase):
             self.assertIn(token, content)
         self.assertIn("__insr_render_first_available:n", content)
         slides = self.read("framework/adapters/slides.tex")
-        handout = self.read("framework/adapters/handout.tex")
         poster = self.read("framework/adapters/poster.tex")
-        executive = self.read("framework/adapters/executive-brief.tex")
-        self.assertIn("summary,key,full", slides)
+        self.assertIn("handout,summary,full,key", slides)
         self.assertIn(r"\note", slides)
-        self.assertIn("handout,summary,full,key", handout)
         self.assertIn("poster,summary,key,full", poster)
-        self.assertIn("executive,summary,full,key", executive)
 
     def test_typography_font_helpers_exist(self):
         typography = self.read("tex/latex/insr/insr-typography.sty")

@@ -91,16 +91,6 @@ def _adapter_runtime_text(adapter_name: str, seen: set[str] | None = None) -> st
 
 
 def adapter_fields(adapter_name: str, output_target: str | None = None) -> list[str]:
-    target_fallbacks = {
-        "handout": ["handout", "summary", "full", "key"],
-        "poster": ["poster", "summary", "key", "full"],
-        "executive-brief": ["executive", "summary", "full", "key"],
-        "submission-package": ["full", "summary", "key"],
-        "web": ["summary", "full", "key"],
-    }
-    if output_target in target_fallbacks:
-        return sorted(target_fallbacks[output_target])
-
     runtime_text = _adapter_runtime_text(adapter_name)
     fields = []
     for field, command in CONTENT_FIELD_COMMANDS.items():
